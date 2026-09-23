@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sign in — UniConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/tokens.css">
+<style>
+  /* --- Layout --- */
+  .auth {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 900px) {
+    .auth { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* --- Brand panel --- */
+  .brand {
+    display: none;
+    background: #0c0a09;
+    color: #fafaf9;
+    padding: var(--space-8);
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  @media (min-width: 900px) { .brand { display: flex; } }
+
+  .brand__mark {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-weight: 600;
+    font-size: var(--text-md);
+    letter-spacing: -0.01em;
+  }
+  .brand__mark svg { color: #818cf8; }
+
+  .brand__pitch {
+    max-width: 34ch;
+  }
+  .brand__pitch h1 {
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: -0.025em;
+    margin-bottom: var(--space-4);
+  }
+  .brand__pitch h1 span { color: #818cf8; }
+  .brand__pitch p {
+    color: #a8a29e;
+    font-size: var(--text-md);
+    line-height: var(--leading-snug);
+  }
+
+  .brand__foot {
+    font-size: var(--text-sm);
+    color: #78716c;
+  }
+
+  /* --- Form panel --- */
+  .form-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6) var(--space-4);
+    background: var(--bg);
+  }
+  @media (min-width: 900px) {
+    .form-panel { padding: var(--space-8); }
+  }
+
+  .form-wrap {
+    width: 100%;
+    max-width: var(--container-narrow);
+  }
+
+  /* Mobile brand header */
+  .form-wrap__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-weight: 600;
+    font-size: var(--text-md);
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-6);
+    color: var(--text);
+  }
+  .form-wrap__brand svg { color: var(--brand); }
+  @media (min-width: 900px) { .form-wrap__brand { display: none; } }
+
+  /* --- Tabs --- */
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--bg-sunken);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 3px;
+    margin-bottom: var(--space-6);
+  }
+  .tab {
+    appearance: none;
+    border: none;
+    background: transparent;
+    padding: 0.55rem 0.75rem;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-muted);
+    border-radius: calc(var(--radius-md) - 3px);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 40px;
+  }
+  .tab[aria-selected="true"] {
+    background: var(--bg-elevated);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  /* --- Fields --- */
+  h2.form-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-bottom: var(--space-2);
+  }
+  p.form-sub {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-5);
+  }
+
+  .field { margin-bottom: var(--space-4); }
+  .field label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: var(--space-2);
+  }
+  .field input {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    color: var(--text);
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 46px;
+  }
+  .field input::placeholder { color: var(--text-subtle); }
+  .field input:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
+  }
+
+  .field--pw { position: relative; }
+  .field--pw input { padding-right: 2.75rem; }
+  .pw-toggle {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .pw-toggle:hover { color: var(--text); background: var(--bg-sunken); }
+
+  /* --- Submit --- */
+  .submit {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--brand);
+    color: var(--brand-fg);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 46px;
+    margin-top: var(--space-2);
+  }
+  .submit:hover:not(:disabled) { background: var(--brand-hover); }
+  .submit:active:not(:disabled) { background: var(--brand-active); }
+  .submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  /* --- Alerts --- */
+  .alert {
+    display: none;
+    padding: 0.7rem 0.9rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-4);
+    line-height: var(--leading-snug);
+  }
+  .alert--error {
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
+    color: var(--danger);
+    border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
+  }
+  .alert--success {
+    background: color-mix(in srgb, var(--success) 10%, transparent);
+    color: var(--success);
+    border: 1px solid color-mix(in srgb, var(--success) 25%, transparent);
+  }
+  .alert[data-show] { display: block; }
+
+  /* --- Panels --- */
+  .panel { display: none; }
+  .panel[data-active] { display: block; }
+
+  .foot-note {
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: var(--space-5);
+  }
+  .foot-note button {
+    background: none;
+    border: none;
+    color: var(--brand);
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+  }
+  .foot-note button:hover { color: var(--brand-hover); }
+
+  /* --- Session debug box --- */
+  .session-box {
+    margin-top: var(--space-5);
+    padding: var(--space-4);
+    background: var(--bg-sunken);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    white-space: pre-wrap;
+    word-break: break-all;
+    display: none;
+  }
+  .session-box[data-show] { display: block; }
+</style>
+</head>
+<body>
+
+<div class="auth">
+
+  <!-- Brand panel (desktop) -->
+  <aside class="brand">
+    <div class="brand__mark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+      </svg>
+      UniConnect
+    </div>
+    <div class="brand__pitch">
+      <h1>Every corner of campus, <span>one sign-in.</span></h1>
+      <p>Announcements, coursework, and conversation — organised by the role you hold.</p>
+    </div>
+    <div class="brand__foot">
+      &copy; 2026 UniConnect
+    </div>
+  </aside>
+
+  <!-- Form panel -->
+  <main class="form-panel">
+    <div class="form-wrap">
+
+      <div class="form-wrap__brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+        UniConnect
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" data-mode="signin" id="tab-signin">Sign in</button>
+        <button class="tab" role="tab" aria-selected="false" data-mode="signup" id="tab-signup">Create account</button>
+      </div>
+
+      <div class="alert" id="alert" role="alert"></div>
+
+      <!-- Sign in -->
+      <section class="panel" data-active id="panel-signin">
+        <h2 class="form-title">Welcome back</h2>
+        <p class="form-sub">Sign in with your institutional email to continue.</p>
+
+        <form id="form-signin" novalidate>
+          <div class="field">
+            <label for="signin-email">Email</label>
+            <input type="email" id="signin-email" autocomplete="email" required placeholder="you@abu.edu.ng">
+          </div>
+          <div class="field field--pw">
+            <label for="signin-password">Password</label>
+            <input type="password" id="signin-password" autocomplete="current-password" required minlength="8" placeholder="Your password">
+            <button type="button" class="pw-toggle" data-target="signin-password" aria-label="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <button type="submit" class="submit" id="btn-signin">Sign in</button>
+        </form>
+
+        <p class="foot-note">New here? <button type="button" data-goto="signup">Create an account</button></p>
+      </section>
+
+      <!-- Sign up -->
+      <section class="panel" id="panel-signup">
+        <h2 class="form-title">Create your account</h2>
+        <p class="form-sub">Use your institutional email. You'll confirm it before signing in.</p>
+
+        <form id="form-signup" novalidate>
+          <div class="field">
+            <label for="signup-name">Full name</label>
+            <input type="text" id="signup-name" autocomplete="name" required placeholder="Hadi Eze">
+          </div>
+          <div class="field">
+            <label for="signup-email">Email</label>
+            <input type="email" id="signup-email" autocomplete="email" required placeholder="you@abu.edu.ng">
+          </div>
+          <div class="field field--pw">
+            <label for="signup-password">Password</label>
+            <input type="password" id="signup-password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
+            <button type="button" class="pw-toggle" data-target="signup-password" aria-label="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <button type="submit" class="submit" id="btn-signup">Create account</button>
+        </form>
+
+        <p class="foot-note">Already have an account? <button type="button" data-goto="signin">Sign in</button></p>
+      </section>
+
+      <!-- Session debug — shown after a successful auth so we can verify -->
+      <pre class="session-box" id="session-box"></pre>
+
+    </div>
+  </main>
+
+</div>
+
+<script type="module">
+  import { supabase } from '../js/supabase.js';
+
+  // ---------- DOM ----------
+  const tabs        = document.querySelectorAll('.tab');
+  const panelIn     = document.getElementById('panel-signin');
+  const panelUp     = document.getElementById('panel-signup');
+  const alertEl     = document.getElementById('alert');
+  const sessionBox  = document.getElementById('session-box');
+
+  // ---------- Helpers ----------
+  function showAlert(kind, msg) {
+    alertEl.className = 'alert alert--' + kind;
+    alertEl.textContent = msg;
+    alertEl.dataset.show = '1';
+  }
+  function clearAlert() {
+    alertEl.removeAttribute('data-show');
+  }
+  function setMode(mode) {
+    tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.mode === mode)));
+    panelIn.toggleAttribute('data-active', mode === 'signin');
+    panelUp.toggleAttribute('data-active', mode === 'signup');
+    clearAlert();
+  }
+  function setBusy(btn, busy, label) {
+    btn.disabled = busy;
+    btn.textContent = busy ? 'Working…' : label;
+  }
+
+  // ---------- Tabs ----------
+  tabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode)));
+  document.querySelectorAll('[data-goto]').forEach(b =>
+    b.addEventListener('click', () => setMode(b.dataset.goto))
+  );
+
+  // ---------- Password visibility ----------
+  document.querySelectorAll('.pw-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    });
+  });
+
+  // ---------- Sign in ----------
+  document.getElementById('form-signin').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearAlert();
+
+    const email    = document.getElementById('signin-email').value.trim();
+    const password = document.getElementById('signin-password').value;
+    const btn      = document.getElementById('btn-signin');
+
+    if (!email || !password) {
+      showAlert('error', 'Enter your email and password.');
+      return;
+    }
+
+    setBusy(btn, true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      await onAuthenticated(data.session);
+    } catch (err) {
+      showAlert('error', err.message || 'Sign in failed.');
+    } finally {
+      setBusy(btn, false, 'Sign in');
+    }
+  });
+
+  // ---------- Sign up ----------
+  document.getElementById('form-signup').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearAlert();
+
+    const fullName = document.getElementById('signup-name').value.trim();
+    const email    = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const btn      = document.getElementById('btn-signup');
+
+    if (!fullName || !email || !password) {
+      showAlert('error', 'Fill in all fields.');
+      return;
+    }
+    if (password.length < 8) {
+      showAlert('error', 'Password must be at least 8 characters.');
+      return;
+    }
+
+    setBusy(btn, true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName } },
+      });
+      if (error) throw error;
+
+      if (data.session) {
+        // Email confirmation disabled — signed in immediately
+        await onAuthenticated(data.session);
+      } else {
+        // Confirmation required
+        showAlert('success', 'Account created. Check your email to confirm before signing in.');
+        setMode('signin');
+        document.getElementById('signin-email').value = email;
+      }
+    } catch (err) {
+      showAlert('error', err.message || 'Sign up failed.');
+    } finally {
+      setBusy(btn, false, 'Create account');
+    }
+  });
+
+  // ---------- Post-auth ----------
+  async function onAuthenticated(session) {
+    sessionBox.textContent =
+      'Authenticated.\n' +
+      '  user.id:    ' + session.user.id + '\n' +
+      '  user.email: ' + session.user.email + '\n' +
+      '  expires:    ' + new Date(session.expires_at * 1000).toISOString();
+    sessionBox.setAttribute('data-show', '1');
+    showAlert('success', 'Signed in. Dashboard comes in Step 11.');
+  }
+
+  // ---------- Resume session if already signed in ----------
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) await onAuthenticated(session);
+
+</script>
+
+</body>
+</html>
