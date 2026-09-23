@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Groups — UniConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/tokens.css">
+<style>
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-3) var(--space-5);
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); min-height: 56px;
+  }
+  .topbar__brand {
+    display: flex; align-items: center; gap: var(--space-2);
+    font-weight: 600; font-size: var(--text-base);
+    letter-spacing: -0.01em; color: var(--text);
+  }
+  .topbar__brand svg { color: var(--brand); }
+  .topbar__right { display: flex; align-items: center; gap: var(--space-2); }
+  .btn-ghost {
+    appearance: none; background: transparent;
+    border: 1px solid var(--border); color: var(--text-muted);
+    padding: 0.45rem 0.85rem; border-radius: var(--radius-md);
+    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
+    transition: all var(--duration-fast) var(--ease); min-height: 36px;
+    text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .btn-ghost:hover {
+    border-color: var(--border-strong); color: var(--text);
+    background: var(--bg-elevated);
+  }
+  .btn-primary {
+    appearance: none; background: var(--brand); color: var(--brand-fg);
+    border: none; padding: 0.55rem 1rem;
+    border-radius: var(--radius-md); font-size: var(--text-sm);
+    font-weight: 500; cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 38px; display: inline-flex;
+    align-items: center; gap: var(--space-2);
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-6) var(--space-4); }
+  @media (min-width: 640px) { .wrap { padding: var(--space-8) var(--space-6); } }
+
+  .head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;
+  }
+  .head h1 {
+    font-size: var(--text-2xl); font-weight: 600;
+    letter-spacing: -0.02em; line-height: var(--leading-tight);
+    margin-bottom: var(--space-2);
+  }
+  @media (min-width: 640px) { .head h1 { font-size: var(--text-3xl); } }
+  .head p { color: var(--text-muted); font-size: var(--text-base); }
+
+  .section { margin-bottom: var(--space-8); }
+  .section__head {
+    display: flex; align-items: center; gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .section__head h2 {
+    font-size: var(--text-md); font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .section__count {
+    font-size: var(--text-xs); color: var(--text-muted);
+    background: var(--bg-sunken);
+    padding: 0.1rem 0.5rem; border-radius: var(--radius-full);
+  }
+
+  .list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+  .grp {
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: var(--space-4);
+    transition: border-color var(--duration-fast) var(--ease);
+  }
+  .grp:hover { border-color: var(--border-strong); }
+  .grp__row { display: flex; gap: var(--space-4); align-items: flex-start; }
+  .grp__avatar {
+    width: 44px; height: 44px; border-radius: var(--radius-md);
+    background: var(--brand-subtle); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--text-md); font-weight: 600;
+    flex-shrink: 0; text-transform: uppercase;
+  }
+  .grp__body { flex: 1; min-width: 0; }
+  .grp__meta {
+    display: flex; align-items: center; gap: var(--space-2);
+    margin-bottom: var(--space-2); flex-wrap: wrap;
+    font-size: var(--text-xs); color: var(--text-subtle);
+  }
+  .grp__type {
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 0.15rem 0.5rem; border-radius: var(--radius-full);
+  }
+  .type--interest   { background: #f5f5f4; color: #57534e; }
+  .type--department { background: #dbeafe; color: #1e40af; }
+  .type--faculty    { background: #e0e7ff; color: #3730a3; }
+  .type--level      { background: #dcfce7; color: #166534; }
+  .type--course     { background: #fef3c7; color: #92400e; }
+  .type--study      { background: #fee2e2; color: #991b1b; }
+  @media (prefers-color-scheme: dark) {
+    .type--interest   { background: #292524; color: #a8a29e; }
+    .type--department { background: #172554; color: #93c5fd; }
+    .type--faculty    { background: #1e1b4b; color: #a5b4fc; }
+    .type--level      { background: #052e16; color: #86efac; }
+    .type--course     { background: #451a03; color: #fcd34d; }
+    .type--study      { background: #450a0a; color: #fca5a5; }
+  }
+  .grp__name {
+    font-size: var(--text-md); font-weight: 600;
+    letter-spacing: -0.01em; line-height: var(--leading-snug);
+    margin-bottom: var(--space-1);
+    overflow-wrap: anywhere;
+  }
+  .grp__desc {
+    font-size: var(--text-sm); color: var(--text-muted);
+    line-height: var(--leading-snug);
+    overflow-wrap: anywhere;
+  }
+  .grp__actions { display: flex; gap: var(--space-2); flex-shrink: 0; }
+
+  .btn-sm {
+    padding: 0.35rem 0.75rem; border-radius: var(--radius-md);
+    font-size: var(--text-xs); font-weight: 500; cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 32px; display: inline-flex;
+    align-items: center; gap: var(--space-1);
+    border: 1px solid transparent;
+  }
+  .btn-sm:disabled { opacity: 0.5; cursor: wait; }
+  .btn-join  { background: var(--brand); color: var(--brand-fg); border-color: var(--brand); }
+  .btn-join:hover:not(:disabled)  { background: var(--brand-hover); }
+  .btn-leave {
+    background: transparent; color: var(--text-muted);
+    border-color: var(--border);
+  }
+  .btn-leave:hover:not(:disabled) { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, transparent); }
+
+  .state { padding: var(--space-8) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
+  .state[hidden] { display: none; }
+  .state--error { color: var(--danger); }
+  .state--empty {
+    padding: var(--space-6) var(--space-4);
+    background: var(--bg-sunken); border-radius: var(--radius-lg);
+    border: 1px dashed var(--border-strong);
+  }
+  .state p { max-width: 44ch; margin: 0 auto; }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: var(--space-4);
+    opacity: 0; pointer-events: none;
+    transition: opacity var(--duration) var(--ease);
+  }
+  .modal-backdrop[data-open] { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); width: 100%; max-width: 500px;
+    max-height: 90vh; overflow-y: auto; padding: var(--space-6);
+    transform: translateY(12px); transition: transform var(--duration) var(--ease);
+  }
+  .modal-backdrop[data-open] .modal { transform: translateY(0); }
+  .modal h2 {
+    font-size: var(--text-lg); font-weight: 600;
+    letter-spacing: -0.01em; margin-bottom: var(--space-2);
+  }
+  .modal .sub { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-5); }
+  .modal .field { margin-bottom: var(--space-4); }
+  .modal label {
+    display: block; font-size: var(--text-sm);
+    font-weight: 500; color: var(--text); margin-bottom: var(--space-2);
+  }
+  .modal input[type="text"], .modal textarea, .modal select {
+    width: 100%; padding: 0.7rem 0.85rem;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-md); font-size: var(--text-base);
+    color: var(--text); transition: all var(--duration-fast) var(--ease);
+  }
+  .modal input:focus, .modal textarea:focus, .modal select:focus {
+    border-color: var(--brand); outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
+  }
+  .modal textarea { min-height: 80px; resize: vertical; font-family: inherit; line-height: var(--leading-base); }
+
+  .modal-alert {
+    display: none; padding: 0.7rem 0.9rem;
+    border-radius: var(--radius-md); font-size: var(--text-sm);
+    margin-bottom: var(--space-4); line-height: var(--leading-snug);
+    overflow-wrap: anywhere;
+  }
+  .modal-alert[data-show] { display: block; }
+  .modal-alert--error {
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
+    color: var(--danger);
+    border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
+  }
+
+  .modal-actions {
+    display: flex; gap: var(--space-3);
+    margin-top: var(--space-5); justify-content: flex-end;
+  }
+  @media (max-width: 480px) { .modal-actions { flex-direction: column-reverse; } }
+  .btn-danger {
+    appearance: none; background: transparent; color: var(--danger);
+    border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);
+    padding: 0.55rem 1rem; border-radius: var(--radius-md);
+    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
+    transition: all var(--duration-fast) var(--ease); min-height: 38px;
+  }
+  .btn-danger:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+
+  .toast {
+    position: fixed; bottom: var(--space-4); left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: var(--bg);
+    padding: 0.65rem 1rem; border-radius: var(--radius-md);
+    font-size: var(--text-sm); font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none;
+    transition: all var(--duration) var(--ease); z-index: 60;
+    max-width: 90vw; text-align: center;
+  }
+  .toast[data-show] { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast[data-kind="error"] { background: var(--danger); color: white; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+    </svg>
+    UniConnect
+  </div>
+  <div class="topbar__right">
+    <a class="btn-ghost" href="dashboard.html">Dashboard</a>
+    <a class="btn-ghost" href="announcements.html">Announcements</a>
+    <button class="btn-ghost" id="btn-signout">Sign out</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="head">
+    <div>
+      <h1>Groups</h1>
+      <p>Communities within your institution.</p>
+    </div>
+    <button class="btn-primary" id="btn-create" hidden>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      Create
+    </button>
+  </div>
+
+  <div class="state state--error" id="state-error" hidden></div>
+  <div class="state" id="state-loading">Loading…</div>
+
+  <section class="section" id="section-mine" hidden>
+    <div class="section__head">
+      <h2>Your groups</h2>
+      <span class="section__count" id="count-mine">0</span>
+    </div>
+    <div class="list" id="list-mine"></div>
+  </section>
+
+  <section class="section" id="section-discover" hidden>
+    <div class="section__head">
+      <h2>Discover</h2>
+      <span class="section__count" id="count-discover">0</span>
+    </div>
+    <div class="list" id="list-discover"></div>
+  </section>
+
+</main>
+
+<!-- Create modal -->
+<div class="modal-backdrop" id="modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h2 id="modal-title">Create a group</h2>
+    <p class="sub">Visible to everyone at your institution.</p>
+
+    <div class="modal-alert modal-alert--error" id="modal-alert"></div>
+
+    <form id="form-create">
+      <div class="field">
+        <label for="f-name">Name</label>
+        <input type="text" id="f-name" required maxlength="80" placeholder="e.g. Study Group — Physics">
+      </div>
+      <div class="field">
+        <label for="f-type">Type</label>
+        <select id="f-type" required>
+          <option value="interest">Interest</option>
+          <option value="study">Study</option>
+          <option value="department">Department</option>
+          <option value="faculty">Faculty</option>
+          <option value="level">Level</option>
+          <option value="course">Course</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-desc">Description <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
+        <textarea id="f-desc" maxlength="400" placeholder="What is this group for?"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-danger" id="btn-cancel">Cancel</button>
+        <button type="submit" class="btn-primary" id="btn-submit">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { supabase } from '../js/supabase.js';
+
+  const $ = (id) => document.getElementById(id);
+  let allGroups = [];      // every group in the institution
+  let myGroupIds = new Set();
+  let currentProfile = null;
+
+  // ---- Auth guard ----
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.replace('login.html'); throw new Error('unauthenticated'); }
+
+  // ---- Profile ----
+  const { data: profile, error: pErr } = await supabase
+    .from('profiles')
+    .select('id, full_name, role, institution_id')
+    .eq('id', session.user.id)
+    .single();
+
+  if (pErr) { showError('Could not load profile: ' + pErr.message); throw pErr; }
+  currentProfile = profile;
+
+  const canCreate = ['lecturer','staff','hod','admin','leadership'].includes(profile.role);
+  if (canCreate && profile.institution_id) $('btn-create').hidden = false;
+
+  // ---- Helpers ----
+  function escapeHtml(s) {
+    return String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function initials(name) {
+    return (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+  }
+  function toast(msg, kind) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.setAttribute('data-show', '1');
+    if (kind) el.setAttribute('data-kind', kind); else el.removeAttribute('data-kind');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.removeAttribute('data-show'), 3500);
+  }
+  function showError(msg) {
+    $('state-loading').hidden = true;
+    $('state-error').textContent = msg;
+    $('state-error').hidden = false;
+  }
+
+  // ---- Load ----
+  async function load() {
+    // 1. Every group in the institution, with a member count.
+    const { data: groups, error: gErr } = await supabase
+      .from('groups')
+      .select(`
+        id, name, description, type, created_at,
+        group_members ( count )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (gErr) { showError('Could not load groups: ' + gErr.message); return; }
+
+    allGroups = (groups || []).map(g => ({
+      ...g,
+      member_count: Array.isArray(g.group_members) && g.group_members[0]
+        ? g.group_members[0].count
+        : 0,
+    }));
+
+    // 2. Which ones am I in?
+    const { data: mine, error: mErr } = await supabase
+      .from('group_members')
+      .select('group_id')
+      .eq('user_id', session.user.id);
+
+    if (mErr) { showError('Could not load your memberships: ' + mErr.message); return; }
+
+    myGroupIds = new Set((mine || []).map(r => r.group_id));
+
+    $('state-loading').hidden = true;
+    render();
+  }
+
+  // ---- Render ----
+  function groupCard(g, isMine) {
+    const memberLabel = g.member_count === 1 ? '1 member' : `${g.member_count} members`;
+    const action = isMine
+      ? `<button class="btn-sm btn-leave" data-action="leave" data-id="${g.id}">Leave</button>`
+      : `<button class="btn-sm btn-join"  data-action="join"  data-id="${g.id}">Join</button>`;
+
+    return `
+      <article class="grp">
+        <div class="grp__row">
+          <div class="grp__avatar">${escapeHtml(initials(g.name))}</div>
+          <div class="grp__body">
+            <div class="grp__meta">
+              <span class="grp__type type--${escapeHtml(g.type)}">${escapeHtml(g.type)}</span>
+              <span>·</span>
+              <span>${memberLabel}</span>
+            </div>
+            <h3 class="grp__name">${escapeHtml(g.name)}</h3>
+            ${g.description ? `<p class="grp__desc">${escapeHtml(g.description)}</p>` : ''}
+          </div>
+          <div class="grp__actions">${action}</div>
+        </div>
+      </article>
+    `;
+  }
+
+  function render() {
+    const mine = allGroups.filter(g => myGroupIds.has(g.id));
+    const discover = allGroups.filter(g => !myGroupIds.has(g.id));
+
+    // Mine
+    $('section-mine').hidden = false;
+    $('count-mine').textContent = mine.length;
+    $('list-mine').innerHTML = mine.length
+      ? mine.map(g => groupCard(g, true)).join('')
+      : `<div class="state state--empty"><p>You haven't joined any groups yet. Pick one from Discover below.</p></div>`;
+
+    // Discover
+    $('section-discover').hidden = false;
+    $('count-discover').textContent = discover.length;
+    $('list-discover').innerHTML = discover.length
+      ? discover.map(g => groupCard(g, false)).join('')
+      : `<div class="state state--empty"><p>You're already in every group at your institution.</p></div>`;
+  }
+
+  // ---- Join / Leave (event-delegated) ----
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+
+    const action = btn.dataset.action;
+    const groupId = btn.dataset.id;
+    btn.disabled = true;
+    const prev = btn.textContent;
+    btn.textContent = action === 'join' ? 'Joining…' : 'Leaving…';
+
+    try {
+      if (action === 'join') {
+        const { error } = await supabase.from('group_members').insert({
+          group_id: groupId,
+          user_id: session.user.id,
+        });
+        if (error) throw error;
+        toast('Joined.');
+      } else if (action === 'leave') {
+        const { error } = await supabase
+          .from('group_members')
+          .delete()
+          .eq('group_id', groupId)
+          .eq('user_id', session.user.id);
+        if (error) throw error;
+        toast('Left.');
+      }
+      await load();
+    } catch (err) {
+      toast(err.message || 'Action failed', 'error');
+      btn.disabled = false;
+      btn.textContent = prev;
+    }
+  });
+
+  // ---- Create modal ----
+  function openModal() {
+    $('modal-alert').removeAttribute('data-show');
+    $('form-create').reset();
+    $('modal').setAttribute('data-open', '1');
+    $('modal').setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => $('f-name').focus(), 50);
+  }
+  function closeModal() {
+    $('modal').removeAttribute('data-open');
+    $('modal').setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  $('btn-create').addEventListener('click', openModal);
+  $('btn-cancel').addEventListener('click', closeModal);
+  $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal();
+  });
+
+  // ---- Create submit ----
+  $('form-create').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const alertEl = $('modal-alert');
+    const btn = $('btn-submit');
+    alertEl.removeAttribute('data-show');
+
+    const name = $('f-name').value.trim();
+    const type = $('f-type').value;
+    const desc = $('f-desc').value.trim();
+
+    if (!name) { alertEl.textContent = 'Name is required.'; alertEl.setAttribute('data-show','1'); return; }
+    if (!currentProfile.institution_id) {
+      alertEl.textContent = 'Your account is not assigned to an institution.';
+      alertEl.setAttribute('data-show','1'); return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Creating…';
+
+    try {
+      // Insert the group.
+      const { data: created, error: gErr } = await supabase
+        .from('groups')
+        .insert({
+          institution_id: currentProfile.institution_id,
+          name,
+          description: desc || null,
+          type,
+          created_by: currentProfile.id,
+        })
+        .select('id')
+        .single();
+
+      if (gErr) throw gErr;
+
+      // Creator auto-joins.
+      const { error: mErr } = await supabase.from('group_members').insert({
+        group_id: created.id,
+        user_id: session.user.id,
+        role: 'moderator',
+      });
+      if (mErr) throw mErr;
+
+      closeModal();
+      toast('Group created.');
+      await load();
+    } catch (err) {
+      alertEl.textContent = err.message || 'Could not create group.';
+      alertEl.setAttribute('data-show','1');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Create';
+    }
+  });
+
+  // ---- Sign out ----
+  $('btn-signout').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    window.location.replace('login.html');
+  });
+
+  load();
+</script>
+
+</body>
+</html>
