@@ -241,22 +241,6 @@
     padding: 0;
   }
   .foot-note button:hover { color: var(--brand-hover); }
-
-  /* --- Session debug box --- */
-  .session-box {
-    margin-top: var(--space-5);
-    padding: var(--space-4);
-    background: var(--bg-sunken);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--text-muted);
-    white-space: pre-wrap;
-    word-break: break-all;
-    display: none;
-  }
-  .session-box[data-show] { display: block; }
 </style>
 </head>
 <body>
@@ -326,7 +310,7 @@
       <!-- Sign up -->
       <section class="panel" id="panel-signup">
         <h2 class="form-title">Create your account</h2>
-        <p class="form-sub">Use your institutional email. You'll confirm it before signing in.</p>
+        <p class="form-sub">Use your institutional email to get started.</p>
 
         <form id="form-signup" novalidate>
           <div class="field">
@@ -350,9 +334,6 @@
         <p class="foot-note">Already have an account? <button type="button" data-goto="signin">Sign in</button></p>
       </section>
 
-      <!-- Session debug — shown after a successful auth so we can verify -->
-      <pre class="session-box" id="session-box"></pre>
-
     </div>
   </main>
 
@@ -362,11 +343,10 @@
   import { supabase } from '../js/supabase.js';
 
   // ---------- DOM ----------
-  const tabs        = document.querySelectorAll('.tab');
-  const panelIn     = document.getElementById('panel-signin');
-  const panelUp     = document.getElementById('panel-signup');
-  const alertEl     = document.getElementById('alert');
-  const sessionBox  = document.getElementById('session-box');
+  const tabs    = document.querySelectorAll('.tab');
+  const panelIn = document.getElementById('panel-signin');
+  const panelUp = document.getElementById('panel-signup');
+  const alertEl = document.getElementById('alert');
 
   // ---------- Helpers ----------
   function showAlert(kind, msg) {
@@ -418,12 +398,11 @@
 
     setBusy(btn, true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      await onAuthenticated(data.session);
+      onAuthenticated();
     } catch (err) {
       showAlert('error', err.message || 'Sign in failed.');
-    } finally {
       setBusy(btn, false, 'Sign in');
     }
   });
@@ -457,35 +436,27 @@
       if (error) throw error;
 
       if (data.session) {
-        // Email confirmation disabled — signed in immediately
-        await onAuthenticated(data.session);
+        onAuthenticated();
       } else {
-        // Confirmation required
         showAlert('success', 'Account created. Check your email to confirm before signing in.');
         setMode('signin');
         document.getElementById('signin-email').value = email;
+        setBusy(btn, false, 'Create account');
       }
     } catch (err) {
       showAlert('error', err.message || 'Sign up failed.');
-    } finally {
       setBusy(btn, false, 'Create account');
     }
   });
 
   // ---------- Post-auth ----------
-  async function onAuthenticated(session) {
-    sessionBox.textContent =
-      'Authenticated.\n' +
-      '  user.id:    ' + session.user.id + '\n' +
-      '  user.email: ' + session.user.email + '\n' +
-      '  expires:    ' + new Date(session.expires_at * 1000).toISOString();
-    sessionBox.setAttribute('data-show', '1');
-    showAlert('success', 'Signed in. Dashboard comes in Step 11.');
+  function onAuthenticated() {
+    window.location.replace('dashboard.html');
   }
 
   // ---------- Resume session if already signed in ----------
   const { data: { session } } = await supabase.auth.getSession();
-  if (session) await onAuthenticated(session);
+  if (session) onAuthenticated();
 
 </script>
 
