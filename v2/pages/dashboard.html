@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dashboard — UniConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/tokens.css">
+<style>
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-5);
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    min-height: 56px;
+  }
+  .topbar__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 600;
+    font-size: var(--text-base);
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .topbar__brand svg { color: var(--brand); }
+
+  .topbar__right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .topbar__user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--brand);
+    color: var(--brand-fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .btn-ghost {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 36px;
+  }
+  .btn-ghost:hover {
+    border-color: var(--border-strong);
+    color: var(--text);
+    background: var(--bg-elevated);
+  }
+
+  .wrap {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+  }
+  @media (min-width: 640px) {
+    .wrap { padding: var(--space-8) var(--space-6); }
+  }
+
+  .greeting {
+    margin-bottom: var(--space-6);
+  }
+  .greeting h1 {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: var(--leading-tight);
+    margin-bottom: var(--space-2);
+  }
+  @media (min-width: 640px) {
+    .greeting h1 { font-size: var(--text-3xl); }
+  }
+  .greeting p {
+    color: var(--text-muted);
+    font-size: var(--text-base);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  @media (min-width: 720px) {
+    .grid { grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+  }
+
+  .card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+  .card__label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    color: var(--text-subtle);
+    margin-bottom: var(--space-3);
+  }
+  .card__title {
+    font-size: var(--text-md);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-2);
+  }
+
+  .field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border);
+    font-size: var(--text-sm);
+  }
+  .field-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .field-row:first-of-type { padding-top: 0; }
+  .field-row dt { color: var(--text-muted); }
+  .field-row dd { color: var(--text); font-weight: 500; text-align: right; max-width: 60%; overflow-wrap: anywhere; }
+
+  .placeholder {
+    color: var(--text-subtle);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
+  /* Loading / error states */
+  .state {
+    padding: var(--space-8) var(--space-4);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+  .state[hidden] { display: none; }
+  .state--error { color: var(--danger); }
+
+  #content[hidden] { display: none; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+    </svg>
+    UniConnect
+  </div>
+  <div class="topbar__right">
+    <div class="topbar__user" id="topbar-user" hidden>
+      <span class="avatar" id="topbar-avatar"></span>
+      <span id="topbar-name"></span>
+    </div>
+    <button class="btn-ghost" id="btn-signout">Sign out</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="state" id="state-loading">Loading…</div>
+  <div class="state state--error" id="state-error" hidden></div>
+
+  <div id="content" hidden>
+
+    <div class="greeting">
+      <h1 id="greeting-title">Hello.</h1>
+      <p id="greeting-sub"></p>
+    </div>
+
+    <div class="grid">
+
+      <section class="card">
+        <div class="card__label">Your account</div>
+        <dl>
+          <div class="field-row"><dt>Name</dt><dd id="f-name">—</dd></div>
+          <div class="field-row"><dt>Email</dt><dd id="f-email">—</dd></div>
+          <div class="field-row"><dt>Role</dt><dd id="f-role">—</dd></div>
+          <div class="field-row"><dt>Institution</dt><dd id="f-institution">Not assigned</dd></div>
+          <div class="field-row"><dt>Department</dt><dd id="f-department">Not assigned</dd></div>
+        </dl>
+      </section>
+
+      <section class="card">
+        <div class="card__label">Coming next</div>
+        <div class="card__title">Your campus feed</div>
+        <p class="placeholder">
+          Announcements, materials, and conversations will appear here once we
+          finish the next few steps. Nothing to show yet — the shell is real,
+          the contents come next.
+        </p>
+      </section>
+
+    </div>
+
+  </div>
+
+</main>
+
+<script type="module">
+  import { supabase } from '../js/supabase.js';
+
+  const $ = (id) => document.getElementById(id);
+
+  function showError(msg) {
+    $('state-loading').hidden = true;
+    $('state-error').textContent = msg;
+    $('state-error').hidden = false;
+  }
+
+  // ---- Auth guard ----
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    window.location.replace('login.html');
+    throw new Error('unauthenticated');
+  }
+
+  // ---- Load profile ----
+  // RLS: profiles_select allows id = auth.uid() — the user reads their own row.
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('full_name, email, role, level, institution_id, department_id')
+    .eq('id', session.user.id)
+    .single();
+
+  if (error) {
+    showError('Could not load your profile: ' + error.message);
+    throw error;
+  }
+
+  // ---- Populate ----
+  const firstName = (profile.full_name || '').split(' ')[0] || 'there';
+  const hour = new Date().getHours();
+  const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+  $('greeting-title').textContent = `${timeGreeting}, ${firstName}.`;
+  $('greeting-sub').textContent = 'You are signed in. Welcome to UniConnect v2.';
+
+  $('f-name').textContent  = profile.full_name || '—';
+  $('f-email').textContent = profile.email || '—';
+  $('f-role').textContent  = profile.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : '—';
+
+  // Topbar avatar & name
+  const initials = (profile.full_name || profile.email || '?')
+    .split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('');
+  $('topbar-avatar').textContent = initials || '?';
+  $('topbar-name').textContent = firstName;
+  $('topbar-user').hidden = false;
+
+  // Reveal
+  $('state-loading').hidden = true;
+  $('content').hidden = false;
+
+  // ---- Sign out ----
+  $('btn-signout').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    window.location.replace('login.html');
+  });
+</script>
+
+</body>
+</html>
