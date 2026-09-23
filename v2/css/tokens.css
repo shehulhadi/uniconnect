@@ -1,0 +1,139 @@
+/* ============================================================
+   UniConnect v2 — Design tokens
+   Single source of truth for colour, type, spacing, motion.
+   ============================================================ */
+
+:root {
+  /* --- Colour: neutrals --- */
+  --bg:            #fafaf9;
+  --bg-elevated:   #ffffff;
+  --bg-sunken:     #f5f5f4;
+  --border:        #e7e5e4;
+  --border-strong: #d6d3d1;
+
+  --text:          #0c0a09;
+  --text-muted:    #57534e;
+  --text-subtle:   #a8a29e;
+
+  /* --- Colour: brand --- */
+  --brand:         #4f46e5;   /* electric indigo */
+  --brand-hover:   #4338ca;
+  --brand-active:  #3730a3;
+  --brand-fg:      #ffffff;
+  --brand-subtle:  #eef2ff;
+
+  /* --- Colour: state --- */
+  --success:       #16a34a;
+  --warning:       #d97706;
+  --danger:        #dc2626;
+  --info:          #0284c7;
+
+  /* --- Type --- */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 0.9375rem;
+  --text-md:   1.0625rem;
+  --text-lg:   1.25rem;
+  --text-xl:   1.5rem;
+  --text-2xl:  2rem;
+  --text-3xl:  2.5rem;
+
+  --leading-tight: 1.2;
+  --leading-snug:  1.4;
+  --leading-base:  1.6;
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* --- Space --- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+  --space-10: 4rem;
+
+  /* --- Radius --- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+
+  /* --- Motion --- */
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration: 200ms;
+
+  /* --- Layout --- */
+  --container: 1120px;
+  --container-narrow: 480px;
+}
+
+/* --- Dark mode --- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:            #0c0a09;
+    --bg-elevated:   #1c1917;
+    --bg-sunken:     #171412;
+    --border:        #292524;
+    --border-strong: #44403c;
+
+    --text:          #fafaf9;
+    --text-muted:    #a8a29e;
+    --text-subtle:   #78716c;
+
+    --brand:         #818cf8;
+    --brand-hover:   #a5b4fc;
+    --brand-active:  #c7d2fe;
+    --brand-fg:      #0c0a09;
+    --brand-subtle:  #1e1b4b;
+  }
+}
+
+/* --- Reset --- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-base);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+img, svg, video { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--brand); text-decoration: none; transition: color var(--duration-fast) var(--ease); }
+a:hover { color: var(--brand-hover); }
+
+/* --- Focus --- */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* --- Accessibility helper --- */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
