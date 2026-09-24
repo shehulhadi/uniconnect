@@ -1,4 +1,4 @@
-/* v2/css/nav.css — mobile bottom navigation */
+/* v2/css/nav.css — mobile bottom navigation (solid, no glass) */
 
 .bottom-nav {
   position: fixed;
@@ -7,9 +7,7 @@
   display: flex;
   align-items: stretch;
   justify-content: space-around;
-  background: color-mix(in srgb, var(--bg-elevated) 92%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: var(--bg-elevated);
   border-top: 1px solid var(--border);
   padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
   min-height: 60px;
@@ -44,7 +42,6 @@
 
 .bottom-nav__label { line-height: 1; }
 
-/* Reserve space so page content isn't hidden behind the bar */
 body.has-bottom-nav { padding-bottom: 72px; }
 
 @media (min-width: 768px) {

@@ -1,0 +1,8 @@
+/* v2/css/topbar.css — forces every topbar to be solid, non-glass.
+   Loaded last so it wins over per-page inline styles. */
+
+.topbar {
+  background: var(--bg-elevated) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
