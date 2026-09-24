@@ -68,10 +68,7 @@
     display: flex; align-items: center; gap: var(--space-3);
     margin-bottom: var(--space-4);
   }
-  .section__head h2 {
-    font-size: var(--text-md); font-weight: 600;
-    letter-spacing: -0.01em;
-  }
+  .section__head h2 { font-size: var(--text-md); font-weight: 600; letter-spacing: -0.01em; }
   .section__count {
     font-size: var(--text-xs); color: var(--text-muted);
     background: var(--bg-sunken);
@@ -84,6 +81,7 @@
     background: var(--bg-elevated); border: 1px solid var(--border);
     border-radius: var(--radius-lg); padding: var(--space-4);
     transition: border-color var(--duration-fast) var(--ease);
+    cursor: pointer;
   }
   .grp:hover { border-color: var(--border-strong); }
   .grp__row { display: flex; gap: var(--space-4); align-items: flex-start; }
@@ -121,13 +119,11 @@
   .grp__name {
     font-size: var(--text-md); font-weight: 600;
     letter-spacing: -0.01em; line-height: var(--leading-snug);
-    margin-bottom: var(--space-1);
-    overflow-wrap: anywhere;
+    margin-bottom: var(--space-1); overflow-wrap: anywhere;
   }
   .grp__desc {
     font-size: var(--text-sm); color: var(--text-muted);
-    line-height: var(--leading-snug);
-    overflow-wrap: anywhere;
+    line-height: var(--leading-snug); overflow-wrap: anywhere;
   }
   .grp__actions { display: flex; gap: var(--space-2); flex-shrink: 0; }
 
@@ -158,7 +154,6 @@
   }
   .state p { max-width: 44ch; margin: 0 auto; }
 
-  /* Modal */
   .modal-backdrop {
     position: fixed; inset: 0; z-index: 50;
     background: rgba(0,0,0,0.5);
@@ -262,7 +257,7 @@
   <div class="head">
     <div>
       <h1>Groups</h1>
-      <p>Communities within your institution.</p>
+      <p>Communities within your institution. Tap a group to open its chat.</p>
     </div>
     <button class="btn-primary" id="btn-create" hidden>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -291,14 +286,11 @@
 
 </main>
 
-<!-- Create modal -->
 <div class="modal-backdrop" id="modal" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <h2 id="modal-title">Create a group</h2>
     <p class="sub">Visible to everyone at your institution.</p>
-
     <div class="modal-alert modal-alert--error" id="modal-alert"></div>
-
     <form id="form-create">
       <div class="field">
         <label for="f-name">Name</label>
@@ -333,15 +325,13 @@
   import { supabase } from '../js/supabase.js';
 
   const $ = (id) => document.getElementById(id);
-  let allGroups = [];      // every group in the institution
+  let allGroups = [];
   let myGroupIds = new Set();
   let currentProfile = null;
 
-  // ---- Auth guard ----
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) { window.location.replace('login.html'); throw new Error('unauthenticated'); }
 
-  // ---- Profile ----
   const { data: profile, error: pErr } = await supabase
     .from('profiles')
     .select('id, full_name, role, institution_id')
@@ -354,7 +344,6 @@
   const canCreate = ['lecturer','staff','hod','admin','leadership'].includes(profile.role);
   if (canCreate && profile.institution_id) $('btn-create').hidden = false;
 
-  // ---- Helpers ----
   function escapeHtml(s) {
     return String(s ?? '')
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -377,9 +366,7 @@
     $('state-error').hidden = false;
   }
 
-  // ---- Load ----
   async function load() {
-    // 1. Every group in the institution, with a member count.
     const { data: groups, error: gErr } = await supabase
       .from('groups')
       .select(`
@@ -397,7 +384,6 @@
         : 0,
     }));
 
-    // 2. Which ones am I in?
     const { data: mine, error: mErr } = await supabase
       .from('group_members')
       .select('group_id')
@@ -411,15 +397,14 @@
     render();
   }
 
-  // ---- Render ----
   function groupCard(g, isMine) {
     const memberLabel = g.member_count === 1 ? '1 member' : `${g.member_count} members`;
     const action = isMine
-      ? `<button class="btn-sm btn-leave" data-action="leave" data-id="${g.id}">Leave</button>`
-      : `<button class="btn-sm btn-join"  data-action="join"  data-id="${g.id}">Join</button>`;
+      ? `<button class="btn-sm btn-leave" data-action="leave" data-id="${g.id}" type="button">Leave</button>`
+      : `<button class="btn-sm btn-join"  data-action="join"  data-id="${g.id}" type="button">Join</button>`;
 
     return `
-      <article class="grp">
+      <article class="grp" data-id="${g.id}">
         <div class="grp__row">
           <div class="grp__avatar">${escapeHtml(initials(g.name))}</div>
           <div class="grp__body">
@@ -441,14 +426,12 @@
     const mine = allGroups.filter(g => myGroupIds.has(g.id));
     const discover = allGroups.filter(g => !myGroupIds.has(g.id));
 
-    // Mine
     $('section-mine').hidden = false;
     $('count-mine').textContent = mine.length;
     $('list-mine').innerHTML = mine.length
       ? mine.map(g => groupCard(g, true)).join('')
       : `<div class="state state--empty"><p>You haven't joined any groups yet. Pick one from Discover below.</p></div>`;
 
-    // Discover
     $('section-discover').hidden = false;
     $('count-discover').textContent = discover.length;
     $('list-discover').innerHTML = discover.length
@@ -456,43 +439,55 @@
       : `<div class="state state--empty"><p>You're already in every group at your institution.</p></div>`;
   }
 
-  // ---- Join / Leave (event-delegated) ----
+  // ---- ONE click handler: buttons first, then cards ----
   document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
+    const actionBtn = e.target.closest('[data-action]');
+    if (actionBtn) {
+      e.preventDefault();
+      const action = actionBtn.dataset.action;
+      const groupId = actionBtn.dataset.id;
+      actionBtn.disabled = true;
+      const prev = actionBtn.textContent;
+      actionBtn.textContent = action === 'join' ? 'Joining…' : 'Leaving…';
 
-    const action = btn.dataset.action;
-    const groupId = btn.dataset.id;
-    btn.disabled = true;
-    const prev = btn.textContent;
-    btn.textContent = action === 'join' ? 'Joining…' : 'Leaving…';
-
-    try {
-      if (action === 'join') {
-        const { error } = await supabase.from('group_members').insert({
-          group_id: groupId,
-          user_id: session.user.id,
-        });
-        if (error) throw error;
-        toast('Joined.');
-      } else if (action === 'leave') {
-        const { error } = await supabase
-          .from('group_members')
-          .delete()
-          .eq('group_id', groupId)
-          .eq('user_id', session.user.id);
-        if (error) throw error;
-        toast('Left.');
+      try {
+        if (action === 'join') {
+          const { error } = await supabase.from('group_members').insert({
+            group_id: groupId,
+            user_id: session.user.id,
+          });
+          if (error) throw error;
+          toast('Joined.');
+        } else if (action === 'leave') {
+          const { error } = await supabase
+            .from('group_members')
+            .delete()
+            .eq('group_id', groupId)
+            .eq('user_id', session.user.id);
+          if (error) throw error;
+          toast('Left.');
+        }
+        await load();
+      } catch (err) {
+        toast(err.message || 'Action failed', 'error');
+        actionBtn.disabled = false;
+        actionBtn.textContent = prev;
       }
-      await load();
-    } catch (err) {
-      toast(err.message || 'Action failed', 'error');
-      btn.disabled = false;
-      btn.textContent = prev;
+      return;
+    }
+
+    // Not a button — was it a card? Only if the card belongs to me.
+    const card = e.target.closest('.grp[data-id]');
+    if (card) {
+      const id = card.dataset.id;
+      if (myGroupIds.has(id)) {
+        location.href = 'group.html?id=' + id;
+      } else {
+        toast('Join the group first to open its chat.');
+      }
     }
   });
 
-  // ---- Create modal ----
   function openModal() {
     $('modal-alert').removeAttribute('data-show');
     $('form-create').reset();
@@ -513,7 +508,6 @@
     if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal();
   });
 
-  // ---- Create submit ----
   $('form-create').addEventListener('submit', async (e) => {
     e.preventDefault();
     const alertEl = $('modal-alert');
@@ -534,7 +528,6 @@
     btn.textContent = 'Creating…';
 
     try {
-      // Insert the group.
       const { data: created, error: gErr } = await supabase
         .from('groups')
         .insert({
@@ -549,7 +542,6 @@
 
       if (gErr) throw gErr;
 
-      // Creator auto-joins.
       const { error: mErr } = await supabase.from('group_members').insert({
         group_id: created.id,
         user_id: session.user.id,
@@ -569,7 +561,6 @@
     }
   });
 
-  // ---- Sign out ----
   $('btn-signout').addEventListener('click', async () => {
     await supabase.auth.signOut();
     window.location.replace('login.html');
