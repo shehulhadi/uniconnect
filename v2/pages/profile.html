@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/nav.css">
+<link rel="stylesheet" href="../css/notifications.css">
 <style>
   .topbar {
     position: sticky; top: 0; z-index: 10;
@@ -551,7 +553,7 @@
       .from('profiles')
       .select(`
         id, full_name, email, role, status, level, level_id,
-        matric_no, staff_no, avatar_url, member_since, created_at, last_seen_at,
+        matric_no, staff_no, avatar_url, created_at, last_seen_at,
         headline, bio, phone, admission_year, graduation_year, social_links,
         institution_id, faculty_id, department_id, programme_id, session_id,
         institutions ( name ),
@@ -655,8 +657,7 @@
     setText('f-admission', p.admission_year);
     setText('f-graduation', p.graduation_year);
 
-    const since = p.member_since ? new Date(p.member_since) :
-                  p.created_at ? new Date(p.created_at) : null;
+    const since = p.created_at ? new Date(p.created_at) : null;
     if (since) {
       setText('f-member-since', since.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
       $('stat-since').textContent = since.getFullYear();
