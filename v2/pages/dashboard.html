@@ -6,177 +6,368 @@
 <title>Dashboard — UniConnect</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/nav.css">
+<link rel="stylesheet" href="../css/notifications.css">
+<link rel="stylesheet" href="../css/topbar.css">
 <style>
   .topbar {
     position: sticky; top: 0; z-index: 10;
     display: flex; align-items: center; justify-content: space-between;
+    gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    background: color-mix(in srgb, var(--bg) 85%, transparent);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border); min-height: 56px;
   }
-  .topbar__brand {
-    display: flex; align-items: center; gap: var(--space-2);
-    font-weight: 600; font-size: var(--text-base);
-    letter-spacing: -0.01em; color: var(--text);
-  }
+  .topbar__brand { display: flex; align-items: center; gap: var(--space-2); font-weight: 600; font-size: var(--text-base); letter-spacing: -0.01em; color: var(--text); }
   .topbar__brand svg { color: var(--brand); }
   .topbar__right { display: flex; align-items: center; gap: var(--space-2); }
-  .avatar {
-    width: 32px; height: 32px; border-radius: var(--radius-full);
-    background: var(--brand); color: var(--brand-fg);
-    display: flex; align-items: center; justify-content: center;
+
+  .icon-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: var(--radius-md);
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-muted); cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--border-strong); background: var(--bg-sunken); }
+  .icon-btn:disabled { opacity: 0.5; cursor: wait; }
+  .icon-btn svg { width: 16px; height: 16px; }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-10); }
+  @media (min-width: 640px) { .wrap { padding: var(--space-6) var(--space-6) var(--space-10); } }
+
+  /* ---------- Greeting ---------- */
+  .greet { margin-bottom: var(--space-5); }
+  .greet__row {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: var(--space-3); margin-bottom: var(--space-3);
+  }
+  .greet__title {
+    font-size: var(--text-2xl); font-weight: 700;
+    letter-spacing: -0.025em; line-height: 1.15;
+    margin-bottom: 4px;
+  }
+  @media (min-width: 640px) { .greet__title { font-size: var(--text-3xl); } }
+  .greet__sub { font-size: var(--text-sm); color: var(--text-muted); }
+  .greet__sub strong { color: var(--text); font-weight: 500; }
+
+  /* Status pill */
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0.35rem 0.7rem 0.35rem 0.65rem;
+    border-radius: var(--radius-full);
     font-size: var(--text-xs); font-weight: 600;
-    flex-shrink: 0; text-transform: uppercase;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: var(--bg-sunken); color: var(--text-muted);
+    border: 1px solid transparent;
+    cursor: pointer; flex-shrink: 0;
+    transition: all var(--duration-fast) var(--ease);
+    position: relative;
   }
+  .status-pill:hover { border-color: var(--border-strong); color: var(--text); }
+  .status-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-subtle); }
+  .status-pill[data-status="online"] { background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success); }
+  .status-pill[data-status="online"] .dot { background: var(--success); }
+  .status-pill[data-status="away"]   { background: color-mix(in srgb, var(--warning) 14%, transparent); color: var(--warning); }
+  .status-pill[data-status="away"] .dot { background: var(--warning); }
+  .status-pill[data-status="busy"]   { background: color-mix(in srgb, var(--danger) 10%, transparent); color: var(--danger); }
+  .status-pill[data-status="busy"] .dot { background: var(--danger); }
 
-  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-6) var(--space-4) var(--space-10); }
-  @media (min-width: 640px) { .wrap { padding: var(--space-8) var(--space-6) var(--space-10); } }
-
-  .greeting { margin-bottom: var(--space-6); }
-  .greeting h1 {
-    font-size: var(--text-2xl); font-weight: 600;
-    letter-spacing: -0.02em; line-height: var(--leading-tight);
-    margin-bottom: var(--space-2);
+  .status-pop {
+    position: absolute; top: calc(100% + 6px); right: 0; z-index: 40;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    padding: 4px; min-width: 170px; display: none;
   }
-  @media (min-width: 640px) { .greeting h1 { font-size: var(--text-3xl); } }
-  .greeting p { color: var(--text-muted); font-size: var(--text-base); }
-
-  /* ---- Primary nav grid ---- */
-  .nav-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3);
-    margin-bottom: var(--space-6);
+  .status-pop[data-open] { display: block; }
+  .status-pop button {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 0.5rem 0.65rem;
+    background: transparent; border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text); font-size: var(--text-sm);
+    font-family: inherit; cursor: pointer; text-align: left;
   }
-  @media (min-width: 480px) { .nav-grid { grid-template-columns: repeat(4, 1fr); } }
+  .status-pop button:hover { background: var(--bg-sunken); }
+  .status-pop button .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-pop button[data-for="online"] .dot  { background: var(--success); }
+  .status-pop button[data-for="away"] .dot    { background: var(--warning); }
+  .status-pop button[data-for="busy"] .dot    { background: var(--danger); }
+  .status-pop button[data-for="offline"] .dot { background: var(--text-subtle); }
+  .status-pop button[data-active="1"] { background: var(--bg-sunken); font-weight: 600; }
 
-  .nav-card {
-    display: flex; flex-direction: column; align-items: flex-start;
-    gap: var(--space-3);
-    padding: var(--space-4);
+  /* ---------- Stats ---------- */
+  .stats {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3); margin-bottom: var(--space-6);
+  }
+  @media (min-width: 560px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+
+  .stat {
     background: var(--bg-elevated);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
+    padding: var(--space-4);
     text-decoration: none; color: var(--text);
     transition: all var(--duration-fast) var(--ease);
+    display: flex; flex-direction: column; gap: 8px;
     min-height: 96px;
+    cursor: pointer;
+    position: relative;
   }
-  .nav-card:hover { border-color: var(--brand); transform: translateY(-1px); }
-  .nav-card__icon {
-    width: 32px; height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--brand); background: var(--brand-subtle);
+  .stat:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  .stat__icon {
+    width: 28px; height: 28px;
     border-radius: var(--radius-md);
+    background: var(--brand-subtle); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
   }
-  .nav-card__label {
-    font-size: var(--text-sm); font-weight: 500;
-    letter-spacing: -0.005em;
+  .stat__num {
+    font-size: var(--text-xl); font-weight: 700;
+    letter-spacing: -0.025em; line-height: 1;
+    font-feature-settings: "tnum";
+  }
+  .stat__label {
+    font-size: 0.6875rem; text-transform: uppercase;
+    letter-spacing: 0.06em; font-weight: 600;
+    color: var(--text-subtle);
+  }
+  .stat__num[data-pulse] { animation: numPulse 0.5s var(--ease); }
+  @keyframes numPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); color: var(--brand); }
+    100% { transform: scale(1); }
   }
 
-  /* ---- Sections ---- */
-  .section { margin-bottom: var(--space-8); }
-  .section__head {
+  /* ---------- Courses carousel ---------- */
+  .section-head {
     display: flex; align-items: baseline; justify-content: space-between;
-    margin-bottom: var(--space-4);
+    gap: var(--space-3); margin-bottom: var(--space-3);
   }
-  .section__head h2 {
-    font-size: var(--text-md); font-weight: 600;
+  .section-head h2 {
+    font-size: var(--text-base); font-weight: 700;
     letter-spacing: -0.01em;
   }
-  .section__link {
+  .section-head a {
     font-size: var(--text-sm); color: var(--brand);
     font-weight: 500; text-decoration: none;
   }
-  .section__link:hover { text-decoration: underline; }
+  .section-head a:hover { text-decoration: underline; }
+  .section { margin-bottom: var(--space-6); }
 
-  /* ---- Item cards ---- */
-  .item {
+  .courses-scroll {
     display: flex; gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
+    overflow-x: auto; overflow-y: hidden;
+    padding: 2px 2px 8px 2px;
+    margin: 0 -2px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .courses-scroll::-webkit-scrollbar { display: none; }
+
+  .course-card {
+    flex: 0 0 220px;
+    scroll-snap-align: start;
     background: var(--bg-elevated);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-2);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
     text-decoration: none; color: var(--text);
     transition: all var(--duration-fast) var(--ease);
+    display: flex; flex-direction: column; gap: 10px;
+    min-height: 120px;
+    cursor: pointer;
   }
-  .item:hover { border-color: var(--border-strong); }
-  .item:last-child { margin-bottom: 0; }
-
-  .item__icon {
-    width: 36px; height: 36px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--bg-sunken); color: var(--text-muted);
-    border-radius: var(--radius-md);
+  .course-card:hover { border-color: var(--brand); }
+  .course-card__code {
+    font-size: 0.6875rem; font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--brand);
+    background: var(--brand-subtle);
+    padding: 3px 8px; border-radius: var(--radius-sm);
+    align-self: flex-start;
   }
-  .item__body { flex: 1; min-width: 0; }
-  .item__title {
+  .course-card__title {
     font-size: var(--text-sm); font-weight: 600;
     line-height: var(--leading-snug);
     overflow: hidden; text-overflow: ellipsis;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    margin-bottom: 2px;
   }
-  .item__meta {
+  .course-card__foot {
+    margin-top: auto;
     font-size: var(--text-xs); color: var(--text-subtle);
-    display: flex; gap: var(--space-2); flex-wrap: wrap;
-    align-items: center;
-  }
-  .pill {
-    display: inline-block; padding: 0.1rem 0.5rem;
-    border-radius: var(--radius-full);
-    font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.05em; font-size: 0.6875rem;
-  }
-  .pill--general      { background: #f5f5f4; color: #57534e; }
-  .pill--important    { background: #fef3c7; color: #92400e; }
-  .pill--urgent       { background: #fee2e2; color: #991b1b; }
-  .pill--registration { background: #dcfce7; color: #166534; }
-  .pill--seminar      { background: #dbeafe; color: #1e40af; }
-  .pill--update       { background: #e0e7ff; color: #3730a3; }
-  @media (prefers-color-scheme: dark) {
-    .pill--general      { background: #292524; color: #a8a29e; }
-    .pill--important    { background: #451a03; color: #fcd34d; }
-    .pill--urgent       { background: #450a0a; color: #fca5a5; }
-    .pill--registration { background: #052e16; color: #86efac; }
-    .pill--seminar      { background: #172554; color: #93c5fd; }
-    .pill--update       { background: #1e1b4b; color: #a5b4fc; }
-  }
-  .course-code {
-    font-weight: 600; color: var(--brand);
-    background: var(--brand-subtle);
-    padding: 0.1rem 0.5rem; border-radius: var(--radius-sm);
-    font-size: 0.6875rem; letter-spacing: 0.02em;
+    display: flex; align-items: center; gap: 6px;
   }
 
   .empty-inline {
     padding: var(--space-5) var(--space-4);
     background: var(--bg-sunken);
-    border-radius: var(--radius-md);
     border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
     text-align: center;
-    font-size: var(--text-sm); color: var(--text-muted);
+    line-height: var(--leading-snug);
   }
 
+  /* ---------- Filters ---------- */
+  .filters {
+    display: flex; gap: 6px;
+    overflow-x: auto; padding-bottom: 8px; margin-bottom: var(--space-3);
+    scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+
+  .chip {
+    appearance: none;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs); font-weight: 500;
+    cursor: pointer; flex-shrink: 0;
+    transition: all var(--duration-fast) var(--ease);
+    font-family: inherit;
+    min-height: 32px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .chip:hover { border-color: var(--border-strong); color: var(--text); }
+  .chip[aria-pressed="true"] {
+    background: var(--text); color: var(--bg); border-color: var(--text);
+  }
+  .chip__count {
+    font-size: 0.625rem; font-weight: 700;
+    background: var(--bg-sunken); color: var(--text-subtle);
+    padding: 1px 5px; border-radius: var(--radius-sm);
+  }
+  .chip[aria-pressed="true"] .chip__count { background: rgba(255,255,255,0.2); color: var(--bg); }
+
+  /* ---------- Activity feed ---------- */
+  .feed { display: flex; flex-direction: column; gap: 6px; }
+
+  .feed-item {
+    display: flex; gap: var(--space-3);
+    padding: var(--space-3) var(--space-3);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-decoration: none; color: var(--text);
+    transition: all var(--duration-fast) var(--ease);
+    align-items: flex-start;
+    cursor: pointer;
+    position: relative;
+  }
+  .feed-item:hover { border-color: var(--border-strong); }
+  .feed-item[data-unread]::before {
+    content: '';
+    position: absolute; left: 4px; top: 50%;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--brand);
+    transform: translateY(-50%);
+  }
+  .feed-item[data-unread] { padding-left: 14px; }
+
+  .feed-item__icon {
+    width: 34px; height: 34px; flex-shrink: 0;
+    border-radius: var(--radius-md);
+    background: var(--bg-sunken); color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feed-item[data-unread] .feed-item__icon {
+    background: var(--brand-subtle); color: var(--brand);
+  }
+  .feed-item__icon svg { width: 16px; height: 16px; }
+
+  .feed-item__body { flex: 1; min-width: 0; }
+  .feed-item__title {
+    font-size: var(--text-sm); font-weight: 500;
+    line-height: var(--leading-snug);
+    margin-bottom: 2px;
+    overflow-wrap: anywhere;
+  }
+  .feed-item[data-unread] .feed-item__title { font-weight: 600; }
+  .feed-item__sub {
+    font-size: var(--text-xs); color: var(--text-muted);
+    line-height: var(--leading-snug);
+    overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    margin-bottom: 3px;
+    overflow-wrap: anywhere;
+  }
+  .feed-item__time {
+    font-size: 0.6875rem; color: var(--text-subtle);
+  }
+
+  /* ---------- Quick actions ---------- */
+  .qa {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+  @media (min-width: 560px) { .qa { grid-template-columns: repeat(4, 1fr); } }
+
+  .qa__item {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: var(--space-4);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-decoration: none; color: var(--text);
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 92px;
+    cursor: pointer;
+    font-family: inherit; font-size: inherit;
+    text-align: left;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .qa__item:hover { border-color: var(--brand); transform: translateY(-1px); }
+  .qa__icon {
+    width: 30px; height: 30px;
+    border-radius: var(--radius-md);
+    background: var(--brand-subtle); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qa__label {
+    font-size: var(--text-xs); font-weight: 600;
+    letter-spacing: -0.005em;
+    line-height: var(--leading-snug);
+  }
+
+  /* ---------- States ---------- */
   .state { padding: var(--space-6) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
-  .state--error { color: var(--danger); }
   .state[hidden] { display: none; }
+  .state--error { color: var(--danger); }
+  #content[hidden] { display: none; }
 
   .skel {
     background: linear-gradient(90deg, var(--bg-sunken) 0%, var(--bg-elevated) 50%, var(--bg-sunken) 100%);
     background-size: 200% 100%;
     animation: shimmer 1.4s ease-in-out infinite;
     border-radius: var(--radius-md);
-    height: 68px; margin-bottom: var(--space-2);
+    height: 60px;
   }
   @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed; bottom: 84px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: var(--bg);
+    padding: 0.65rem 1rem; border-radius: var(--radius-md);
+    font-size: var(--text-sm); font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none;
+    transition: all var(--duration) var(--ease);
+    z-index: 60; max-width: 90vw; text-align: center;
+  }
+  .toast[data-show] { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast[data-kind="error"] { background: var(--danger); color: #fff; }
 </style>
-  <link rel="stylesheet" href="../css/nav.css">
-  <link rel="stylesheet" href="../css/notifications.css">
-  <link rel="stylesheet" href="../css/topbar.css">
 </head>
 <body>
 
@@ -189,240 +380,587 @@
     UniConnect
   </div>
   <div class="topbar__right">
-    <a class="avatar" href="profile.html" id="topbar-avatar" title="Your profile">?</a>
+    <button class="icon-btn" id="btn-refresh" title="Refresh" aria-label="Refresh dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 4v6h-6M1 20v-6h6"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+    </button>
+    <!-- Bell is injected here by notifications.js -->
   </div>
 </header>
 
 <main class="wrap">
 
-  <div class="greeting">
-    <h1 id="greeting-title">Hello.</h1>
-    <p id="greeting-sub">Welcome back.</p>
+  <div class="state" id="state-loading">Loading…</div>
+  <div class="state state--error" id="state-error" hidden></div>
+
+  <div id="content" hidden>
+
+    <!-- Greeting -->
+    <section class="greet">
+      <div class="greet__row">
+        <div>
+          <h1 class="greet__title" id="greet-title">Hello.</h1>
+          <div class="greet__sub" id="greet-sub">Welcome back.</div>
+        </div>
+        <button class="status-pill" id="status-pill" data-status="offline" type="button" aria-label="Change status">
+          <span class="dot"></span>
+          <span id="status-label">Offline</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+      <a class="stat" id="stat-messages" href="messages.html">
+        <div class="stat__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="stat__num" id="stat-messages-num">—</div>
+        <div class="stat__label">Unread</div>
+      </a>
+      <a class="stat" id="stat-notices" href="announcements.html">
+        <div class="stat__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11l18-8v18L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
+          </svg>
+        </div>
+        <div class="stat__num" id="stat-notices-num">—</div>
+        <div class="stat__label">Announcements</div>
+      </a>
+      <a class="stat" id="stat-courses" href="groups.html">
+        <div class="stat__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+        <div class="stat__num" id="stat-courses-num">—</div>
+        <div class="stat__label">Courses</div>
+      </a>
+      <a class="stat" id="stat-communities" href="groups.html">
+        <div class="stat__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          </svg>
+        </div>
+        <div class="stat__num" id="stat-communities-num">—</div>
+        <div class="stat__label">Communities</div>
+      </a>
+    </section>
+
+    <!-- Courses carousel -->
+    <section class="section">
+      <div class="section-head">
+        <h2>My courses</h2>
+        <a href="groups.html">View all →</a>
+      </div>
+      <div id="courses-body">
+        <div class="skel" style="height:120px;"></div>
+      </div>
+    </section>
+
+    <!-- Activity feed -->
+    <section class="section">
+      <div class="section-head">
+        <h2>Activity</h2>
+        <a href="#" id="link-mark-all" style="display:none;">Mark all read</a>
+      </div>
+
+      <div class="filters" role="tablist" aria-label="Time filter">
+        <button class="chip" data-time="today" aria-pressed="true">Today</button>
+        <button class="chip" data-time="week" aria-pressed="false">This week</button>
+        <button class="chip" data-time="all" aria-pressed="false">All</button>
+      </div>
+
+      <div class="filters" role="tablist" aria-label="Type filter">
+        <button class="chip" data-type="all" aria-pressed="true">All</button>
+        <button class="chip" data-type="announcement" aria-pressed="false">Notices</button>
+        <button class="chip" data-type="material" aria-pressed="false">Materials</button>
+        <button class="chip" data-type="system" aria-pressed="false">Messages</button>
+      </div>
+
+      <div id="feed-body">
+        <div class="skel" style="margin-bottom:6px;"></div>
+        <div class="skel"></div>
+      </div>
+    </section>
+
+    <!-- Quick actions -->
+    <section class="section">
+      <div class="section-head"><h2>Quick actions</h2></div>
+      <div class="qa" id="qa"></div>
+    </section>
+
   </div>
-
-  <div class="nav-grid">
-    <a class="nav-card" href="announcements.html">
-      <span class="nav-card__icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8v18L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
-      </span>
-      <span class="nav-card__label">Announcements</span>
-    </a>
-    <a class="nav-card" href="materials.html">
-      <span class="nav-card__icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      </span>
-      <span class="nav-card__label">Materials</span>
-    </a>
-    <a class="nav-card" href="groups.html">
-      <span class="nav-card__icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      </span>
-      <span class="nav-card__label">Groups</span>
-    </a>
-    <a class="nav-card" href="profile.html">
-      <span class="nav-card__icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </span>
-      <span class="nav-card__label">Profile</span>
-    </a>
-  </div>
-
-  <section class="section">
-    <div class="section__head">
-      <h2>Recent announcements</h2>
-      <a class="section__link" href="announcements.html">See all →</a>
-    </div>
-    <div id="feed-ann">
-      <div class="skel"></div><div class="skel"></div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section__head">
-      <h2>Recent materials</h2>
-      <a class="section__link" href="materials.html">See all →</a>
-    </div>
-    <div id="feed-mat">
-      <div class="skel"></div><div class="skel"></div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section__head">
-      <h2>Your groups</h2>
-      <a class="section__link" href="groups.html">Manage →</a>
-    </div>
-    <div id="feed-groups">
-      <div class="skel"></div>
-    </div>
-  </section>
 
 </main>
+
+<div class="toast" id="toast"></div>
 
 <script type="module">
   import { supabase } from '../js/supabase.js';
 
   const $ = (id) => document.getElementById(id);
+  let meId = null;
+  let meProfile = null;
+  let canPost = { announcement: false, material: false };
+  let notifications = [];
+  let currentTimeFilter = 'today';
+  let currentTypeFilter = 'all';
+  let channel = null;
 
-  // ---- Auth guard ----
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
+  meId = session.user.id;
 
-  const meId = session.user.id;
+  // ---------- Helpers ----------
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+  const initials = (name) => (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
 
-  // ---- Helpers ----
-  function esc(s) {
-    return String(s ?? '').replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[c]));
-  }
   function timeAgo(iso) {
     if (!iso) return '';
     const diff = (Date.now() - new Date(iso).getTime()) / 1000;
     if (diff < 60) return 'just now';
-    if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
     if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
     if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
     return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   }
-  function fmtBytes(bytes) {
-    if (!bytes) return '';
-    const kb = bytes / 1024;
-    if (kb < 1024) return kb.toFixed(0) + ' KB';
-    return (kb / 1024).toFixed(1) + ' MB';
+  function toast(msg, kind) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.setAttribute('data-show', '1');
+    if (kind) el.setAttribute('data-kind', kind); else el.removeAttribute('data-kind');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
   }
-  function initials(name) {
-    return (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+  function showError(msg) {
+    $('state-loading').hidden = true;
+    $('state-error').hidden = false;
+    $('state-error').textContent = msg;
   }
-  function emptyHtml(msg) { return `<div class="empty-inline">${esc(msg)}</div>`; }
+  function pulse(el) {
+    el.removeAttribute('data-pulse');
+    void el.offsetWidth;
+    el.setAttribute('data-pulse', '1');
+    setTimeout(() => el.removeAttribute('data-pulse'), 500);
+  }
+  function animateNumber(el, to) {
+    const from = parseInt(el.textContent, 10);
+    if (Number.isNaN(from)) {
+      el.textContent = to;
+      pulse(el);
+      return;
+    }
+    if (from === to) return;
+    pulse(el);
+    el.textContent = to;
+  }
 
-  // ---- Profile ----
-  const { data: profile } = await supabase
+  // ---------- Notification icons ----------
+  function notifIcon(kind) {
+    const paths = {
+      announcement: '<path d="M3 11l18-8v18L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+      material:     '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+      group:        '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+      system:       '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    };
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[kind] || paths.system}</svg>`;
+  }
+
+  // ---------- Load profile ----------
+  const { data: prof, error: pErr } = await supabase
     .from('profiles')
-    .select('id, full_name, role, registration_step')
+    .select(`
+      id, full_name, email, role, status, last_seen_at, institution_id,
+      institutions ( name ),
+      programmes   ( name ),
+      levels       ( display_name )
+    `)
     .eq('id', meId)
     .single();
 
-  if (profile && profile.registration_step && profile.registration_step !== 'complete') {
-    window.location.replace('onboarding.html');
+  if (pErr) { showError('Could not load profile: ' + pErr.message); throw pErr; }
+
+  if (prof && prof.registration_step && prof.registration_step !== 'complete') {
+    location.replace('onboarding.html');
     throw new Error('onboarding incomplete');
   }
+  meProfile = prof;
 
-  const firstName = (profile?.full_name || 'there').split(' ')[0];
+  // Check posting capabilities (best effort — RLS still gates)
+  const { data: canAnn } = await supabase.rpc('has_permission', { p_permission: 'announcements.create' });
+  const { data: canMat } = await supabase.rpc('has_permission', { p_permission: 'materials.create' });
+  canPost.announcement = !!canAnn;
+  canPost.material = !!canMat;
+
+  // ---------- Greeting ----------
+  const first = (meProfile.full_name || 'there').split(' ')[0];
   const hour = new Date().getHours();
-  const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  $('greeting-title').textContent = `${greet}, ${firstName}.`;
-  $('greeting-sub').textContent = 'Here is what is new.';
+  const dayName = new Date().toLocaleDateString(undefined, { weekday: 'long' });
+  const greetWord = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  $('greet-title').textContent = `${greetWord}, ${first}.`;
 
-  $('topbar-avatar').textContent = initials(profile?.full_name);
+  const idBits = [];
+  if (meProfile.programmes?.name)  idBits.push(meProfile.programmes.name);
+  if (meProfile.levels?.display_name) idBits.push(meProfile.levels.display_name);
+  if (meProfile.institutions?.name) idBits.push(meProfile.institutions.name);
+  $('greet-sub').innerHTML = idBits.length
+    ? idBits.map(b => `<strong>${esc(b)}</strong>`).join(' · ')
+    : 'Welcome back.';
 
-  // ---- Announcements feed ----
-  async function loadAnnouncements() {
-    const { data, error } = await supabase
+  // ---------- Status pill ----------
+  function effectiveStatus(p) {
+    const raw = p.status || 'offline';
+    if (raw === 'offline') return 'offline';
+    const last = p.last_seen_at ? new Date(p.last_seen_at).getTime() : 0;
+    const age = Date.now() - last;
+    if (age > 24 * 60 * 60 * 1000) return 'offline';
+    if (age > 60 * 60 * 1000) return 'away';
+    return raw;
+  }
+  const pill = $('status-pill');
+  const pop  = document.createElement('div');
+  pop.className = 'status-pop';
+  pop.innerHTML = `
+    <button type="button" data-for="online"  data-set="online"><span class="dot"></span> Online</button>
+    <button type="button" data-for="away"    data-set="away"><span class="dot"></span> Away</button>
+    <button type="button" data-for="busy"    data-set="busy"><span class="dot"></span> Busy</button>
+    <button type="button" data-for="offline" data-set="offline"><span class="dot"></span> Appear offline</button>
+  `;
+  pill.parentNode.appendChild(pop);
+
+  function renderStatus() {
+    const eff = effectiveStatus(meProfile);
+    pill.setAttribute('data-status', eff);
+    $('status-label').textContent =
+      eff === 'online' ? 'Online' :
+      eff === 'away'   ? 'Away' :
+      eff === 'busy'   ? 'Busy' : 'Offline';
+    document.querySelectorAll('.status-pop button').forEach(b => {
+      b.dataset.active = b.dataset.for === meProfile.status ? '1' : '';
+    });
+  }
+  renderStatus();
+
+  pill.addEventListener('click', (e) => {
+    e.stopPropagation();
+    pop.toggleAttribute('data-open');
+  });
+  document.addEventListener('click', () => pop.removeAttribute('data-open'));
+
+  pop.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-set]');
+    if (!btn) return;
+    pop.removeAttribute('data-open');
+    const value = btn.dataset.set;
+    const { error } = await supabase
+      .from('profiles')
+      .update({ status: value, last_seen_at: new Date().toISOString() })
+      .eq('id', meId);
+    if (error) { toast(error.message, 'error'); return; }
+    meProfile.status = value;
+    meProfile.last_seen_at = new Date().toISOString();
+    renderStatus();
+    toast('Status updated.');
+  });
+
+  // ---------- Stats ----------
+  async function loadStats() {
+    // Unread DMs
+    const { data: inbox } = await supabase.rpc('dm_inbox');
+    const unread = (inbox || []).reduce((sum, t) => sum + (t.unread || 0), 0);
+    animateNumber($('stat-messages-num'), unread);
+
+    // Announcements count (all visible)
+    const { count: annCount } = await supabase
       .from('announcements')
-      .select('id, title, tag, created_at')
-      .order('created_at', { ascending: false })
-      .limit(3);
+      .select('id', { count: 'exact', head: true });
+    animateNumber($('stat-notices-num'), annCount ?? 0);
 
-    const el = $('feed-ann');
-    if (error) { el.innerHTML = emptyHtml('Could not load announcements.'); return; }
-    if (!data || data.length === 0) { el.innerHTML = emptyHtml('No announcements yet.'); return; }
+    // Active course enrollments
+    const { count: courseCount } = await supabase
+      .from('course_enrollments')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', meId)
+      .eq('status', 'active');
+    animateNumber($('stat-courses-num'), courseCount ?? 0);
 
-    el.innerHTML = data.map(a => `
-      <a class="item" href="announcements.html">
-        <div class="item__icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8v18L3 13v-2z"/></svg>
-        </div>
-        <div class="item__body">
-          <div class="item__title">${esc(a.title)}</div>
-          <div class="item__meta">
-            <span class="pill pill--${esc(a.tag)}">${esc(a.tag)}</span>
-            <span>${timeAgo(a.created_at)}</span>
-          </div>
-        </div>
-      </a>
-    `).join('');
-  }
-
-  // ---- Materials feed ----
-  async function loadMaterials() {
-    const { data, error } = await supabase
-      .from('materials')
-      .select('id, title, course_code, file_size, created_at')
-      .order('created_at', { ascending: false })
-      .limit(3);
-
-    const el = $('feed-mat');
-    if (error) { el.innerHTML = emptyHtml('Could not load materials.'); return; }
-    if (!data || data.length === 0) { el.innerHTML = emptyHtml('No materials yet.'); return; }
-
-    el.innerHTML = data.map(m => `
-      <a class="item" href="materials.html">
-        <div class="item__icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-        </div>
-        <div class="item__body">
-          <div class="item__title">${esc(m.title)}</div>
-          <div class="item__meta">
-            <span class="course-code">${esc(m.course_code)}</span>
-            <span>${fmtBytes(m.file_size)}</span>
-            <span>·</span>
-            <span>${timeAgo(m.created_at)}</span>
-          </div>
-        </div>
-      </a>
-    `).join('');
-  }
-
-  // ---- Groups feed ----
-  async function loadGroups() {
-    const { data, error } = await supabase
+    // Community memberships
+    const { count: commCount } = await supabase
       .from('community_members')
+      .select('community_id', { count: 'exact', head: true })
+      .eq('user_id', meId);
+    animateNumber($('stat-communities-num'), commCount ?? 0);
+  }
+
+  // ---------- Courses carousel ----------
+  async function loadCourses() {
+    const body = $('courses-body');
+
+    const { data: ce, error } = await supabase
+      .from('course_enrollments')
       .select(`
-        joined_at,
-        communities ( id, name, type )
+        course_id,
+        status,
+        courses ( id, code, title, level_ordinal, semester )
       `)
       .eq('user_id', meId)
-      .order('joined_at', { ascending: false })
-      .limit(4);
+      .eq('status', 'active');
 
-    const el = $('feed-groups');
-    if (error) { el.innerHTML = emptyHtml('Could not load groups.'); return; }
-    if (!data || data.length === 0) {
-      el.innerHTML = emptyHtml('You are not in any groups yet. <a href="groups.html" style="color:var(--brand)">Find one →</a>');
+    if (error) { body.innerHTML = `<div class="empty-inline">Could not load courses.</div>`; return; }
+    if (!ce || ce.length === 0) {
+      body.innerHTML = `<div class="empty-inline">No courses yet. They will appear when you're enrolled.</div>`;
       return;
     }
 
-    el.innerHTML = data.map(row => {
-      const g = row.groups;
-      if (!g) return '';
+    // Fetch the community for each course in one query
+    const courseIds = ce.map(r => r.course_id);
+    const { data: communities } = await supabase
+      .from('communities')
+      .select('id, course_id')
+      .in('course_id', courseIds)
+      .eq('kind', 'course');
+    const commByCourse = new Map((communities || []).map(c => [c.course_id, c.id]));
+
+    body.innerHTML = '<div class="courses-scroll">' + ce.map(r => {
+      const c = r.courses;
+      if (!c) return '';
+      const commId = commByCourse.get(c.id);
+      const href = commId ? `group-chat.html?id=${commId}` : '#';
       return `
-        <a class="item" href="group-chat.html?id=${esc(g.id)}">
-          <div class="item__icon" style="background:var(--brand-subtle);color:var(--brand);font-weight:600;font-size:12px;">${initials(g.name)}</div>
-          <div class="item__body">
-            <div class="item__title">${esc(g.name)}</div>
-            <div class="item__meta">
-              <span>${esc(g.type)}</span>
-              <span>·</span>
-              <span>joined ${timeAgo(row.joined_at)}</span>
-            </div>
-          </div>
-        </a>
-      `;
-    }).join('');
+        <a class="course-card" href="${href}" ${!commId ? 'data-no-community="1"' : ''}>
+          <span class="course-card__code">${esc(c.code)}</span>
+          <span class="course-card__title">${esc(c.title)}</span>
+          <span class="course-card__foot">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            Open channel
+          </span>
+        </a>`;
+    }).join('') + '</div>';
+
+    body.querySelectorAll('[data-no-community]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        toast('This course has no channel yet.');
+      });
+    });
   }
 
-  // ---- Sign out ----
-  $('btn-signout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    location.replace('login.html');
+  // ---------- Activity feed ----------
+  async function loadNotifications() {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('id, kind, title, body, link, read, created_at')
+      .eq('user_id', meId)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) { console.error('[dashboard]', error); return; }
+    notifications = data || [];
+    renderFeed();
+    updateMarkAllVisibility();
+  }
+
+  function timeCutoff(filter) {
+    const now = Date.now();
+    if (filter === 'today') {
+      const d = new Date(); d.setHours(0,0,0,0);
+      return d.getTime();
+    }
+    if (filter === 'week') return now - 7 * 24 * 60 * 60 * 1000;
+    return 0;
+  }
+
+  function renderFeed() {
+    const body = $('feed-body');
+    const cutoff = timeCutoff(currentTimeFilter);
+
+    const filtered = notifications.filter(n => {
+      if (new Date(n.created_at).getTime() < cutoff) return false;
+      if (currentTypeFilter === 'all') return true;
+      return n.kind === currentTypeFilter;
+    });
+
+    if (filtered.length === 0) {
+      body.innerHTML = `<div class="empty-inline">Nothing here yet.</div>`;
+      return;
+    }
+
+    body.innerHTML = '<div class="feed">' + filtered.map(n => `
+      <a class="feed-item" href="${esc(n.link || '#')}" data-id="${esc(n.id)}" ${!n.read ? 'data-unread="1"' : ''}>
+        <div class="feed-item__icon">${notifIcon(n.kind)}</div>
+        <div class="feed-item__body">
+          <div class="feed-item__title">${esc(n.title)}</div>
+          ${n.body ? `<div class="feed-item__sub">${esc(n.body)}</div>` : ''}
+          <div class="feed-item__time">${timeAgo(n.created_at)}</div>
+        </div>
+      </a>
+    `).join('') + '</div>';
+  }
+
+  function updateMarkAllVisibility() {
+    const hasUnread = notifications.some(n => !n.read);
+    $('link-mark-all').style.display = hasUnread ? '' : 'none';
+  }
+
+  $('link-mark-all').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
+    if (!unreadIds.length) return;
+    // Optimistic
+    notifications.forEach(n => { n.read = true; });
+    renderFeed();
+    updateMarkAllVisibility();
+    const { error } = await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', meId)
+      .in('id', unreadIds);
+    if (error) toast(error.message, 'error');
+    else       toast('All marked as read.');
   });
 
-  // ---- Boot (parallel) ----
-  await Promise.all([loadAnnouncements(), loadMaterials(), loadGroups()]);
+  // Tap activity item → mark read, then follow link
+  $('feed-body').addEventListener('click', async (e) => {
+    const item = e.target.closest('.feed-item');
+    if (!item) return;
+    const id = item.dataset.id;
+    const n = notifications.find(x => x.id === id);
+    if (n && !n.read) {
+      n.read = true;
+      item.removeAttribute('data-unread');
+      updateMarkAllVisibility();
+      supabase.from('notifications').update({ read: true }).eq('id', id).then(() => {});
+    }
+    // Default anchor href handles the navigation; no preventDefault.
+  });
+
+  // Filter chips
+  document.querySelectorAll('[data-time]').forEach(c => {
+    c.addEventListener('click', () => {
+      currentTimeFilter = c.dataset.time;
+      document.querySelectorAll('[data-time]').forEach(x =>
+        x.setAttribute('aria-pressed', String(x.dataset.time === currentTimeFilter))
+      );
+      renderFeed();
+    });
+  });
+  document.querySelectorAll('[data-type]').forEach(c => {
+    c.addEventListener('click', () => {
+      currentTypeFilter = c.dataset.type;
+      document.querySelectorAll('[data-type]').forEach(x =>
+        x.setAttribute('aria-pressed', String(x.dataset.type === currentTypeFilter))
+      );
+      renderFeed();
+    });
+  });
+
+  // ---------- Quick actions ----------
+  function renderQA() {
+    const items = [];
+
+    if (canPost.announcement) {
+      items.push({
+        href: 'announcements.html',
+        label: 'Post announcement',
+        svg: '<path d="M3 11l18-8v18L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+      });
+    }
+    if (canPost.material) {
+      items.push({
+        href: 'materials.html',
+        label: 'Upload material',
+        svg: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/>',
+      });
+    }
+    items.push({
+      href: 'messages.html',
+      label: 'Start a chat',
+      svg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    });
+    items.push({
+      href: 'groups.html',
+      label: 'Find a community',
+      svg: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>',
+    });
+    items.push({
+      href: 'profile.html',
+      label: 'Edit profile',
+      svg: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/>',
+    });
+    items.push({
+      href: 'settings.html',
+      label: 'Settings',
+      svg: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.09-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+    });
+
+    $('qa').innerHTML = items.map(i => `
+      <a class="qa__item" href="${esc(i.href)}">
+        <span class="qa__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${i.svg}</svg>
+        </span>
+        <span class="qa__label">${esc(i.label)}</span>
+      </a>
+    `).join('');
+  }
+
+  // ---------- Realtime: new notification arrives ----------
+  function subscribeRealtime() {
+    channel = supabase
+      .channel('dashboard-notifs:' + meId)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${meId}` },
+        (payload) => {
+          const n = payload.new;
+          if (!n || notifications.some(x => x.id === n.id)) return;
+          notifications.unshift(n);
+          notifications = notifications.slice(0, 50);
+          renderFeed();
+          updateMarkAllVisibility();
+          toast('New activity: ' + n.title);
+        }
+      )
+      .subscribe();
+  }
+
+  // ---------- Refresh button ----------
+  $('btn-refresh').addEventListener('click', async () => {
+    const btn = $('btn-refresh');
+    btn.disabled = true;
+    await Promise.all([loadStats(), loadCourses(), loadNotifications()]);
+    btn.disabled = false;
+    toast('Refreshed.');
+  });
+
+  // ---------- Boot ----------
+  try {
+    await Promise.all([loadStats(), loadCourses(), loadNotifications()]);
+    renderQA();
+    $('state-loading').hidden = true;
+    $('content').hidden = false;
+    subscribeRealtime();
+
+    // Bump last_seen
+    supabase.rpc('touch_my_last_seen').then(() => {});
+  } catch (e) {
+    showError(e.message || 'Failed to load dashboard');
+  }
+
+  window.addEventListener('beforeunload', () => {
+    if (channel) supabase.removeChannel(channel);
+  });
 </script>
 
-  <script type="module" src="../js/bottom-nav.js"></script>
-  <script type="module" src="../js/notifications.js"></script>
+<script type="module" src="../js/bottom-nav.js"></script>
+<script type="module" src="../js/notifications.js"></script>
 </body>
 </html>
