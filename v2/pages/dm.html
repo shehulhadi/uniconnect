@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Message — UniConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/tokens.css">
+<style>
+  html, body { height: 100%; height: 100dvh; overflow: hidden; }
+  body { display: flex; flex-direction: column; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); min-height: 56px;
+    flex-shrink: 0;
+  }
+  .back {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: var(--radius-md);
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-muted); text-decoration: none;
+    transition: all var(--duration-fast) var(--ease);
+    flex-shrink: 0;
+  }
+  .back:hover { color: var(--text); border-color: var(--border-strong); background: var(--bg-elevated); }
+
+  .avatar {
+    width: 36px; height: 36px; border-radius: var(--radius-full);
+    background: var(--brand-subtle); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--text-xs); font-weight: 600;
+    flex-shrink: 0; text-transform: uppercase;
+  }
+
+  .head { min-width: 0; flex: 1; }
+  .head__name {
+    font-weight: 600; font-size: var(--text-base);
+    letter-spacing: -0.01em; line-height: 1.2;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .head__meta {
+    font-size: var(--text-xs); color: var(--text-subtle);
+  }
+
+  .main {
+    flex: 1; min-height: 0;
+    max-width: 720px; width: 100%;
+    margin: 0 auto;
+    padding: 0 var(--space-4) 88px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  .msgs {
+    flex: 1; min-height: 0;
+    overflow-y: auto;
+    padding: var(--space-4) 0;
+    display: flex; flex-direction: column; gap: var(--space-2);
+  }
+  .msgs::-webkit-scrollbar { width: 6px; }
+  .msgs::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+  .date-divider {
+    text-align: center;
+    font-size: var(--text-xs);
+    color: var(--text-subtle);
+    padding: var(--space-2) 0;
+    position: relative;
+  }
+  .date-divider span { background: var(--bg); padding: 0 var(--space-3); position: relative; z-index: 1; }
+  .date-divider::before {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 50%;
+    border-top: 1px solid var(--border);
+  }
+
+  .msg {
+    display: flex; gap: var(--space-2); align-items: flex-end;
+    max-width: 80%;
+  }
+  .msg--mine { align-self: flex-end; flex-direction: row-reverse; }
+  .msg__bubble {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+  .msg--mine .msg__bubble {
+    background: var(--brand); color: var(--brand-fg);
+    border-color: var(--brand);
+  }
+  .msg__time {
+    font-size: 0.6875rem; color: var(--text-subtle);
+    margin-top: 3px; display: block;
+  }
+  .msg--mine .msg__time { color: color-mix(in srgb, var(--brand-fg) 70%, transparent); }
+
+  .composer {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 20;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    padding: var(--space-3) var(--space-4) max(var(--space-3), env(safe-area-inset-bottom));
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  @media (min-width: 720px) {
+    .composer {
+      left: 50%; transform: translateX(-50%);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      border-top-left-radius: var(--radius-lg);
+      border-top-right-radius: var(--radius-lg);
+    }
+  }
+  .composer__row { display: flex; gap: var(--space-2); align-items: flex-end; }
+  .composer textarea {
+    flex: 1;
+    min-height: 40px; max-height: 140px;
+    padding: 0.65rem 0.85rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base); font-family: inherit;
+    color: var(--text); line-height: 1.4;
+    resize: none;
+    transition: border-color var(--duration-fast) var(--ease);
+  }
+  .composer textarea:focus {
+    outline: none; border-color: var(--brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
+  }
+  .composer textarea:disabled { opacity: 0.6; cursor: not-allowed; }
+  .send {
+    appearance: none;
+    background: var(--brand); color: var(--brand-fg);
+    border: none; border-radius: var(--radius-md);
+    padding: 0 1rem; min-width: 60px; min-height: 40px;
+    font-size: var(--text-sm); font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .send:hover:not(:disabled) { background: var(--brand-hover); }
+  .send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .state {
+    padding: var(--space-6) var(--space-4);
+    text-align: center; color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+  .state--error { color: var(--danger); }
+  .state--empty { margin: auto; max-width: 34ch; }
+  .state--empty h3 {
+    font-size: var(--text-base); color: var(--text);
+    margin-bottom: var(--space-2); font-weight: 600;
+  }
+</style>
+</head>
+<body data-no-nav="1" data-no-notifications="1">
+
+<header class="topbar">
+  <a class="back" href="messages.html" aria-label="Back to messages">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  </a>
+  <div class="avatar" id="other-avatar">?</div>
+  <div class="head">
+    <div class="head__name" id="other-name">Loading…</div>
+    <div class="head__meta" id="other-meta"></div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="msgs" id="msgs">
+    <div class="state" id="state-loading">Loading messages…</div>
+  </div>
+
+  <form class="composer" id="composer">
+    <div class="composer__row">
+      <textarea id="input" rows="1" placeholder="Write a message…" maxlength="2000" autocomplete="off" disabled></textarea>
+      <button class="send" id="btn-send" type="submit" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+      </button>
+    </div>
+  </form>
+</main>
+
+<script type="module">
+  import { supabase } from '../js/supabase.js';
+
+  const $ = (id) => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  const threadId = params.get('id');
+  if (!threadId) { location.replace('messages.html'); throw new Error('missing thread id'); }
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
+  const meId = session.user.id;
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+  const initials = (name) => (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+  const fmtTime = (iso) => new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const dateKey = (iso) => new Date(iso).toDateString();
+  function dateLabel(key) {
+    const d = new Date(key), now = new Date();
+    const day = 1000*60*60*24;
+    const diff = Math.floor((now.setHours(0,0,0,0) - d.setHours(0,0,0,0)) / day);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return d.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // ---- Thread + other user ----
+  let otherId = null, otherName = '';
+
+  async function loadThread() {
+    const { data, error } = await supabase
+      .from('dm_threads')
+      .select('id, user_a, user_b')
+      .eq('id', threadId)
+      .maybeSingle();
+    if (error || !data) return { error: error || { message: 'Thread not found.' } };
+    otherId = (data.user_a === meId) ? data.user_b : data.user_a;
+    const { data: prof } = await supabase
+      .from('profiles')
+      .select('full_name, email, role')
+      .eq('id', otherId)
+      .maybeSingle();
+    otherName = prof?.full_name || prof?.email || 'User';
+    $('other-name').textContent = otherName;
+    $('other-avatar').textContent = initials(otherName);
+    $('other-meta').textContent = prof?.role || '';
+    document.title = `${otherName} — UniConnect`;
+    return { data: true };
+  }
+
+  // ---- Messages ----
+  const msgsEl = $('msgs');
+
+  function makeNode(m) {
+    const isMine = m.sender_id === meId;
+    const wrap = el('div', 'msg' + (isMine ? ' msg--mine' : ''));
+    wrap.dataset.id = m.id;
+    const bubble = el('div', 'msg__bubble');
+    bubble.appendChild(document.createTextNode(m.body));
+    bubble.appendChild(el('span', 'msg__time', fmtTime(m.created_at)));
+    wrap.appendChild(bubble);
+    return wrap;
+  }
+
+  function scrollToBottom(smooth = true) {
+    requestAnimationFrame(() => {
+      msgsEl.scrollTo({ top: msgsEl.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+    });
+  }
+
+  async function loadMessages() {
+    const { data, error } = await supabase
+      .from('dm_messages')
+      .select('id, sender_id, recipient_id, body, read, created_at')
+      .eq('thread_id', threadId)
+      .order('created_at', { ascending: true })
+      .limit(300);
+
+    msgsEl.innerHTML = '';
+    if (error) {
+      msgsEl.appendChild(el('div', 'state state--error', 'Could not load messages: ' + error.message));
+      return;
+    }
+    if (!data || data.length === 0) {
+      const empty = el('div', 'state state--empty');
+      empty.appendChild(el('h3', null, 'No messages yet'));
+      empty.appendChild(el('p', null, 'Say hello.'));
+      msgsEl.appendChild(empty);
+      return;
+    }
+
+    let lastKey = null;
+    for (const m of data) {
+      const k = dateKey(m.created_at);
+      if (k !== lastKey) {
+        const d = el('div', 'date-divider');
+        d.appendChild(el('span', null, dateLabel(k)));
+        msgsEl.appendChild(d);
+        lastKey = k;
+      }
+      msgsEl.appendChild(makeNode(m));
+    }
+    scrollToBottom(false);
+
+    // Mark incoming as read
+    const unreadIds = data.filter(m => m.recipient_id === meId && !m.read).map(m => m.id);
+    if (unreadIds.length) {
+      supabase.from('dm_messages')
+        .update({ read: true })
+        .in('id', unreadIds)
+        .then(() => {});
+    }
+  }
+
+  // ---- Realtime ----
+  let channel = null;
+  function subscribe() {
+    channel = supabase
+      .channel(`dm:${threadId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'dm_messages', filter: `thread_id=eq.${threadId}` },
+        (payload) => {
+          const m = payload.new;
+          if (msgsEl.querySelector(`[data-id="${m.id}"]`)) return;
+          msgsEl.querySelector('.state--empty')?.remove();
+
+          const k = dateKey(m.created_at);
+          const lastDiv = msgsEl.querySelector('.date-divider:last-of-type');
+          if (lastDiv?.dataset.key !== k) {
+            const d = el('div', 'date-divider');
+            d.dataset.key = k;
+            d.appendChild(el('span', null, dateLabel(k)));
+            msgsEl.appendChild(d);
+          }
+          msgsEl.appendChild(makeNode(m));
+          scrollToBottom();
+
+          // If it's for me, mark read immediately
+          if (m.recipient_id === meId) {
+            supabase.from('dm_messages').update({ read: true }).eq('id', m.id).then(() => {});
+          }
+        }
+      )
+      .subscribe();
+  }
+
+  // ---- Composer ----
+  const form = $('composer'), input = $('input'), sendBtn = $('btn-send');
+
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(min-width: 768px)').matches) {
+      e.preventDefault(); form.requestSubmit();
+    }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = input.value.trim();
+    if (!body || !otherId) return;
+
+    input.value = ''; input.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    const { data, error } = await supabase
+      .from('dm_messages')
+      .insert({ thread_id: threadId, sender_id: meId, recipient_id: otherId, body })
+      .select('id, sender_id, recipient_id, body, read, created_at')
+      .single();
+
+    sendBtn.disabled = false;
+    if (error) {
+      input.value = body;
+      input.dispatchEvent(new Event('input'));
+      alert('Send failed: ' + error.message);
+      return;
+    }
+    msgsEl.querySelector('.state--empty')?.remove();
+    msgsEl.appendChild(makeNode(data));
+    scrollToBottom();
+  });
+
+  // ---- Boot ----
+  const t = await loadThread();
+  if (t.error) {
+    msgsEl.innerHTML = '';
+    msgsEl.appendChild(el('div', 'state state--error', t.error.message));
+  } else {
+    input.disabled = false;
+    sendBtn.disabled = false;
+    await loadMessages();
+    subscribe();
+    input.focus();
+  }
+
+  window.addEventListener('beforeunload', () => {
+    if (channel) supabase.removeChannel(channel);
+  });
+</script>
+
+</body>
+</html>

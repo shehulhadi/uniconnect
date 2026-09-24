@@ -4,6 +4,8 @@
 const ITEMS = [
   { href: 'dashboard.html',     label: 'Home',      files: ['dashboard.html'],
     svg: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
+  { href: 'messages.html',      label: 'Chat',      files: ['messages.html','dm.html'],
+    svg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' },
   { href: 'announcements.html', label: 'Notices',   files: ['announcements.html'],
     svg: '<path d="M3 11l18-8v18L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>' },
   { href: 'materials.html',     label: 'Materials', files: ['materials.html'],
