@@ -133,6 +133,12 @@
   .inst-card__name { font-size: var(--text-base); font-weight: 500; line-height: var(--leading-snug); overflow-wrap: anywhere; }
   .inst-card__meta { font-size: var(--text-xs); color: var(--text-subtle); margin-top: 2px; }
 
+  .id-summary { display: flex; flex-direction: column; gap: 6px; margin-top: var(--space-2); }
+  .id-summary__row { display: flex; justify-content: space-between; gap: var(--space-3); font-size: var(--text-sm); }
+  .id-summary__row span { color: var(--text-muted); }
+  .id-summary__row strong { font-weight: 500; text-align: right; }
+  .hint { font-size: var(--text-xs); color: var(--text-subtle); margin-top: 6px; }
+
   .placeholder { padding: var(--space-6) var(--space-5); background: var(--bg-sunken); border-radius: var(--radius-lg); border: 1px dashed var(--border-strong); text-align: center; color: var(--text-muted); font-size: var(--text-sm); line-height: var(--leading-snug); margin-bottom: var(--space-4); }
 </style>
 </head>
@@ -236,7 +242,52 @@
 
     <!-- Panel 4: Identity -->
     <section class="onb-panel" id="panel-identity" hidden>
-      <div class="placeholder">Student identity and verification are built in a later step.</div>
+
+      <div class="onb-card" id="id-summary">
+        <div class="onb-card__label">Your academic record</div>
+        <div class="id-summary">
+          <div class="id-summary__row"><span>Institution</span><strong id="id-institution">—</strong></div>
+          <div class="id-summary__row"><span>Faculty</span><strong id="id-faculty">—</strong></div>
+          <div class="id-summary__row"><span>Department</span><strong id="id-department">—</strong></div>
+          <div class="id-summary__row"><span>Programme</span><strong id="id-programme">—</strong></div>
+          <div class="id-summary__row"><span>Level</span><strong id="id-level">—</strong></div>
+          <div class="id-summary__row"><span>Session</span><strong id="id-session">—</strong></div>
+        </div>
+      </div>
+
+      <div id="id-form-block">
+        <div class="field">
+          <label for="id-matric">Matric / Student number</label>
+          <input type="text" id="id-matric" placeholder="e.g. CSC/21/0042" autocapitalize="characters" autocomplete="off">
+          <div class="hint">The identifier your institution gave you.</div>
+        </div>
+        <div class="onb-actions">
+          <button class="btn-secondary" id="btn-id-back">Back</button>
+          <button class="btn-primary" id="btn-id-continue" disabled>Submit for verification</button>
+        </div>
+      </div>
+
+      <div id="id-verified-block" hidden>
+        <div class="onb-card" style="border-color: var(--success);">
+          <div class="onb-card__label" style="color: var(--success);">Verified</div>
+          <div class="onb-card__value">Your student identity is confirmed.</div>
+        </div>
+        <div class="onb-actions">
+          <button class="btn-primary" id="btn-id-verified-continue">Continue</button>
+        </div>
+      </div>
+
+      <div id="id-pending-block" hidden>
+        <div class="onb-card">
+          <div class="onb-card__label">Submitted for review</div>
+          <div class="onb-card__value">Your university information has been submitted.</div>
+          <div class="onb-card__hint">Your institution will review your details. This page will update once a decision is made.</div>
+        </div>
+        <div class="onb-actions">
+          <button class="btn-primary" id="btn-id-refresh">Refresh status</button>
+        </div>
+      </div>
+
     </section>
 
     <!-- Panel 5: Enrollment -->

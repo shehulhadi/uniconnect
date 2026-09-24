@@ -302,6 +302,89 @@ export async function run() {
     });
   }
 
+  // ---------- Panel 4: Identity ----------
+  if (current === 3) {
+    const btnContinue = $('btn-id-continue');
+    const inputMatric  = $('id-matric');
+
+    const { data: summary } = await supabase
+      .from('profiles')
+      .select(`
+        institutions ( name ),
+        faculties    ( name ),
+        departments  ( name ),
+        programmes   ( name ),
+        levels       ( display_name ),
+        academic_sessions ( name )
+      `)
+      .eq('id', meId)
+      .single();
+
+    if (summary) {
+      $('id-institution').textContent = summary.institutions?.name || '—';
+      $('id-faculty').textContent     = summary.faculties?.name || '—';
+      $('id-department').textContent  = summary.departments?.name || '—';
+      $('id-programme').textContent   = summary.programmes?.name || '—';
+      $('id-level').textContent       = summary.levels?.display_name || '—';
+      $('id-session').textContent     = summary.academic_sessions?.name || '—';
+    }
+
+    if (profile.matric_no) {
+      inputMatric.value = profile.matric_no;
+      btnContinue.disabled = false;
+    }
+
+    inputMatric.addEventListener('input', () => {
+      btnContinue.disabled = !inputMatric.value.trim();
+    });
+
+    $('btn-id-back').addEventListener('click', async () => {
+      await supabase.from('profiles').update({ registration_step: 'academic' }).eq('id', meId);
+      location.reload();
+    });
+
+    btnContinue.addEventListener('click', async () => {
+      const matric = inputMatric.value.trim();
+      if (!matric) return;
+      btnContinue.disabled = true;
+      btnContinue.textContent = 'Submitting…';
+
+      const { data, error } = await supabase.rpc('onboarding_submit_identity', {
+        p_matric_no: matric,
+      });
+
+      if (error) {
+        btnContinue.disabled = false;
+        btnContinue.textContent = 'Submit for verification';
+        $('alert').textContent = error.message;
+        $('alert').setAttribute('data-show', '1');
+        return;
+      }
+
+      const status = data?.status;
+      if (status === 'verified') {
+        location.reload();
+      } else {
+        $('id-form-block').hidden = true;
+        $('id-pending-block').hidden = false;
+      }
+    });
+
+    $('btn-id-refresh')?.addEventListener('click', () => location.reload());
+    $('btn-id-verified-continue')?.addEventListener('click', async () => {
+      await supabase.from('profiles').update({ registration_step: 'enrollment' }).eq('id', meId);
+      location.reload();
+    });
+
+    if (profile.verification_status === 'verified') {
+      $('id-form-block').hidden = true;
+      $('id-verified-block').hidden = false;
+    } else if (profile.verification_status === 'pending') {
+      $('id-form-block').hidden = true;
+      $('id-pending-block').hidden = false;
+    }
+  }
+
   // ---------- Sign out ----------
   $('btn-signout').addEventListener('click', async () => {
     await supabase.auth.signOut();
