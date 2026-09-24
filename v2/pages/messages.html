@@ -8,63 +8,92 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/nav.css">
+<link rel="stylesheet" href="../css/notifications.css">
+<link rel="stylesheet" href="../css/topbar.css">
 <style>
   .topbar {
     position: sticky; top: 0; z-index: 10;
     display: flex; align-items: center; justify-content: space-between;
+    gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    background: color-mix(in srgb, var(--bg) 85%, transparent);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border); min-height: 56px;
   }
-  .topbar__brand {
-    display: flex; align-items: center; gap: var(--space-2);
-    font-weight: 600; font-size: var(--text-base);
-    letter-spacing: -0.01em; color: var(--text);
-  }
-  .topbar__brand svg { color: var(--brand); }
+  .topbar__title { font-size: var(--text-base); font-weight: 600; letter-spacing: -0.01em; }
   .topbar__right { display: flex; align-items: center; gap: var(--space-2); }
 
-  .btn-primary {
-    appearance: none; background: var(--brand); color: var(--brand-fg);
-    border: none; padding: 0.5rem 0.9rem;
-    border-radius: var(--radius-md); font-size: var(--text-sm);
-    font-weight: 500; cursor: pointer;
+  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-4) var(--space-4) var(--space-10); }
+  @media (min-width: 640px) { .wrap { padding: var(--space-5) var(--space-6) var(--space-10); } }
+
+  /* Tabs */
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: var(--bg-sunken);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 3px;
+    margin-bottom: var(--space-4);
+  }
+  .tab {
+    appearance: none; border: none; background: transparent;
+    padding: 0.55rem 0.5rem;
+    font-size: var(--text-sm); font-weight: 500;
+    color: var(--text-muted);
+    border-radius: calc(var(--radius-md) - 3px);
+    cursor: pointer;
     transition: all var(--duration-fast) var(--ease);
-    min-height: 36px; display: inline-flex;
-    align-items: center; gap: var(--space-2);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 40px;
+    position: relative;
   }
-  .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
-  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+  .tab:hover { color: var(--text); }
+  .tab[aria-selected="true"] { background: var(--bg-elevated); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+  .tab__badge {
+    min-width: 18px; height: 18px; border-radius: 9px;
+    background: var(--danger); color: #fff;
+    font-size: 0.625rem; font-weight: 700;
+    display: none; align-items: center; justify-content: center;
+    padding: 0 5px;
+  }
+  .tab__badge[data-show] { display: inline-flex; }
 
-  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-6) var(--space-4); }
-  @media (min-width: 640px) { .wrap { padding: var(--space-8) var(--space-6); } }
+  .panel[hidden] { display: none; }
 
-  .head {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    gap: var(--space-4); margin-bottom: var(--space-5); flex-wrap: wrap;
+  .search {
+    width: 100%; padding: 0.7rem 0.9rem;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: var(--radius-md); font-size: var(--text-sm);
+    color: var(--text); margin-bottom: var(--space-4);
+    min-height: 44px;
+    transition: border-color var(--duration-fast) var(--ease);
   }
-  .head h1 {
-    font-size: var(--text-2xl); font-weight: 600;
-    letter-spacing: -0.02em; line-height: var(--leading-tight);
-    margin-bottom: var(--space-2);
+  .search:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent); }
+
+  .section-label {
+    font-size: var(--text-xs); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-subtle);
+    margin-bottom: var(--space-2); margin-top: var(--space-4);
+    display: flex; align-items: center; justify-content: space-between;
   }
-  @media (min-width: 640px) { .head h1 { font-size: var(--text-3xl); } }
-  .head p { color: var(--text-muted); font-size: var(--text-base); }
+  .section-label:first-child { margin-top: 0; }
 
   .list { display: flex; flex-direction: column; gap: 2px; }
 
-  .thread {
-    display: flex; gap: var(--space-3); align-items: center;
-    padding: var(--space-3) var(--space-3);
+  .row {
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-3);
     border-radius: var(--radius-md);
     text-decoration: none; color: var(--text);
     transition: background var(--duration-fast) var(--ease);
     -webkit-tap-highlight-color: transparent;
+    border: none; background: transparent;
+    width: 100%; text-align: left;
+    font-family: inherit; font-size: inherit;
   }
-  .thread:hover { background: var(--bg-sunken); }
-  .thread[data-unread] .thread__name { font-weight: 700; }
-  .thread[data-unread] .thread__preview { color: var(--text); font-weight: 500; }
+  .row:hover { background: var(--bg-sunken); }
+  .row[data-clickable] { cursor: pointer; }
 
   .avatar {
     width: 44px; height: 44px; border-radius: var(--radius-full);
@@ -72,104 +101,68 @@
     display: flex; align-items: center; justify-content: center;
     font-size: var(--text-sm); font-weight: 600;
     flex-shrink: 0; text-transform: uppercase;
+    overflow: hidden; position: relative;
   }
-  .avatar--lg {
-    width: 56px; height: 56px; font-size: var(--text-md);
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar__dot {
+    position: absolute; bottom: 0; right: 0;
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid var(--bg-elevated);
+    background: var(--text-subtle);
   }
+  .avatar__dot[data-status="online"] { background: var(--success); }
+  .avatar__dot[data-status="away"]   { background: var(--warning); }
+  .avatar__dot[data-status="busy"]   { background: var(--danger); }
 
-  .thread__body { flex: 1; min-width: 0; }
-  .thread__row {
-    display: flex; align-items: baseline;
-    justify-content: space-between; gap: var(--space-2);
-    margin-bottom: 2px;
-  }
-  .thread__name {
+  .row__body { flex: 1; min-width: 0; }
+  .row__name {
     font-size: var(--text-sm); font-weight: 500;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
   }
-  .thread__time {
-    font-size: var(--text-xs); color: var(--text-subtle);
-    flex-shrink: 0;
+  .row__name .role-chip {
+    font-size: 0.5625rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    background: var(--bg-sunken); color: var(--text-subtle);
+    padding: 1px 5px; border-radius: var(--radius-sm);
   }
-  .thread__preview {
-    font-size: var(--text-sm); color: var(--text-muted);
-    line-height: var(--leading-snug);
+  .row__sub {
+    font-size: var(--text-xs); color: var(--text-muted);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .thread__badge {
-    min-width: 20px; height: 20px;
-    border-radius: var(--radius-full);
-    background: var(--brand); color: var(--brand-fg);
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 0.6875rem; font-weight: 700;
-    padding: 0 6px; flex-shrink: 0;
+    margin-top: 2px;
   }
 
+  .row__action { flex-shrink: 0; display: flex; gap: 6px; align-items: center; }
+
+  .btn-mini {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    padding: 0.35rem 0.7rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs); font-weight: 500;
+    cursor: pointer; min-height: 32px;
+    transition: all var(--duration-fast) var(--ease);
+    display: inline-flex; align-items: center; gap: 4px;
+    white-space: nowrap;
+  }
+  .btn-mini:hover:not(:disabled) { color: var(--text); border-color: var(--border-strong); }
+  .btn-mini:disabled { opacity: 0.5; cursor: wait; }
+  .btn-mini--primary { background: var(--brand); color: var(--brand-fg); border-color: var(--brand); }
+  .btn-mini--primary:hover:not(:disabled) { background: var(--brand-hover); color: var(--brand-fg); }
+  .btn-mini--danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
+  .btn-mini--danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+
   .empty {
-    padding: var(--space-10) var(--space-4);
+    padding: var(--space-8) var(--space-4);
     text-align: center;
     color: var(--text-muted);
     font-size: var(--text-sm);
+    line-height: var(--leading-snug);
   }
   .empty svg { color: var(--border-strong); margin-bottom: var(--space-3); }
-  .empty h3 {
-    font-size: var(--text-base); color: var(--text);
-    margin-bottom: var(--space-2); font-weight: 600;
-  }
-  .empty p { max-width: 34ch; margin: 0 auto var(--space-4); }
-
-  /* Modal */
-  .modal-backdrop {
-    position: fixed; inset: 0; z-index: 50;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    display: flex; align-items: center; justify-content: center;
-    padding: var(--space-4);
-    opacity: 0; pointer-events: none;
-    transition: opacity var(--duration) var(--ease);
-  }
-  .modal-backdrop[data-open] { opacity: 1; pointer-events: auto; }
-  .modal {
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); width: 100%; max-width: 440px;
-    max-height: 85vh; overflow-y: auto; padding: var(--space-5);
-    transform: translateY(12px); transition: transform var(--duration) var(--ease);
-  }
-  .modal-backdrop[data-open] .modal { transform: translateY(0); }
-  .modal h2 {
-    font-size: var(--text-lg); font-weight: 600;
-    letter-spacing: -0.01em; margin-bottom: var(--space-2);
-  }
-  .modal .sub {
-    font-size: var(--text-sm); color: var(--text-muted);
-    margin-bottom: var(--space-4);
-  }
-  .modal input[type="search"] {
-    width: 100%; padding: 0.65rem 0.85rem;
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: var(--radius-md); font-size: var(--text-sm);
-    color: var(--text); margin-bottom: var(--space-3);
-  }
-  .modal input[type="search"]:focus {
-    outline: none; border-color: var(--brand);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
-  }
-
-  .user-list { display: flex; flex-direction: column; gap: 2px; }
-  .user-item {
-    display: flex; gap: var(--space-3); align-items: center;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: background var(--duration-fast) var(--ease);
-    text-align: left;
-    border: none; background: transparent; width: 100%;
-    color: var(--text);
-    font-family: inherit;
-  }
-  .user-item:hover { background: var(--bg-sunken); }
-  .user-item__name { font-size: var(--text-sm); font-weight: 500; }
-  .user-item__sub { font-size: var(--text-xs); color: var(--text-muted); }
+  .empty h3 { font-size: var(--text-base); color: var(--text); margin-bottom: var(--space-2); font-weight: 600; }
 
   .state { padding: var(--space-6) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
   .state[hidden] { display: none; }
@@ -189,50 +182,45 @@
   .toast[data-show] { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast[data-kind="error"] { background: var(--danger); color: white; }
 </style>
-  <link rel="stylesheet" href="../css/nav.css">
-  <link rel="stylesheet" href="../css/notifications.css">
-  <link rel="stylesheet" href="../css/topbar.css">
 </head>
 <body>
 
 <header class="topbar">
-  <div class="topbar__brand">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-    </svg>
-    UniConnect
-  </div>
-  <div class="topbar__right">
-    <button class="btn-primary" id="btn-new">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-      New
-    </button>
-  </div>
+  <div class="topbar__title">Messages</div>
+  <div class="topbar__right"></div>
 </header>
 
 <main class="wrap">
-  <div class="head">
-    <div>
-      <h1>Messages</h1>
-      <p>Direct conversations with people at your institution.</p>
-    </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="chats">Chats</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="friends">
+      Friends <span class="tab__badge" id="tab-badge-friends"></span>
+    </button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="people">People</button>
   </div>
 
   <div class="state" id="state-loading">Loading…</div>
   <div class="state state--error" id="state-error" hidden></div>
-  <div id="inbox" hidden></div>
-</main>
 
-<!-- New message modal -->
-<div class="modal-backdrop" id="modal" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <h2 id="modal-title">New message</h2>
-    <p class="sub">Pick someone at your institution to start a conversation with.</p>
-    <input type="search" id="user-search" placeholder="Search by name or email…" autocomplete="off">
-    <div class="user-list" id="user-list"></div>
-  </div>
-</div>
+  <!-- Chats -->
+  <section class="panel" id="panel-chats" hidden>
+    <div id="chats-body"></div>
+  </section>
+
+  <!-- Friends -->
+  <section class="panel" id="panel-friends" hidden>
+    <input type="search" class="search" id="friends-search" placeholder="Search friends…" autocomplete="off">
+    <div id="friends-body"></div>
+  </section>
+
+  <!-- People -->
+  <section class="panel" id="panel-people" hidden>
+    <input type="search" class="search" id="people-search" placeholder="Search by name or email…" autocomplete="off">
+    <div id="people-body"></div>
+  </section>
+
+</main>
 
 <div class="toast" id="toast"></div>
 
@@ -240,10 +228,12 @@
   import { supabase } from '../js/supabase.js';
 
   const $ = (id) => document.getElementById(id);
+  let meId = null;
+  let currentTab = 'chats';
 
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
-  const meId = session.user.id;
+  meId = session.user.id;
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
@@ -251,12 +241,13 @@
   const initials = (name) => (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
   const timeAgo = (iso) => {
     if (!iso) return '';
-    const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    const d = new Date(iso);
+    const diff = (Date.now() - d.getTime()) / 1000;
     if (diff < 60) return 'now';
     if (diff < 3600) return Math.floor(diff / 60) + 'm';
     if (diff < 86400) return Math.floor(diff / 3600) + 'h';
     if (diff < 604800) return Math.floor(diff / 86400) + 'd';
-    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   };
   function toast(msg, kind) {
     const el = $('toast');
@@ -264,134 +255,395 @@
     el.setAttribute('data-show', '1');
     if (kind) el.setAttribute('data-kind', kind); else el.removeAttribute('data-kind');
     clearTimeout(toast._t);
-    toast._t = setTimeout(() => el.removeAttribute('data-show'), 3500);
+    toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
+  }
+  function showError(msg) {
+    $('state-loading').hidden = true;
+    $('state-error').hidden = false;
+    $('state-error').textContent = msg;
   }
 
-  // ---- Load inbox ----
-  async function loadInbox() {
+  // ------------------------------------------------------------------
+  // Tab switching
+  // ------------------------------------------------------------------
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => switchTab(t.dataset.tab));
+  });
+
+  function switchTab(name) {
+    currentTab = name;
+    document.querySelectorAll('.tab').forEach(t =>
+      t.setAttribute('aria-selected', String(t.dataset.tab === name))
+    );
+    ['chats','friends','people'].forEach(k => {
+      const el = $(`panel-${k}`);
+      if (el) el.hidden = k !== name;
+    });
+    if (name === 'chats')   loadChats();
+    if (name === 'friends') loadFriends();
+    if (name === 'people')  loadPeople('');
+  }
+
+  // ------------------------------------------------------------------
+  // CHATS
+  // ------------------------------------------------------------------
+  async function loadChats() {
+    const body = $('chats-body');
+    body.innerHTML = '<div class="state">Loading chats…</div>';
     const { data, error } = await supabase.rpc('dm_inbox');
     if (error) {
-      $('state-loading').hidden = true;
-      $('state-error').hidden = false;
-      $('state-error').textContent = 'Could not load messages: ' + error.message;
+      body.innerHTML = `<div class="state state--error">${esc(error.message)}</div>`;
       return;
     }
-    $('state-loading').hidden = true;
-    $('inbox').hidden = false;
-
     if (!data || data.length === 0) {
-      $('inbox').innerHTML = `
+      body.innerHTML = `
         <div class="empty">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
           <h3>No conversations yet</h3>
-          <p>Start a conversation with someone at your institution.</p>
+          <p>Open the <strong>Friends</strong> tab and start a chat with someone.</p>
         </div>`;
       return;
     }
 
-    $('inbox').innerHTML = '<div class="list">' + data.map(t => {
+    body.innerHTML = '<div class="list">' + data.map(t => {
       const name = t.other_name || t.other_email || 'Unknown';
-      const unreadAttr = t.unread > 0 ? ' data-unread="1"' : '';
-      const badge = t.unread > 0 ? `<span class="thread__badge">${t.unread}</span>` : '';
+      const unread = t.unread > 0;
+      const last = t.last_message || 'No messages yet';
       return `
-        <a class="thread"${unreadAttr} href="dm.html?id=${esc(t.thread_id)}">
+        <a class="row" href="dm.html?id=${esc(t.thread_id)}" data-clickable>
           <div class="avatar">${esc(initials(name))}</div>
-          <div class="thread__body">
-            <div class="thread__row">
-              <span class="thread__name">${esc(name)}</span>
-              <span class="thread__time">${timeAgo(t.last_message_at)}</span>
-            </div>
-            <div class="thread__preview">${esc(t.last_message || 'No messages yet')}</div>
+          <div class="row__body">
+            <div class="row__name">${esc(name)}</div>
+            <div class="row__sub" style="${unread ? 'color:var(--text);font-weight:500;' : ''}">${esc(last)}</div>
           </div>
-          ${badge}
+          <div class="row__action">
+            ${unread ? `<span class="tab__badge" data-show="1">${t.unread}</span>` : ''}
+            <span style="font-size:var(--text-xs);color:var(--text-subtle)">${timeAgo(t.last_message_at)}</span>
+          </div>
         </a>`;
     }).join('') + '</div>';
   }
 
-  // ---- New message: pick a user ----
-  async function openUserPicker() {
-    $('modal').setAttribute('data-open', '1');
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => $('user-search').focus(), 50);
+  // ------------------------------------------------------------------
+  // FRIENDS
+  // ------------------------------------------------------------------
+  let friendsCache = { pendingIncoming: [], pendingOutgoing: [], friends: [] };
 
-    $('user-list').innerHTML = '<div class="state">Loading…</div>';
+  async function loadFriends() {
+    const body = $('friends-body');
+    body.innerHTML = '<div class="state">Loading…</div>';
 
-    // Profiles in the same institution, excluding self
     const { data, error } = await supabase
-      .from('profiles')
-      .select('id, full_name, email, role')
-      .neq('id', meId)
-      .order('full_name');
+      .from('user_relationships')
+      .select(`
+        id, kind, created_at,
+        from_user_id, to_user_id,
+        from_profile:profiles!user_relationships_from_user_id_fkey ( id, full_name, email, avatar_url, role, status ),
+        to_profile:profiles!user_relationships_to_user_id_fkey ( id, full_name, email, avatar_url, role, status )
+      `)
+      .in('kind', ['friend_request','friend'])
+      .or(`from_user_id.eq.${meId},to_user_id.eq.${meId}`);
 
     if (error) {
-      $('user-list').innerHTML = '<div class="state state--error">' + esc(error.message) + '</div>';
+      body.innerHTML = `<div class="state state--error">${esc(error.message)}</div>`;
       return;
     }
 
-    const users = data || [];
-    if (users.length === 0) {
-      $('user-list').innerHTML = '<div class="state">No other users at your institution yet.</div>';
-      return;
+    const pendingIncoming = [];
+    const pendingOutgoing = [];
+    const friends = [];
+
+    (data || []).forEach(row => {
+      if (row.kind === 'friend_request') {
+        if (row.to_user_id === meId) pendingIncoming.push({ id: row.id, user: row.from_profile, at: row.created_at });
+        else                          pendingOutgoing.push({ id: row.id, user: row.to_profile, at: row.created_at });
+      } else if (row.kind === 'friend') {
+        const other = row.from_user_id === meId ? row.to_profile : row.from_profile;
+        friends.push(other);
+      }
+    });
+
+    friendsCache = { pendingIncoming, pendingOutgoing, friends };
+
+    // Tab badge
+    const badge = $('tab-badge-friends');
+    if (pendingIncoming.length) {
+      badge.textContent = pendingIncoming.length;
+      badge.setAttribute('data-show', '1');
+    } else {
+      badge.removeAttribute('data-show');
     }
 
-    renderUsers(users);
-
-    $('user-search').oninput = (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      const filtered = !q ? users : users.filter(u =>
-        (u.full_name || '').toLowerCase().includes(q) ||
-        (u.email || '').toLowerCase().includes(q)
-      );
-      renderUsers(filtered);
-    };
+    renderFriends($('friends-search').value.trim().toLowerCase());
   }
 
-  function renderUsers(users) {
-    $('user-list').innerHTML = users.map(u => `
-      <button class="user-item" data-id="${esc(u.id)}" data-name="${esc(u.full_name || u.email)}" type="button">
-        <div class="avatar" style="width:36px;height:36px;font-size:var(--text-xs);">${esc(initials(u.full_name || u.email))}</div>
-        <div style="flex:1;min-width:0;">
-          <div class="user-item__name">${esc(u.full_name || '(no name)')}</div>
-          <div class="user-item__sub">${esc(u.role)} · ${esc(u.email)}</div>
+  function renderFriends(q) {
+    const body = $('friends-body');
+    const { pendingIncoming, pendingOutgoing, friends } = friendsCache;
+    const filtered = !q ? friends : friends.filter(f =>
+      (f?.full_name || '').toLowerCase().includes(q) ||
+      (f?.email || '').toLowerCase().includes(q)
+    );
+
+    let html = '';
+
+    if (pendingIncoming.length) {
+      html += `<div class="section-label">Requests for you <span style="color:var(--danger)">${pendingIncoming.length}</span></div>`;
+      html += '<div class="list">' + pendingIncoming.map(p => rowForUser(p.user, {
+        actions: [
+          { label: 'Accept', kind: 'primary', action: 'accept', id: p.id },
+          { label: 'Decline', kind: 'danger', action: 'decline', id: p.id },
+        ],
+      })).join('') + '</div>';
+    }
+
+    if (pendingOutgoing.length) {
+      html += `<div class="section-label">Sent</div>`;
+      html += '<div class="list">' + pendingOutgoing.map(p => rowForUser(p.user, {
+        actions: [{ label: 'Cancel', kind: 'danger', action: 'cancel', id: p.id }],
+      })).join('') + '</div>';
+    }
+
+    html += `<div class="section-label">Friends <span style="color:var(--text-subtle)">${filtered.length}</span></div>`;
+    if (filtered.length === 0) {
+      html += `<div class="empty">
+        ${q ? 'No friends match that search.' : 'You haven\'t added any friends yet. Check the <strong>People</strong> tab.'}
+      </div>`;
+    } else {
+      html += '<div class="list">' + filtered.map(f => rowForUser(f, {
+        actions: [
+          { label: 'Message', kind: 'primary', action: 'message', id: f.id },
+          { label: 'Unfriend', kind: 'danger', action: 'unfriend', id: f.id },
+        ],
+      })).join('') + '</div>';
+    }
+
+    body.innerHTML = html;
+  }
+
+  $('friends-search').addEventListener('input', (e) => {
+    renderFriends(e.target.value.trim().toLowerCase());
+  });
+
+  function rowForUser(u, opts = {}) {
+    if (!u) return '';
+    const name = u.full_name || u.email || 'Unknown';
+    const sub = u.email || '';
+    const avatar = u.avatar_url
+      ? `<img src="${esc(u.avatar_url)}" alt="">`
+      : esc(initials(name));
+    const dot = u.status && u.status !== 'offline'
+      ? `<span class="avatar__dot" data-status="${esc(u.status)}"></span>` : '';
+
+    const actions = (opts.actions || []).map(a =>
+      `<button class="btn-mini ${a.kind === 'primary' ? 'btn-mini--primary' : a.kind === 'danger' ? 'btn-mini--danger' : ''}"
+              data-relation-action="${esc(a.action)}"
+              data-relation-id="${esc(a.id)}"
+              type="button">${esc(a.label)}</button>`
+    ).join('');
+
+    return `
+      <div class="row">
+        <div class="avatar">${avatar}${dot}</div>
+        <div class="row__body">
+          <div class="row__name">${esc(name)} <span class="role-chip">${esc(u.role || 'student')}</span></div>
+          <div class="row__sub">${esc(sub)}</div>
         </div>
-      </button>
-    `).join('');
+        <div class="row__action">${actions}</div>
+      </div>`;
   }
 
-  function closeModal() {
-    $('modal').removeAttribute('data-open');
-    document.body.style.overflow = '';
-    $('user-search').value = '';
+  // ------------------------------------------------------------------
+  // PEOPLE
+  // ------------------------------------------------------------------
+  async function loadPeople(q) {
+    const body = $('people-body');
+    body.innerHTML = '<div class="state">Loading…</div>';
+
+    const { data, error } = await supabase.rpc('people_directory', { p_search: q || null });
+    if (error) {
+      body.innerHTML = `<div class="state state--error">${esc(error.message)}</div>`;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      body.innerHTML = `<div class="empty">
+        ${q ? 'No one matches that search.' : 'No other users at your institution yet.'}
+      </div>`;
+      return;
+    }
+
+    body.innerHTML = '<div class="list">' + data.map(p => {
+      const actions = [];
+
+      if (p.friendship === 'none' || p.friendship === 'blocked_me') {
+        if (p.friendship !== 'blocked_me') {
+          actions.push({ label: 'Add friend', kind: 'primary', action: 'friend_request', id: p.user_id });
+        }
+      } else if (p.friendship === 'request_sent') {
+        actions.push({ label: 'Request sent', action: 'noop', id: '', disabled: true });
+      } else if (p.friendship === 'request_received') {
+        actions.push({ label: 'Accept request', kind: 'primary', action: 'accept', id: p.user_id });
+      } else if (p.friendship === 'friend') {
+        actions.push({ label: 'Message', kind: 'primary', action: 'message', id: p.user_id });
+      }
+
+      if (p.friendship === 'blocked_by_me') {
+        actions.push({ label: 'Unblock', kind: 'danger', action: 'unblock', id: p.user_id });
+      } else if (p.friendship !== 'blocked_me') {
+        if (p.is_following) {
+          actions.push({ label: 'Unfollow', action: 'unfollow', id: p.user_id });
+        } else {
+          actions.push({ label: 'Follow', action: 'follow', id: p.user_id });
+        }
+        actions.push({ label: 'Block', kind: 'danger', action: 'block', id: p.user_id });
+      }
+
+      const chips = [];
+      if (p.is_following) chips.push('Following');
+      if (p.follows_me)   chips.push('Follows you');
+      if (p.friendship === 'friend') chips.push('Friend');
+
+      return `
+        <div class="row">
+          <div class="avatar">
+            ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" alt="">` : esc(initials(p.full_name || p.email))}
+            ${p.status && p.status !== 'offline' ? `<span class="avatar__dot" data-status="${esc(p.status)}"></span>` : ''}
+          </div>
+          <div class="row__body">
+            <div class="row__name">${esc(p.full_name || p.email)} <span class="role-chip">${esc(p.role || 'student')}</span></div>
+            <div class="row__sub">${esc(p.email || '')}${chips.length ? ' · ' + chips.join(' · ') : ''}</div>
+          </div>
+          <div class="row__action">
+            ${actions.map(a => `
+              <button class="btn-mini ${a.kind === 'primary' ? 'btn-mini--primary' : a.kind === 'danger' ? 'btn-mini--danger' : ''}"
+                      ${a.disabled ? 'disabled' : ''}
+                      data-people-action="${esc(a.action)}"
+                      data-people-id="${esc(a.id)}"
+                      type="button">${esc(a.label)}</button>
+            `).join('')}
+          </div>
+        </div>`;
+    }).join('') + '</div>';
   }
 
-  $('btn-new').addEventListener('click', openUserPicker);
-  $('modal').addEventListener('click', (e) => {
-    if (e.target === $('modal')) return closeModal();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal();
+  $('people-search').addEventListener('input', (e) => {
+    clearTimeout(loadPeople._t);
+    const v = e.target.value.trim();
+    loadPeople._t = setTimeout(() => loadPeople(v), 250);
   });
 
-  // Picking a user: find-or-create thread, then go to it
-  $('user-list').addEventListener('click', async (e) => {
-    const btn = e.target.closest('.user-item');
-    if (!btn) return;
-    const otherId = btn.dataset.id;
+  // ------------------------------------------------------------------
+  // Actions (event-delegated)
+  // ------------------------------------------------------------------
+  document.addEventListener('click', async (e) => {
+    const relBtn = e.target.closest('[data-relation-action]');
+    if (relBtn) { e.preventDefault(); await handleRelation(relBtn); return; }
+
+    const pplBtn = e.target.closest('[data-people-action]');
+    if (pplBtn) { e.preventDefault(); await handlePeople(pplBtn); return; }
+  });
+
+  async function handleRelation(btn) {
+    const action = btn.dataset.relationAction;
+    const id = btn.dataset.relationId;
     btn.disabled = true;
 
-    const { data, error } = await supabase.rpc('find_or_create_dm_thread', { other: otherId });
-    if (error) {
-      toast(error.message, 'error');
+    try {
+      if (action === 'accept' || action === 'decline') {
+        const { error } = await supabase.rpc('respond_friend_request', {
+          p_request_id: id, p_accept: action === 'accept',
+        });
+        if (error) throw error;
+        toast(action === 'accept' ? 'Friend added.' : 'Request declined.');
+      } else if (action === 'cancel') {
+        const { error } = await supabase.rpc('respond_friend_request', {
+          p_request_id: id, p_accept: false,
+        });
+        if (error) throw error;
+        toast('Request cancelled.');
+      } else if (action === 'message') {
+        const { data, error } = await supabase.rpc('find_or_create_dm_thread', { other: id });
+        if (error) throw error;
+        location.href = 'dm.html?id=' + data;
+        return;
+      } else if (action === 'unfriend') {
+        const { error } = await supabase.rpc('unfriend', { p_other_user: id });
+        if (error) throw error;
+        toast('Unfriended.');
+      }
+      await loadFriends();
+    } catch (err) {
+      toast(err.message || 'Action failed', 'error');
       btn.disabled = false;
-      return;
     }
-    location.href = 'dm.html?id=' + data;
-  });
+  }
 
-  loadInbox();
+  async function handlePeople(btn) {
+    const action = btn.dataset.peopleAction;
+    const id = btn.dataset.peopleId;
+    if (action === 'noop') return;
+    btn.disabled = true;
+
+    try {
+      if (action === 'friend_request') {
+        const { error } = await supabase.rpc('send_friend_request', { p_to_user: id });
+        if (error) throw error;
+        toast('Friend request sent.');
+      } else if (action === 'accept') {
+        // incoming request: find the request id first
+        const { data: req } = await supabase
+          .from('user_relationships')
+          .select('id')
+          .eq('kind','friend_request')
+          .eq('from_user_id', id)
+          .eq('to_user_id', meId)
+          .maybeSingle();
+        if (!req) throw new Error('Request not found');
+        const { error } = await supabase.rpc('respond_friend_request', { p_request_id: req.id, p_accept: true });
+        if (error) throw error;
+        toast('Friend added.');
+      } else if (action === 'follow') {
+        const { error } = await supabase.rpc('follow_user', { p_to_user: id });
+        if (error) throw error;
+        toast('Following.');
+      } else if (action === 'unfollow') {
+        const { error } = await supabase.rpc('unfollow_user', { p_to_user: id });
+        if (error) throw error;
+        toast('Unfollowed.');
+      } else if (action === 'block') {
+        if (!confirm('Block this person? They won\'t be able to message you.')) { btn.disabled = false; return; }
+        const { error } = await supabase.rpc('block_user', { p_to_user: id });
+        if (error) throw error;
+        toast('Blocked.');
+      } else if (action === 'unblock') {
+        const { error } = await supabase.rpc('unblock_user', { p_to_user: id });
+        if (error) throw error;
+        toast('Unblocked.');
+      } else if (action === 'message') {
+        const { data, error } = await supabase.rpc('find_or_create_dm_thread', { other: id });
+        if (error) throw error;
+        location.href = 'dm.html?id=' + data;
+        return;
+      }
+      const q = $('people-search').value.trim();
+      await loadPeople(q);
+    } catch (err) {
+      toast(err.message || 'Action failed', 'error');
+      btn.disabled = false;
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Boot
+  // ------------------------------------------------------------------
+  $('state-loading').hidden = true;
+  switchTab('chats');
 </script>
 
+<script type="module" src="../js/bottom-nav.js"></script>
+<script type="module" src="../js/notifications.js"></script>
 </body>
 </html>
