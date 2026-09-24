@@ -178,6 +178,36 @@
   .state[hidden] { display: none; }
   .state--error { color: var(--danger); }
 
+  /* Selects */
+  select.select {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    color: var(--text);
+    font-family: inherit;
+    min-height: 46px;
+    transition: border-color var(--duration-fast) var(--ease);
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%2378716c' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    padding-right: 2.4rem;
+  }
+  select.select:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
+  }
+  select.select:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background-color: var(--bg-sunken);
+  }
+
   /* Institution picker */
   .field {
     margin-bottom: var(--space-4);
@@ -347,8 +377,44 @@
 
     <!-- Panel 3: Academic -->
     <section class="onb-panel" id="panel-academic" hidden>
-      <div class="placeholder">
-        Academic details are built in a later step.
+      <div class="field">
+        <label for="sel-faculty">Faculty</label>
+        <select id="sel-faculty" class="select">
+          <option value="">Loading…</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="sel-department">Department</label>
+        <select id="sel-department" class="select" disabled>
+          <option value="">Select a faculty first</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="sel-programme">Programme</label>
+        <select id="sel-programme" class="select" disabled>
+          <option value="">Select a department first</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="sel-level">Current level</label>
+        <select id="sel-level" class="select" disabled>
+          <option value="">Loading…</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="sel-session">Academic session</label>
+        <select id="sel-session" class="select" disabled>
+          <option value="">Loading…</option>
+        </select>
+      </div>
+
+      <div class="onb-actions">
+        <button class="btn-secondary" id="btn-acad-back">Back</button>
+        <button class="btn-primary" id="btn-acad-continue" disabled>Continue</button>
       </div>
     </section>
 
@@ -428,7 +494,7 @@
   // ---------- Load profile ----------
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, email, full_name, registration_step, verification_status, institution_id, department_id, programme_id, level_id, session_id, matric_no')
+    .select('id, email, full_name, registration_step, verification_status, institution_id, faculty_id, department_id, programme_id, level_id, session_id, matric_no')
     .eq('id', meId)
     .single();
 
@@ -585,6 +651,207 @@
 
       if (upErr) {
         btn.disabled = false; btn.textContent = 'Continue';
+        $('alert').textContent = upErr.message;
+        $('alert').setAttribute('data-show', '1');
+        return;
+      }
+      location.reload();
+    });
+  }
+
+  // ---------- Panel 3: Academic ----------
+  if (current === 2) {
+    const selFaculty   = $('sel-faculty');
+    const selDept      = $('sel-department');
+    const selProg      = $('sel-programme');
+    const selLevel     = $('sel-level');
+    const selSession   = $('sel-session');
+    const btnContinue  = $('btn-acad-continue');
+
+    const instId = profile.institution_id;
+
+    if (!instId) {
+      location.replace('onboarding.html');
+      throw new Error('missing institution');
+    }
+
+    let faculties   = [];
+    let departments = [];
+    let programmes  = [];
+
+    function fillSelect(select, items, valueKey, labelKey, placeholder, selected) {
+      const opts = ['<option value="">' + placeholder + '</option>']
+        .concat(items.map(i => {
+          const sel = (selected && selected === i[valueKey]) ? ' selected' : '';
+          return `<option value="${i[valueKey]}"${sel}>${i[labelKey]}</option>`;
+        }));
+      select.innerHTML = opts.join('');
+    }
+
+    function refreshContinue() {
+      const ok = selFaculty.value && selDept.value && selProg.value
+              && selLevel.value && selSession.value;
+      btnContinue.disabled = !ok;
+    }
+
+    const { data: fac, error: facErr } = await supabase
+      .from('faculties')
+      .select('id, name')
+      .eq('institution_id', instId)
+      .order('name');
+
+    if (facErr) {
+      selFaculty.innerHTML = '<option value="">Could not load faculties</option>';
+      $('alert').textContent = facErr.message;
+      $('alert').setAttribute('data-show', '1');
+      return;
+    }
+
+    faculties = fac || [];
+    fillSelect(selFaculty, faculties, 'id', 'name', 'Select a faculty', profile.faculty_id);
+
+    async function loadDepartments(facultyId, preselect) {
+      selDept.disabled = true;
+      selDept.innerHTML = '<option value="">Loading…</option>';
+      selProg.disabled = true;
+      selProg.innerHTML = '<option value="">Select a department first</option>';
+
+      if (!facultyId) {
+        selDept.innerHTML = '<option value="">Select a faculty first</option>';
+        refreshContinue();
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('departments')
+        .select('id, name')
+        .eq('faculty_id', facultyId)
+        .order('name');
+
+      if (error) {
+        selDept.innerHTML = '<option value="">Could not load departments</option>';
+        refreshContinue();
+        return;
+      }
+
+      departments = data || [];
+      fillSelect(selDept, departments, 'id', 'name', 'Select a department', preselect);
+      selDept.disabled = false;
+      refreshContinue();
+    }
+
+    async function loadProgrammes(deptId, preselect) {
+      selProg.disabled = true;
+      selProg.innerHTML = '<option value="">Loading…</option>';
+
+      if (!deptId) {
+        selProg.innerHTML = '<option value="">Select a department first</option>';
+        refreshContinue();
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('programmes')
+        .select('id, name, code')
+        .eq('department_id', deptId)
+        .order('name');
+
+      if (error) {
+        selProg.innerHTML = '<option value="">Could not load programmes</option>';
+        refreshContinue();
+        return;
+      }
+
+      programmes = data || [];
+      fillSelect(selProg, programmes, 'id', 'name', 'Select a programme', preselect);
+      selProg.disabled = false;
+      refreshContinue();
+    }
+
+    const { data: lv } = await supabase
+      .from('levels')
+      .select('id, ordinal, display_name')
+      .eq('institution_id', instId)
+      .order('ordinal');
+
+    const levels = lv || [];
+    if (levels.length) {
+      fillSelect(selLevel, levels, 'id', 'display_name', 'Select a level', profile.level_id);
+      selLevel.disabled = false;
+      if (levels.length === 1) selLevel.value = levels[0].id;
+    } else {
+      selLevel.innerHTML = '<option value="">No levels configured</option>';
+    }
+
+    const { data: ss } = await supabase
+      .from('academic_sessions')
+      .select('id, name, is_current')
+      .eq('institution_id', instId)
+      .order('start_date', { ascending: false });
+
+    const sessions = ss || [];
+    if (sessions.length) {
+      fillSelect(selSession, sessions, 'id', 'name', 'Select a session', profile.session_id);
+      selSession.disabled = false;
+      if (sessions.length === 1) selSession.value = sessions[0].id;
+      else if (!profile.session_id) {
+        const cur = sessions.find(s => s.is_current);
+        if (cur) selSession.value = cur.id;
+      }
+    } else {
+      selSession.innerHTML = '<option value="">No sessions configured</option>';
+    }
+
+    selFaculty.addEventListener('change', async () => {
+      profile.faculty_id = selFaculty.value || null;
+      await loadDepartments(selFaculty.value, null);
+      selProg.value = '';
+      refreshContinue();
+    });
+
+    selDept.addEventListener('change', async () => {
+      await loadProgrammes(selDept.value, null);
+      refreshContinue();
+    });
+
+    [selProg, selLevel, selSession].forEach(el => el.addEventListener('change', refreshContinue));
+
+    if (profile.faculty_id && faculties.length) {
+      await loadDepartments(profile.faculty_id, profile.department_id);
+      if (profile.department_id) {
+        await loadProgrammes(profile.department_id, profile.programme_id);
+      }
+    }
+
+    refreshContinue();
+
+    $('btn-acad-back').addEventListener('click', async () => {
+      await supabase.from('profiles')
+        .update({ registration_step: 'institution' })
+        .eq('id', meId);
+      location.reload();
+    });
+
+    btnContinue.addEventListener('click', async () => {
+      if (btnContinue.disabled) return;
+      btnContinue.disabled = true;
+      btnContinue.textContent = 'Saving…';
+
+      const { error: upErr } = await supabase
+        .from('profiles')
+        .update({
+          faculty_id:     selFaculty.value,
+          department_id:  selDept.value,
+          programme_id:   selProg.value,
+          level_id:       selLevel.value,
+          session_id:     selSession.value,
+          registration_step: 'verification'
+        })
+        .eq('id', meId);
+
+      if (upErr) {
+        btnContinue.disabled = false;
+        btnContinue.textContent = 'Continue';
         $('alert').textContent = upErr.message;
         $('alert').setAttribute('data-show', '1');
         return;
