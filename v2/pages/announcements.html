@@ -6,98 +6,124 @@
 <title>Announcements — UniConnect</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/nav.css">
+<link rel="stylesheet" href="../css/notifications.css">
+<link rel="stylesheet" href="../css/topbar.css">
 <style>
   .topbar {
     position: sticky; top: 0; z-index: 10;
     display: flex; align-items: center; justify-content: space-between;
-    padding: var(--space-3) var(--space-5);
-    background: color-mix(in srgb, var(--bg) 85%, transparent);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
     border-bottom: 1px solid var(--border); min-height: 56px;
   }
-  .topbar__brand {
-    display: flex; align-items: center; gap: var(--space-2);
-    font-weight: 600; font-size: var(--text-base);
-    letter-spacing: -0.01em; color: var(--text);
-  }
-  .topbar__brand svg { color: var(--brand); }
+  .topbar__title { font-size: var(--text-base); font-weight: 600; letter-spacing: -0.01em; }
   .topbar__right { display: flex; align-items: center; gap: var(--space-2); }
-  .avatar {
-    width: 32px; height: 32px; border-radius: var(--radius-full);
-    background: var(--brand); color: var(--brand-fg);
-    display: flex; align-items: center; justify-content: center;
-    font-size: var(--text-xs); font-weight: 600;
-    flex-shrink: 0; text-transform: uppercase;
-  }
-  .btn-ghost {
-    appearance: none; background: transparent;
-    border: 1px solid var(--border); color: var(--text-muted);
-    padding: 0.45rem 0.85rem; border-radius: var(--radius-md);
-    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
-    transition: all var(--duration-fast) var(--ease); min-height: 36px;
-    text-decoration: none; display: inline-flex; align-items: center;
-  }
-  .btn-ghost:hover {
-    border-color: var(--border-strong); color: var(--text);
-    background: var(--bg-elevated);
-  }
+
   .btn-primary {
     appearance: none; background: var(--brand); color: var(--brand-fg);
-    border: none; padding: 0.55rem 1rem;
+    border: none; padding: 0.5rem 0.9rem;
     border-radius: var(--radius-md); font-size: var(--text-sm);
     font-weight: 500; cursor: pointer;
     transition: all var(--duration-fast) var(--ease);
-    min-height: 38px; display: inline-flex;
-    align-items: center; gap: var(--space-2);
+    min-height: 36px; display: inline-flex; align-items: center; gap: 6px;
   }
   .btn-primary:hover { background: var(--brand-hover); }
   .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 
-  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-6) var(--space-4); }
-  @media (min-width: 640px) { .wrap { padding: var(--space-8) var(--space-6); } }
+  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-10); }
+  @media (min-width: 640px) { .wrap { padding: var(--space-6) var(--space-6) var(--space-10); } }
 
-  .page-head {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;
+  .hero {
+    margin-bottom: var(--space-4);
   }
-  .page-head h1 {
-    font-size: var(--text-2xl); font-weight: 600;
-    letter-spacing: -0.02em; line-height: var(--leading-tight);
-    margin-bottom: var(--space-2);
+  .hero h1 {
+    font-size: var(--text-2xl); font-weight: 700;
+    letter-spacing: -0.025em; line-height: 1.15;
+    margin-bottom: 4px;
   }
-  @media (min-width: 640px) { .page-head h1 { font-size: var(--text-3xl); } }
-  .page-head p { color: var(--text-muted); font-size: var(--text-base); }
+  @media (min-width: 640px) { .hero h1 { font-size: var(--text-3xl); } }
+  .hero p { font-size: var(--text-sm); color: var(--text-muted); }
 
-  .filters { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-5); }
+  .search {
+    width: 100%; padding: 0.7rem 0.9rem;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: var(--radius-md); font-size: var(--text-sm);
+    color: var(--text); margin-bottom: var(--space-3);
+    min-height: 44px;
+    transition: border-color var(--duration-fast) var(--ease);
+  }
+  .search:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent); }
+
+  /* Filter chips */
+  .filters {
+    display: flex; gap: 6px;
+    overflow-x: auto; padding-bottom: 8px; margin-bottom: var(--space-4);
+    scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
   .chip {
-    appearance: none; background: var(--bg-elevated);
-    border: 1px solid var(--border); color: var(--text-muted);
-    padding: 0.35rem 0.75rem; border-radius: var(--radius-full);
-    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
+    appearance: none;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs); font-weight: 500;
+    cursor: pointer; flex-shrink: 0;
     transition: all var(--duration-fast) var(--ease);
+    font-family: inherit;
+    min-height: 32px;
+    display: inline-flex; align-items: center; gap: 5px;
+    white-space: nowrap;
   }
   .chip:hover { border-color: var(--border-strong); color: var(--text); }
   .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
 
+  /* Cards */
   .list { display: flex; flex-direction: column; gap: var(--space-3); }
 
   .ann {
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: var(--space-5);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
     transition: border-color var(--duration-fast) var(--ease);
   }
   .ann:hover { border-color: var(--border-strong); }
 
   .ann__meta {
     display: flex; align-items: center; gap: var(--space-3);
-    margin-bottom: var(--space-3); flex-wrap: wrap;
+    margin-bottom: var(--space-3);
+    flex-wrap: wrap;
   }
+  .ann__avatar {
+    width: 32px; height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--brand-subtle); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--text-xs); font-weight: 700;
+    flex-shrink: 0; overflow: hidden; text-transform: uppercase;
+  }
+  .ann__avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .ann__author { font-size: var(--text-sm); font-weight: 500; }
+  .ann__time {
+    font-size: var(--text-xs); color: var(--text-subtle);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .ann__time::before {
+    content: '·'; color: var(--text-subtle);
+    margin-right: 2px; display: none;
+  }
+  .ann__meta-inner { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+
   .tag {
-    font-size: var(--text-xs); font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    padding: 0.2rem 0.55rem; border-radius: var(--radius-full);
+    font-size: 0.625rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    padding: 3px 8px; border-radius: var(--radius-full);
+    flex-shrink: 0;
   }
   .tag--general      { background: #f5f5f4; color: #57534e; }
   .tag--important    { background: #fef3c7; color: #92400e; }
@@ -105,7 +131,6 @@
   .tag--registration { background: #dcfce7; color: #166534; }
   .tag--seminar      { background: #dbeafe; color: #1e40af; }
   .tag--update       { background: #e0e7ff; color: #3730a3; }
-
   @media (prefers-color-scheme: dark) {
     .tag--general      { background: #292524; color: #a8a29e; }
     .tag--important    { background: #451a03; color: #fcd34d; }
@@ -115,26 +140,67 @@
     .tag--update       { background: #1e1b4b; color: #a5b4fc; }
   }
 
-  .ann__time { font-size: var(--text-xs); color: var(--text-subtle); }
   .ann__title {
-    font-size: var(--text-md); font-weight: 600;
-    letter-spacing: -0.01em; line-height: var(--leading-snug);
+    font-size: var(--text-md); font-weight: 700;
+    letter-spacing: -0.015em; line-height: var(--leading-snug);
     margin-bottom: var(--space-2);
+    overflow-wrap: anywhere;
   }
   .ann__body {
-    color: var(--text-muted); font-size: var(--text-sm);
-    line-height: var(--leading-base); white-space: pre-wrap;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    line-height: var(--leading-base);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
+  .ann[data-expanded] .ann__body {
+    -webkit-line-clamp: unset;
+    display: block;
+  }
+  .ann__expand {
+    appearance: none;
+    background: transparent; border: none;
+    color: var(--brand); font-size: var(--text-xs);
+    font-weight: 600; cursor: pointer;
+    padding: 6px 0 0; font-family: inherit;
+    display: inline-block;
+  }
+  .ann__expand:hover { text-decoration: underline; }
 
-  .state { padding: var(--space-10) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
+  .ann__actions {
+    display: flex; gap: var(--space-3);
+    margin-top: var(--space-3); padding-top: var(--space-3);
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .link-btn {
+    appearance: none; background: transparent; border: none;
+    color: var(--text-muted); cursor: pointer;
+    font-size: var(--text-xs); font-weight: 500;
+    padding: 0; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 5px;
+    transition: color var(--duration-fast) var(--ease);
+  }
+  .link-btn:hover { color: var(--brand); }
+  .link-btn--danger:hover { color: var(--danger); }
+
+  .empty {
+    padding: var(--space-10) var(--space-4);
+    text-align: center; color: var(--text-muted);
+    font-size: var(--text-sm); line-height: var(--leading-snug);
+  }
+  .empty svg { color: var(--border-strong); margin-bottom: var(--space-3); }
+  .empty h3 { font-size: var(--text-base); color: var(--text); margin-bottom: var(--space-2); font-weight: 600; }
+
+  .state { padding: var(--space-6) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
   .state[hidden] { display: none; }
   .state--error { color: var(--danger); }
-  .state h3 { font-size: var(--text-md); color: var(--text); margin-bottom: var(--space-2); font-weight: 600; }
-  .state p { max-width: 40ch; margin: 0 auto; }
 
-  #list[hidden] { display: none; }
-
-  /* --- Modal --- */
+  /* Modal */
   .modal-backdrop {
     position: fixed; inset: 0; z-index: 50;
     background: rgba(0,0,0,0.5);
@@ -145,137 +211,112 @@
     transition: opacity var(--duration) var(--ease);
   }
   .modal-backdrop[data-open] { opacity: 1; pointer-events: auto; }
-
   .modal {
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    width: 100%; max-width: 500px;
-    max-height: 90vh; overflow-y: auto;
-    padding: var(--space-6);
-    transform: translateY(12px);
-    transition: transform var(--duration) var(--ease);
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); width: 100%; max-width: 520px;
+    max-height: 90vh; max-height: 90dvh; overflow-y: auto;
+    padding: var(--space-5);
+    transform: translateY(12px); transition: transform var(--duration) var(--ease);
   }
   .modal-backdrop[data-open] .modal { transform: translateY(0); }
-
-  .modal h2 {
-    font-size: var(--text-lg); font-weight: 600;
-    letter-spacing: -0.01em; margin-bottom: var(--space-2);
-  }
-  .modal .sub {
-    font-size: var(--text-sm); color: var(--text-muted);
-    margin-bottom: var(--space-5);
-  }
-  .modal .field { margin-bottom: var(--space-4); }
-  .modal label {
-    display: block; font-size: var(--text-sm);
-    font-weight: 500; color: var(--text);
-    margin-bottom: var(--space-2);
-  }
-  .modal input, .modal select, .modal textarea {
+  .modal h2 { font-size: var(--text-lg); font-weight: 600; letter-spacing: -0.01em; margin-bottom: var(--space-2); }
+  .modal .sub { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-5); }
+  .modal .field { margin-bottom: var(--space-3); }
+  .modal label { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--text); margin-bottom: var(--space-2); }
+  .modal input, .modal textarea, .modal select {
     width: 100%; padding: 0.7rem 0.85rem;
     background: var(--bg); border: 1px solid var(--border);
-    border-radius: var(--radius-md); font-size: var(--text-base);
-    color: var(--text); transition: all var(--duration-fast) var(--ease);
-  }
-  .modal textarea { min-height: 120px; resize: vertical; font-family: inherit; line-height: var(--leading-base); }
-  .modal input:focus, .modal select:focus, .modal textarea:focus {
-    border-color: var(--brand);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
-    outline: none;
-  }
-
-  .modal-alert {
-    display: none; padding: 0.7rem 0.9rem;
     border-radius: var(--radius-md); font-size: var(--text-sm);
-    margin-bottom: var(--space-4); line-height: var(--leading-snug);
+    color: var(--text); font-family: inherit;
+    transition: all var(--duration-fast) var(--ease);
   }
+  .modal textarea { min-height: 120px; resize: vertical; line-height: var(--leading-base); }
+  .modal input:focus, .modal textarea:focus, .modal select:focus {
+    outline: none; border-color: var(--brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
+  }
+  .modal-alert { display: none; padding: 0.7rem 0.9rem; border-radius: var(--radius-md); font-size: var(--text-sm); margin-bottom: var(--space-4); line-height: var(--leading-snug); overflow-wrap: anywhere; }
   .modal-alert[data-show] { display: block; }
-  .modal-alert--error {
-    background: color-mix(in srgb, var(--danger) 10%, transparent);
-    color: var(--danger);
-    border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
-  }
-
-  .modal-actions {
-    display: flex; gap: var(--space-3);
-    margin-top: var(--space-5); justify-content: flex-end;
-  }
+  .modal-alert--error { background: color-mix(in srgb, var(--danger) 10%, transparent); color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent); }
+  .modal-actions { display: flex; gap: var(--space-3); margin-top: var(--space-5); justify-content: flex-end; }
   @media (max-width: 480px) { .modal-actions { flex-direction: column-reverse; } }
-  .btn-danger {
-    appearance: none; background: transparent; color: var(--danger);
-    border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);
-    padding: 0.55rem 1rem; border-radius: var(--radius-md);
+  .btn-ghost {
+    appearance: none; background: transparent;
+    border: 1px solid var(--border); color: var(--text-muted);
+    padding: 0.65rem 1rem; border-radius: var(--radius-md);
     font-size: var(--text-sm); font-weight: 500; cursor: pointer;
-    transition: all var(--duration-fast) var(--ease); min-height: 38px;
+    transition: all var(--duration-fast) var(--ease); min-height: 40px;
   }
-  .btn-danger:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--border-strong); }
+
+  .toast {
+    position: fixed; bottom: 84px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: var(--bg);
+    padding: 0.65rem 1rem; border-radius: var(--radius-md);
+    font-size: var(--text-sm); font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none;
+    transition: all var(--duration) var(--ease);
+    z-index: 60; max-width: 90vw; text-align: center;
+  }
+  .toast[data-show] { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast[data-kind="error"] { background: var(--danger); color: white; }
 </style>
-  <link rel="stylesheet" href="../css/nav.css">
-  <link rel="stylesheet" href="../css/notifications.css">
-  <link rel="stylesheet" href="../css/topbar.css">
 </head>
 <body>
 
 <header class="topbar">
-  <div class="topbar__brand">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-    </svg>
-    UniConnect
-  </div>
-  <div class="topbar__right"></div>
-</header>
-
-<main class="wrap">
-
-  <div class="page-head">
-    <div>
-      <h1>Announcements</h1>
-      <p>Notices from your institution.</p>
-    </div>
+  <div class="topbar__title">Announcements</div>
+  <div class="topbar__right">
     <button class="btn-primary" id="btn-new" hidden>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
       New
     </button>
   </div>
+</header>
 
-  <div class="filters" id="filters">
+<main class="wrap">
+
+  <div class="hero">
+    <h1>Notices from your institution</h1>
+    <p>Official updates, events, and academic notices.</p>
+  </div>
+
+  <input type="search" class="search" id="search" placeholder="Search by title or message…" autocomplete="off">
+
+  <div class="filters" id="filters" role="tablist">
     <button class="chip" data-tag="all" aria-pressed="true">All</button>
     <button class="chip" data-tag="important" aria-pressed="false">Important</button>
     <button class="chip" data-tag="urgent" aria-pressed="false">Urgent</button>
     <button class="chip" data-tag="registration" aria-pressed="false">Registration</button>
     <button class="chip" data-tag="seminar" aria-pressed="false">Seminar</button>
     <button class="chip" data-tag="update" aria-pressed="false">Update</button>
+    <button class="chip" data-tag="general" aria-pressed="false">General</button>
   </div>
 
   <div class="state" id="state-loading">Loading…</div>
   <div class="state state--error" id="state-error" hidden></div>
-  <div class="state" id="state-empty" hidden>
-    <h3>Nothing here yet</h3>
-    <p>No announcements match this filter.</p>
-  </div>
-  <div class="list" id="list" hidden></div>
+  <div id="feed" hidden></div>
 
 </main>
 
-<!-- Modal -->
+<!-- New / edit modal -->
 <div class="modal-backdrop" id="modal" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <h2 id="modal-title">New announcement</h2>
-    <p class="sub">This will be visible to everyone at your institution.</p>
+    <p class="sub" id="modal-sub">This will be visible to everyone at your institution.</p>
 
     <div class="modal-alert modal-alert--error" id="modal-alert"></div>
 
-    <form id="form-new">
+    <form id="form-ann">
       <div class="field">
-        <label for="f-title">Title</label>
-        <input type="text" id="f-title" required maxlength="150" placeholder="Short, descriptive title">
+        <label for="a-title">Title</label>
+        <input type="text" id="a-title" required maxlength="150" placeholder="Short, descriptive title">
       </div>
       <div class="field">
-        <label for="f-tag">Category</label>
-        <select id="f-tag" required>
+        <label for="a-tag">Category</label>
+        <select id="a-tag" required>
           <option value="general">General</option>
           <option value="important">Important</option>
           <option value="urgent">Urgent</option>
@@ -285,207 +326,337 @@
         </select>
       </div>
       <div class="field">
-        <label for="f-body">Message</label>
-        <textarea id="f-body" required maxlength="5000" placeholder="Write the announcement…"></textarea>
+        <label for="a-body">Message</label>
+        <textarea id="a-body" required maxlength="5000" placeholder="Write the announcement…"></textarea>
       </div>
       <div class="modal-actions">
-        <button type="button" class="btn-danger" id="btn-cancel">Cancel</button>
+        <button type="button" class="btn-ghost" id="btn-cancel">Cancel</button>
         <button type="submit" class="btn-primary" id="btn-submit">Publish</button>
       </div>
     </form>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script type="module">
   import { supabase } from '../js/supabase.js';
 
   const $ = (id) => document.getElementById(id);
-  let allAnnouncements = [];
+  let meId = null;
+  let meProfile = null;
+  let all = [];
   let activeTag = 'all';
-  let currentProfile = null;
+  let search = '';
+  let canPost = false;
+  let editingId = null;
 
-  // ---- Auth guard ----
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    window.location.replace('login.html');
-    throw new Error('unauthenticated');
+  if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
+  meId = session.user.id;
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+  const initials = (name) => (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+  function timeAgo(iso) {
+    if (!iso) return '';
+    const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function toast(msg, kind) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.setAttribute('data-show', '1');
+    if (kind) el.setAttribute('data-kind', kind); else el.removeAttribute('data-kind');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
   }
 
-  // ---- Load profile ----
-  const { data: profile, error: pErr } = await supabase
+  // ---------- Profile + permission ----------
+  const { data: prof } = await supabase
     .from('profiles')
-    .select('id, full_name, email, role, institution_id')
-    .eq('id', session.user.id)
+    .select('id, full_name, role, institution_id')
+    .eq('id', meId)
     .single();
+  meProfile = prof || {};
 
-  if (pErr) {
-    showError('Could not load profile: ' + pErr.message);
-    throw pErr;
-  }
-  currentProfile = profile;
+  const { data: perm } = await supabase.rpc('has_permission', { p_permission: 'announcements.create' });
+  canPost = !!perm;
+  if (canPost) $('btn-new').hidden = false;
 
-  const initials = (profile.full_name || profile.email || '?')
-    .split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('');
-  $('topbar-avatar').textContent = initials.toUpperCase();
-  $('topbar-avatar').hidden = false;
-
-  // Show "New" button only for roles permitted by RLS
-  const canPost = ['lecturer','staff','hod','admin','leadership'].includes(profile.role);
-  if (canPost && profile.institution_id) {
-    $('btn-new').hidden = false;
-  }
-
-  // ---- Load announcements ----
-  function showError(msg) {
-    $('state-loading').hidden = true;
-    $('state-error').textContent = msg;
-    $('state-error').hidden = false;
-  }
-
+  // ---------- Load ----------
   async function load() {
+    const body = $('feed');
+    body.innerHTML = '<div class="state">Loading…</div>';
     const { data, error } = await supabase
       .from('announcements')
-      .select('id, title, body, tag, created_at')
-      .order('created_at', { ascending: false });
+      .select(`
+        id, title, body, tag, created_at, author_id,
+        profiles:author_id ( full_name, avatar_url )
+      `)
+      .order('created_at', { ascending: false })
+      .limit(200);
 
     if (error) {
-      showError('Could not load announcements: ' + error.message);
+      $('state-loading').hidden = true;
+      $('state-error').hidden = false;
+      $('state-error').textContent = 'Could not load announcements: ' + error.message;
       return;
     }
 
-    allAnnouncements = data || [];
+    all = data || [];
     $('state-loading').hidden = true;
+    $('feed').hidden = false;
     render();
   }
 
-  // ---- Render ----
-  function formatTime(iso) {
-    if (!iso) return '';
-    const d = new Date(iso);
-    const diff = (Date.now() - d.getTime()) / 1000;
-    if (diff < 60) return 'just now';
-    if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-  }
-
-  function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-
   function render() {
-    const filtered = activeTag === 'all'
-      ? allAnnouncements
-      : allAnnouncements.filter(a => a.tag === activeTag);
+    const body = $('feed');
+    const q = search.trim().toLowerCase();
+    const filtered = all.filter(a => {
+      if (activeTag !== 'all' && a.tag !== activeTag) return false;
+      if (!q) return true;
+      return (a.title || '').toLowerCase().includes(q)
+          || (a.body  || '').toLowerCase().includes(q);
+    });
 
-    $('list').hidden = filtered.length === 0;
-    $('state-empty').hidden = filtered.length !== 0;
+    if (filtered.length === 0) {
+      body.innerHTML = `
+        <div class="empty">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11l18-8v18L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
+          </svg>
+          <h3>${q || activeTag !== 'all' ? 'Nothing matches' : 'No announcements yet'}</h3>
+          <p>${q || activeTag !== 'all' ? 'Try another filter or search term.' : 'Notices from your institution will appear here.'}</p>
+        </div>`;
+      return;
+    }
 
-    $('list').innerHTML = filtered.map(a => `
-      <article class="ann">
-        <div class="ann__meta">
-          <span class="tag tag--${escapeHtml(a.tag)}">${escapeHtml(a.tag)}</span>
-          <span class="ann__time">${formatTime(a.created_at)}</span>
-        </div>
-        <h2 class="ann__title">${escapeHtml(a.title)}</h2>
-        <p class="ann__body">${escapeHtml(a.body)}</p>
-      </article>
-    `).join('');
+    body.innerHTML = '<div class="list">' + filtered.map(a => card(a)).join('') + '</div>';
   }
 
-  // ---- Filters ----
+  function card(a) {
+    const authorName = a.profiles?.full_name || 'Unknown';
+    const authorAvatar = a.profiles?.avatar_url;
+    const isMine = a.author_id === meId;
+    const isLong = (a.body || '').length > 220;
+    const canEdit = isMine && canPost;
+
+    return `
+      <article class="ann" data-id="${esc(a.id)}">
+        <div class="ann__meta">
+          <div class="ann__avatar">
+            ${authorAvatar ? `<img src="${esc(authorAvatar)}" alt="">` : esc(initials(authorName))}
+          </div>
+          <div class="ann__meta-inner">
+            <span class="ann__author">${esc(authorName)}</span>
+            <span class="ann__time">${timeAgo(a.created_at)}</span>
+          </div>
+          <span class="tag tag--${esc(a.tag)}" style="margin-left:auto;">${esc(a.tag)}</span>
+        </div>
+
+        <h3 class="ann__title">${esc(a.title)}</h3>
+        <div class="ann__body">${esc(a.body)}</div>
+        ${isLong ? `<button class="ann__expand" data-action="expand" data-id="${esc(a.id)}">Read more</button>` : ''}
+
+        <div class="ann__actions">
+          <button class="link-btn" data-action="share" data-id="${esc(a.id)}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>
+            Share
+          </button>
+          ${canEdit ? `
+            <button class="link-btn" data-action="edit" data-id="${esc(a.id)}">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+              Edit
+            </button>
+            <button class="link-btn link-btn--danger" data-action="delete" data-id="${esc(a.id)}">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              Delete
+            </button>
+          ` : ''}
+        </div>
+      </article>`;
+  }
+
+  // ---------- Filter / search ----------
   $('filters').addEventListener('click', (e) => {
-    const btn = e.target.closest('.chip');
-    if (!btn) return;
-    activeTag = btn.dataset.tag;
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    activeTag = chip.dataset.tag;
     document.querySelectorAll('.chip').forEach(c =>
       c.setAttribute('aria-pressed', String(c.dataset.tag === activeTag))
     );
     render();
   });
 
-  // ---- Modal ----
+  $('search').addEventListener('input', (e) => {
+    search = e.target.value;
+    render();
+  });
+
+  // ---------- Card actions ----------
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const id = btn.dataset.id;
+    const a = all.find(x => x.id === id);
+    if (!a) return;
+
+    if (action === 'expand') {
+      const card = btn.closest('.ann');
+      card.toggleAttribute('data-expanded');
+      btn.textContent = card.hasAttribute('data-expanded') ? 'Show less' : 'Read more';
+      return;
+    }
+
+    if (action === 'share') {
+      const text = `${a.title} — ${a.body}`;
+      if (navigator.share) {
+        try { await navigator.share({ title: a.title, text }); } catch (_) {}
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(text)
+          .then(() => toast('Copied to clipboard.'))
+          .catch(() => toast('Share: ' + text));
+      } else {
+        toast('Share: ' + text);
+      }
+      return;
+    }
+
+    if (action === 'edit') {
+      editingId = id;
+      $('modal-title').textContent = 'Edit announcement';
+      $('modal-sub').textContent = 'Update the title, category, or message.';
+      $('a-title').value = a.title;
+      $('a-tag').value = a.tag;
+      $('a-body').value = a.body;
+      $('btn-submit').textContent = 'Save changes';
+      openModal();
+      return;
+    }
+
+    if (action === 'delete') {
+      if (!confirm('Delete this announcement? This cannot be undone.')) return;
+      const { error } = await supabase.from('announcements').delete().eq('id', id);
+      if (error) { toast(error.message, 'error'); return; }
+      toast('Deleted.');
+      await load();
+      return;
+    }
+  });
+
+  // ---------- Modal ----------
   function openModal() {
     $('modal-alert').removeAttribute('data-show');
-    $('form-new').reset();
     $('modal').setAttribute('data-open', '1');
     $('modal').setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    setTimeout(() => $('f-title').focus(), 50);
+    setTimeout(() => $('a-title').focus(), 50);
   }
   function closeModal() {
     $('modal').removeAttribute('data-open');
     $('modal').setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    editingId = null;
+    $('form-ann').reset();
   }
-  $('btn-new').addEventListener('click', openModal);
+
+  $('btn-new').addEventListener('click', () => {
+    editingId = null;
+    $('modal-title').textContent = 'New announcement';
+    $('modal-sub').textContent = 'This will be visible to everyone at your institution.';
+    $('btn-submit').textContent = 'Publish';
+    $('form-ann').reset();
+    openModal();
+  });
   $('btn-cancel').addEventListener('click', closeModal);
-  $('modal').addEventListener('click', (e) => {
-    if (e.target === $('modal')) closeModal();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal();
-  });
+  $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal(); });
 
-  // ---- Submit ----
-  $('form-new').addEventListener('submit', async (e) => {
+  // ---------- Submit ----------
+  $('form-ann').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const title = $('f-title').value.trim();
-    const body  = $('f-body').value.trim();
-    const tag   = $('f-tag').value;
-    const btn   = $('btn-submit');
     const alertEl = $('modal-alert');
-
+    const btn = $('btn-submit');
     alertEl.removeAttribute('data-show');
 
-    if (!title || !body) {
+    const title = $('a-title').value.trim();
+    const tag = $('a-tag').value;
+    const bodyText = $('a-body').value.trim();
+
+    if (!title || !bodyText) {
       alertEl.textContent = 'Title and message are required.';
-      alertEl.setAttribute('data-show', '1');
-      return;
-    }
-    if (!profile.institution_id) {
-      alertEl.textContent = 'Your account is not assigned to an institution.';
-      alertEl.setAttribute('data-show', '1');
-      return;
+      alertEl.setAttribute('data-show', '1'); return;
     }
 
     btn.disabled = true;
-    btn.textContent = 'Publishing…';
+    btn.textContent = editingId ? 'Saving…' : 'Publishing…';
 
-    const { error } = await supabase.from('announcements').insert({
-      institution_id: profile.institution_id,
-      author_id: profile.id,
-      title,
-      body,
-      tag,
-    });
-
-    btn.disabled = false;
-    btn.textContent = 'Publish';
-
-    if (error) {
-      alertEl.textContent = error.message;
+    try {
+      if (editingId) {
+        const { error } = await supabase
+          .from('announcements')
+          .update({ title, tag, body: bodyText })
+          .eq('id', editingId);
+        if (error) throw error;
+        toast('Updated.');
+      } else {
+        if (!meProfile.institution_id) throw new Error('Your account is not attached to an institution.');
+        const { error } = await supabase.from('announcements').insert({
+          institution_id: meProfile.institution_id,
+          author_id: meId,
+          title,
+          tag,
+          body: bodyText,
+        });
+        if (error) throw error;
+        toast('Published.');
+      }
+      closeModal();
+      await load();
+    } catch (err) {
+      alertEl.textContent = err.message || 'Something went wrong.';
       alertEl.setAttribute('data-show', '1');
-      return;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = editingId ? 'Save changes' : 'Publish';
     }
-
-    closeModal();
-    await load();
   });
 
-  // ---- Sign out ----
-  $('btn-signout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    window.location.replace('login.html');
-  });
+  // ---------- Realtime ----------
+  supabase
+    .channel('announcements-public')
+    .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'announcements' },
+        async (payload) => {
+          // Skip if we already have it (our own insert)
+          if (all.some(a => a.id === payload.new.id)) return;
+          // Fetch with author join
+          const { data } = await supabase
+            .from('announcements')
+            .select(`id, title, body, tag, created_at, author_id,
+                     profiles:author_id ( full_name, avatar_url )`)
+            .eq('id', payload.new.id)
+            .single();
+          if (data) {
+            all.unshift(data);
+            render();
+            toast('New announcement posted.');
+          }
+        })
+    .subscribe();
 
-  load();
+  // ---------- Boot ----------
+  await load();
 </script>
 
-  <script type="module" src="../js/bottom-nav.js"></script>
-  <script type="module" src="../js/notifications.js"></script>
+<script type="module" src="../js/bottom-nav.js"></script>
+<script type="module" src="../js/notifications.js"></script>
 </body>
 </html>
