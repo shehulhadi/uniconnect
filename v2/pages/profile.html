@@ -332,10 +332,7 @@
     </svg>
     UniConnect
   </div>
-  <div class="topbar__right">
-    <a class="btn-ghost" href="dashboard.html">Dashboard</a>
-    <button class="btn-ghost" id="btn-signout">Sign out</button>
-  </div>
+  <div class="topbar__right"></div>
 </header>
 
 <main class="wrap">
@@ -431,6 +428,10 @@
       </div>
       <div class="section__body" id="f-social"></div>
     </section>
+
+    <div style="padding:var(--space-6) 0;text-align:center;">
+      <button class="btn-danger" id="btn-signout" style="min-width:220px;">Sign out of UniConnect</button>
+    </div>
 
   </div>
 
@@ -825,6 +826,12 @@
 
   // ---- Sign out ----
   $('btn-signout').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    location.replace('login.html');
+  });
+
+  // ---- Sign out ----
+  $('btn-signout')?.addEventListener('click', async () => {
     await supabase.auth.signOut();
     location.replace('login.html');
   });

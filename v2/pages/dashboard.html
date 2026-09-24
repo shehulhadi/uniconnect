@@ -189,13 +189,6 @@
   </div>
   <div class="topbar__right">
     <a class="avatar" href="profile.html" id="topbar-avatar" title="Your profile">?</a>
-    <button class="avatar" style="border:none;cursor:pointer;" id="btn-signout" title="Sign out" aria-label="Sign out">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-        <path d="M16 17l5-5-5-5"/>
-        <path d="M21 12H9"/>
-      </svg>
-    </button>
   </div>
 </header>
 
@@ -414,7 +407,7 @@
   }
 
   // ---- Sign out ----
-  $('btn-signout').addEventListener('click', async () => {
+  $('btn-signout')?.addEventListener('click', async () => {
     await supabase.auth.signOut();
     location.replace('login.html');
   });

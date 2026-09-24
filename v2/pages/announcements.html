@@ -224,11 +224,7 @@
     </svg>
     UniConnect
   </div>
-  <div class="topbar__right">
-    <span class="avatar" id="topbar-avatar" hidden></span>
-    <a class="btn-ghost" href="dashboard.html">Dashboard</a>
-    <button class="btn-ghost" id="btn-signout">Sign out</button>
-  </div>
+  <div class="topbar__right"></div>
 </header>
 
 <main class="wrap">
@@ -480,7 +476,7 @@
   });
 
   // ---- Sign out ----
-  $('btn-signout').addEventListener('click', async () => {
+  $('btn-signout')?.addEventListener('click', async () => {
     await supabase.auth.signOut();
     window.location.replace('login.html');
   });
