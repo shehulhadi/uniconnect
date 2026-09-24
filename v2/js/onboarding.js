@@ -385,6 +385,58 @@ export async function run() {
     }
   }
 
+  // ---------- Panel 5: Enrollment ----------
+  if (current === 4) {
+    const order = ['institution','faculty','department','programme','level','courses','communities'];
+
+    function setState(key, state) {
+      const el = $('enr-' + key);
+      if (el) el.setAttribute('data-state', state);
+    }
+
+    async function animateSequenceBefore(result) {
+      // Purely cosmetic pacing so the user sees what's being connected.
+      // Each step completes in order, one after another, 220ms apart.
+      for (let i = 0; i < order.length; i++) {
+        setState(order[i], 'active');
+        await new Promise(r => setTimeout(r, 220));
+        setState(order[i], 'done');
+      }
+    }
+
+    // Fire the engine
+    const { data: result, error } = await supabase.rpc('run_enrollment');
+
+    if (error) {
+      fail('Enrollment failed: ' + error.message);
+      return;
+    }
+
+    // Pace the visual and then show summary
+    await animateSequenceBefore(result);
+
+    // Some courses/communities may be zero on re-runs — that's fine, they're
+    // already enrolled. Present the actual returned facts.
+    const parts = [];
+    if (result.faculty)    parts.push(result.faculty);
+    if (result.department) parts.push(result.department);
+    if (result.programme)  parts.push(result.programme);
+    if (result.level)      parts.push(result.level);
+
+    $('enr-inst-name').textContent = result.institution || 'Your institution';
+    $('enr-detail').textContent =
+      (parts.join(' · ')) +
+      (result.new_courses ? `  ·  ${result.new_courses} course${result.new_courses === 1 ? '' : 's'} connected` : '') +
+      (result.new_communities ? `  ·  ${result.new_communities} communit${result.new_communities === 1 ? 'y' : 'ies'} connected` : '');
+
+    $('enr-progress').hidden = true;
+    $('enr-summary').hidden = false;
+
+    $('btn-enr-enter').addEventListener('click', () => {
+      location.replace('dashboard.html');
+    });
+  }
+
   // ---------- Sign out ----------
   $('btn-signout').addEventListener('click', async () => {
     await supabase.auth.signOut();

@@ -139,6 +139,43 @@
   .id-summary__row strong { font-weight: 500; text-align: right; }
   .hint { font-size: var(--text-xs); color: var(--text-subtle); margin-top: 6px; }
 
+  .enr-step {
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-3) 0;
+    font-size: var(--text-base);
+    color: var(--text-muted);
+    transition: color var(--duration) var(--ease);
+  }
+  .enr-step__mark {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--duration) var(--ease);
+    position: relative;
+  }
+  .enr-step[data-state="active"] { color: var(--text); }
+  .enr-step[data-state="active"] .enr-step__mark {
+    border-color: var(--brand);
+    border-top-color: transparent;
+    animation: enrspin 0.9s linear infinite;
+  }
+  .enr-step[data-state="done"] { color: var(--text); font-weight: 500; }
+  .enr-step[data-state="done"] .enr-step__mark {
+    background: var(--success);
+    border-color: var(--success);
+  }
+  .enr-step[data-state="done"] .enr-step__mark::after {
+    content: '';
+    width: 5px; height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-top: -2px;
+  }
+  @keyframes enrspin { to { transform: rotate(360deg); } }
+
   .placeholder { padding: var(--space-6) var(--space-5); background: var(--bg-sunken); border-radius: var(--radius-lg); border: 1px dashed var(--border-strong); text-align: center; color: var(--text-muted); font-size: var(--text-sm); line-height: var(--leading-snug); margin-bottom: var(--space-4); }
 </style>
 </head>
@@ -292,7 +329,49 @@
 
     <!-- Panel 5: Enrollment -->
     <section class="onb-panel" id="panel-enrollment" hidden>
-      <div class="placeholder">Enrollment progress is built in a later step.</div>
+
+      <div id="enr-progress">
+        <div class="enr-step" data-state="pending" id="enr-institution">
+          <span class="enr-step__mark"></span>
+          <span class="enr-step__label">Institution connected</span>
+        </div>
+        <div class="enr-step" data-state="pending" id="enr-faculty">
+          <span class="enr-step__mark"></span>
+          <span class="enr-step__label">Faculty connected</span>
+        </div>
+        <div class="enr-step" data-state="pending" id="enr-department">
+          <span class="enr-step__mark"></span>
+          <span class="enr-step__label">Department connected</span>
+        </div>
+        <div class="enr-step" data-state="pending" id="enr-programme">
+          <span class="enr-step__mark"></span>
+          <span class="enr-step__label">Programme connected</span>
+        </div>
+        <div class="enr-step" data-state="pending" id="enr-level">
+          <span class="enr-step__mark"></span>
+          <span class="enr-step__label">Level community connected</span>
+        </div>
+        <div class="enr-step" data-state="pending" id="enr-courses">
+          <span class="enr-step__mark"></span>
+          <span class="enr-step__label">Courses connected</span>
+        </div>
+        <div class="enr-step" data-state="pending" id="enr-communities">
+          <span class="enr-step__mark"></span>
+          <span class="enr-step__label">Communities connected</span>
+        </div>
+      </div>
+
+      <div id="enr-summary" hidden>
+        <div class="onb-card">
+          <div class="onb-card__label">Your campus is ready</div>
+          <div class="onb-card__value" id="enr-inst-name">—</div>
+          <div class="onb-card__hint" id="enr-detail"></div>
+        </div>
+        <div class="onb-actions">
+          <button class="btn-primary" id="btn-enr-enter">Enter UniConnect</button>
+        </div>
+      </div>
+
     </section>
 
   </div>
