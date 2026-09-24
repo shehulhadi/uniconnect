@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Set up your campus — UniConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/tokens.css">
+<style>
+  body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); }
+
+  .onb-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+  }
+  .onb-brand {
+    display: flex; align-items: center; gap: var(--space-2);
+    font-weight: 600; font-size: var(--text-base);
+    letter-spacing: -0.01em;
+  }
+  .onb-brand svg { color: var(--brand); }
+
+  .btn-ghost {
+    appearance: none; background: transparent;
+    border: 1px solid var(--border); color: var(--text-muted);
+    padding: 0.4rem 0.8rem; border-radius: var(--radius-md);
+    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--border-strong); }
+
+  .onb-wrap {
+    flex: 1;
+    max-width: 560px;
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4) var(--space-10);
+  }
+  @media (min-width: 640px) { .onb-wrap { padding: var(--space-8) var(--space-6) var(--space-10); } }
+
+  /* ---------- Progress ---------- */
+  .onb-progress {
+    display: flex; gap: 6px; margin-bottom: var(--space-5);
+  }
+  .onb-progress__seg {
+    flex: 1; height: 4px; border-radius: 2px;
+    background: var(--border);
+    transition: background var(--duration) var(--ease);
+  }
+  .onb-progress__seg.is-done { background: var(--success); }
+  .onb-progress__seg.is-current { background: var(--brand); }
+
+  .onb-step-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand);
+    margin-bottom: var(--space-2);
+  }
+  .onb-title {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: var(--leading-tight);
+    margin-bottom: var(--space-2);
+  }
+  @media (min-width: 640px) { .onb-title { font-size: var(--text-3xl); } }
+  .onb-sub {
+    font-size: var(--text-base);
+    color: var(--text-muted);
+    line-height: var(--leading-snug);
+    margin-bottom: var(--space-6);
+  }
+
+  /* ---------- Panels ---------- */
+  .onb-panel[hidden] { display: none; }
+
+  .onb-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    margin-bottom: var(--space-5);
+  }
+  .onb-card__label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-subtle);
+    margin-bottom: var(--space-2);
+  }
+  .onb-card__value {
+    font-size: var(--text-md);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+  .onb-card__hint {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: var(--space-3);
+    line-height: var(--leading-snug);
+  }
+
+  .onb-check {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    color: var(--success);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .onb-check svg { width: 16px; height: 16px; }
+
+  /* ---------- Buttons ---------- */
+  .onb-actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+  .onb-actions .btn-primary { flex: 1; }
+  @media (max-width: 480px) { .onb-actions { flex-direction: column-reverse; } }
+
+  .btn-primary {
+    appearance: none;
+    background: var(--brand); color: var(--brand-fg);
+    border: none;
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 48px;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: var(--space-2);
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .btn-secondary {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 48px;
+  }
+  .btn-secondary:hover { color: var(--text); border-color: var(--border-strong); }
+
+  .alert {
+    display: none;
+    padding: 0.75rem 0.9rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    margin-bottom: var(--space-4);
+    overflow-wrap: anywhere;
+  }
+  .alert[data-show] { display: block; }
+  .alert--error {
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
+    color: var(--danger);
+    border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
+  }
+
+  .state { padding: var(--space-8) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
+  .state[hidden] { display: none; }
+  .state--error { color: var(--danger); }
+
+  /* Placeholder for upcoming steps */
+  .placeholder {
+    padding: var(--space-6) var(--space-5);
+    background: var(--bg-sunken);
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--border-strong);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    margin-bottom: var(--space-4);
+  }
+</style>
+</head>
+<body>
+
+<header class="onb-topbar">
+  <div class="onb-brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+    </svg>
+    UniConnect
+  </div>
+  <button class="btn-ghost" id="btn-signout">Sign out</button>
+</header>
+
+<main class="onb-wrap">
+
+  <div class="state" id="state-loading">Loading…</div>
+  <div class="state state--error" id="state-error" hidden></div>
+
+  <div id="wizard" hidden>
+
+    <div class="onb-progress" id="onb-progress"></div>
+
+    <div class="onb-step-label" id="step-label">Step 1 of 5</div>
+    <h1 class="onb-title" id="step-title">Your account</h1>
+    <p class="onb-sub" id="step-sub">Let's get you set up.</p>
+
+    <div class="alert alert--error" id="alert"></div>
+
+    <!-- Panel 1: Account -->
+    <section class="onb-panel" id="panel-account">
+      <div class="onb-card">
+        <div class="onb-card__label">Email</div>
+        <div class="onb-card__value" id="p-email">—</div>
+        <div class="onb-card__hint" id="p-account-hint"></div>
+      </div>
+
+      <div class="onb-actions">
+        <button class="btn-primary" id="btn-account-continue">Continue</button>
+      </div>
+    </section>
+
+    <!-- Panel 2: Institution -->
+    <section class="onb-panel" id="panel-institution" hidden>
+      <div class="placeholder">
+        Institution picker is built in the next step.
+      </div>
+    </section>
+
+    <!-- Panel 3: Academic -->
+    <section class="onb-panel" id="panel-academic" hidden>
+      <div class="placeholder">
+        Academic details are built in a later step.
+      </div>
+    </section>
+
+    <!-- Panel 4: Identity / Verification -->
+    <section class="onb-panel" id="panel-identity" hidden>
+      <div class="placeholder">
+        Student identity and verification are built in a later step.
+      </div>
+    </section>
+
+    <!-- Panel 5: Enrollment -->
+    <section class="onb-panel" id="panel-enrollment" hidden>
+      <div class="placeholder">
+        Enrollment progress is built in a later step.
+      </div>
+    </section>
+
+  </div>
+
+</main>
+
+<script type="module">
+  import { supabase } from '../js/supabase.js';
+
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- Step definitions ----------
+  const STEPS = [
+    { key: 'account',     title: 'Your account',           sub: 'This is the account you signed up with.' },
+    { key: 'institution', title: 'Your institution',       sub: 'Choose the university, polytechnic, or college you belong to.' },
+    { key: 'academic',    title: 'Your academic details',  sub: 'Tell us where you study within your institution.' },
+    { key: 'identity',    title: 'Your student identity',  sub: 'Provide the ID your institution recognises you by.' },
+    { key: 'enrollment',  title: 'Setting up your campus', sub: 'We are connecting you to your courses and communities.' },
+  ];
+
+  // registration_step → visible index (0-based)
+  function visibleStep(regStep) {
+    switch (regStep) {
+      case 'account':      return 0;
+      case 'institution':  return 1;
+      case 'academic':     return 2;
+      case 'verification': return 3;
+      case 'enrollment':   return 4;
+      case 'complete':     return 5;   // handled separately
+      default:             return 0;
+    }
+  }
+
+  function renderStepper(current) {
+    const segs = STEPS.map((_, i) => {
+      let cls = 'onb-progress__seg';
+      if (i < current)  cls += ' is-done';
+      if (i === current) cls += ' is-current';
+      return `<div class="${cls}"></div>`;
+    }).join('');
+    $('onb-progress').innerHTML = segs;
+  }
+
+  function showPanel(idx) {
+    const panels = ['account', 'institution', 'academic', 'identity', 'enrollment'];
+    panels.forEach((key, i) => {
+      const el = $(`panel-${key}`);
+      if (!el) return;
+      el.hidden = i !== idx;
+    });
+  }
+
+  // ---------- State ----------
+  let profile = null;
+  let meId = null;
+
+  // ---------- Auth guard ----------
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
+  meId = session.user.id;
+
+  // ---------- Load profile ----------
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, email, full_name, registration_step, verification_status, institution_id, department_id, programme_id, level_id, session_id, matric_no')
+    .eq('id', meId)
+    .single();
+
+  if (error) {
+    $('state-loading').hidden = true;
+    $('state-error').hidden = false;
+    $('state-error').textContent = 'Could not load your account: ' + error.message;
+    throw error;
+  }
+  profile = data;
+
+  // Already complete — nothing to do here
+  if (profile.registration_step === 'complete') {
+    location.replace('dashboard.html');
+    throw new Error('already complete');
+  }
+
+  // ---------- Render ----------
+  const current = visibleStep(profile.registration_step);
+
+  $('state-loading').hidden = true;
+  $('wizard').hidden = false;
+
+  renderStepper(current);
+  showPanel(current);
+  $('step-label').textContent = `Step ${current + 1} of ${STEPS.length}`;
+  $('step-title').textContent = STEPS[current].title;
+  $('step-sub').textContent   = STEPS[current].sub;
+
+  // ---------- Panel 1: Account ----------
+  if (current === 0) {
+    $('p-email').textContent = profile.email;
+
+    if (profile.verification_status === 'unverified') {
+      // Email confirmation may still be pending, but if they're signed in,
+      // we can treat it as effectively confirmed.
+      $('p-account-hint').textContent =
+        'Your account is active. You can continue to the next step.';
+    } else {
+      $('p-account-hint').textContent =
+        'Your account is active.';
+    }
+
+    $('btn-account-continue').addEventListener('click', async () => {
+      const btn = $('btn-account-continue');
+      btn.disabled = true; btn.textContent = 'Saving…';
+
+      const { error: upErr } = await supabase
+        .from('profiles')
+        .update({ registration_step: 'institution' })
+        .eq('id', meId);
+
+      if (upErr) {
+        btn.disabled = false; btn.textContent = 'Continue';
+        $('alert').textContent = upErr.message;
+        $('alert').setAttribute('data-show', '1');
+        return;
+      }
+      // Reload — the wizard will pick up the new step
+      location.reload();
+    });
+  }
+
+  // ---------- Sign out ----------
+  $('btn-signout').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    location.replace('login.html');
+  });
+</script>
+
+</body>
+</html>
