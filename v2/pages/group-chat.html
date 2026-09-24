@@ -335,7 +335,7 @@
   async function checkMembership() {
     const { data, error } = await supabase
       .from('community_members')
-      .select('group_id')
+      .select('community_id')
       .eq('community_id', groupId)
       .eq('user_id', meId)
       .maybeSingle();
@@ -451,7 +451,7 @@
 
     const { data, error } = await supabase
       .from('community_messages')
-      .insert({ group_id: groupId, sender_id: meId, body })
+      .insert({ community_id: groupId, sender_id: meId, body })
       .select('id, sender_id, body, created_at')
       .single();
 

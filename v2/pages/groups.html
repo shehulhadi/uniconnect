@@ -373,19 +373,19 @@
 
     allGroups = (groups || []).map(g => ({
       ...g,
-      member_count: Array.isArray(g.group_members) && g.group_members[0]
-        ? g.group_members[0].count
+      member_count: Array.isArray(g.community_members) && g.community_members[0]
+        ? g.community_members[0].count
         : 0,
     }));
 
     const { data: mine, error: mErr } = await supabase
       .from('community_members')
-      .select('group_id')
+      .select('community_id')
       .eq('user_id', session.user.id);
 
     if (mErr) { showError('Could not load your memberships: ' + mErr.message); return; }
 
-    myGroupIds = new Set((mine || []).map(r => r.group_id));
+    myGroupIds = new Set((mine || []).map(r => r.community_id));
 
     $('state-loading').hidden = true;
     render();
