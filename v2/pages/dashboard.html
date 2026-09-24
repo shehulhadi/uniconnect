@@ -298,9 +298,14 @@
   // ---- Profile ----
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, full_name, role')
+    .select('id, full_name, role, registration_step')
     .eq('id', meId)
     .single();
+
+  if (profile && profile.registration_step && profile.registration_step !== 'complete') {
+    window.location.replace('onboarding.html');
+    throw new Error('onboarding incomplete');
+  }
 
   const firstName = (profile?.full_name || 'there').split(' ')[0];
   const hour = new Date().getHours();

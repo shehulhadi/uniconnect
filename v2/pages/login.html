@@ -436,7 +436,7 @@
       if (error) throw error;
 
       if (data.session) {
-        onAuthenticated();
+        window.location.replace('onboarding.html');
       } else {
         showAlert('success', 'Account created. Check your email to confirm before signing in.');
         setMode('signin');
