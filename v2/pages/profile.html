@@ -548,7 +548,7 @@
       .from('profiles')
       .select(`
         id, full_name, email, role, level, status,
-        matric_no, staff_no, avatar_url, member_since,
+        matric_no, staff_no, avatar_url, created_at,
         headline, bio, phone, admission_year, graduation_year, social_links,
         institution_id, department_id,
         institutions ( name ),
@@ -638,7 +638,12 @@
 
     setText('f-admission', p.admission_year);
     setText('f-graduation', p.graduation_year);
-    setText('f-member-since', p.member_since);
+    if (p.created_at) {
+      const d = new Date(p.created_at);
+      setText('f-member-since', d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
+    } else {
+      setText('f-member-since', null);
+    }
 
     // Contact
     if (p.email) $('f-email').innerHTML = `<a href="mailto:${esc(p.email)}">${esc(p.email)}</a>`;
