@@ -17,79 +17,48 @@
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border); min-height: 56px;
   }
-  .topbar__brand {
-    display: flex; align-items: center; gap: var(--space-2);
-    font-weight: 600; font-size: var(--text-base);
-    letter-spacing: -0.01em; color: var(--text);
-  }
+  .topbar__brand { display: flex; align-items: center; gap: var(--space-2); font-weight: 600; font-size: var(--text-base); letter-spacing: -0.01em; color: var(--text); }
   .topbar__brand svg { color: var(--brand); }
   .topbar__right { display: flex; align-items: center; gap: var(--space-2); }
-  .btn-ghost {
-    appearance: none; background: transparent;
-    border: 1px solid var(--border); color: var(--text-muted);
-    padding: 0.45rem 0.85rem; border-radius: var(--radius-md);
-    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
-    transition: all var(--duration-fast) var(--ease); min-height: 36px;
-    text-decoration: none; display: inline-flex; align-items: center;
-  }
-  .btn-ghost:hover { border-color: var(--border-strong); color: var(--text); background: var(--bg-elevated); }
-  .btn-primary {
-    appearance: none; background: var(--brand); color: var(--brand-fg);
-    border: none; padding: 0.55rem 1rem;
-    border-radius: var(--radius-md); font-size: var(--text-sm);
-    font-weight: 500; cursor: pointer;
-    transition: all var(--duration-fast) var(--ease);
-    min-height: 38px; display: inline-flex;
-    align-items: center; gap: var(--space-2);
-  }
-  .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
-  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 
-  .wrap { max-width: 720px; margin: 0 auto; padding: 0 var(--space-4) var(--space-10); }
-  @media (min-width: 640px) { .wrap { padding: 0 var(--space-6) var(--space-10); } }
+  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-10); }
+  @media (min-width: 640px) { .wrap { padding: var(--space-6) var(--space-6) var(--space-10); } }
 
-  /* --- Header --- */
+  /* ---------- Hero ---------- */
   .hero {
     position: relative;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    margin-top: var(--space-5);
     margin-bottom: var(--space-5);
     border: 1px solid var(--border);
+    background: var(--bg-elevated);
   }
   .hero__cover {
-    height: 120px;
+    height: 130px;
     background:
-      radial-gradient(120% 100% at 20% 0%, var(--brand) 0%, color-mix(in srgb, var(--brand) 60%, #0c0a09) 55%, #0c0a09 100%);
+      radial-gradient(120% 100% at 20% 0%, var(--brand) 0%, color-mix(in srgb, var(--brand) 55%, #0c0a09) 55%, #0c0a09 100%);
     position: relative;
   }
   .hero__cover::after {
     content: '';
     position: absolute; inset: 0;
     background-image:
-      linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
-    background-size: 32px 32px;
+      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
     mask-image: radial-gradient(70% 100% at 30% 0%, #000 0%, transparent 80%);
     pointer-events: none;
   }
-  @media (min-width: 640px) { .hero__cover { height: 160px; } }
+  @media (min-width: 640px) { .hero__cover { height: 170px; } }
 
-  .hero__body {
-    background: var(--bg-elevated);
-    padding: var(--space-4);
-    padding-top: 56px;
-    position: relative;
-  }
-  @media (min-width: 640px) { .hero__body { padding: var(--space-5); padding-top: 60px; } }
+  .hero__body { padding: var(--space-4); padding-top: 60px; position: relative; }
+  @media (min-width: 640px) { .hero__body { padding: var(--space-5); padding-top: 68px; } }
 
   .hero__avatar-wrap {
-    position: absolute;
-    top: -44px;
-    left: var(--space-4);
-    width: 88px; height: 88px;
+    position: absolute; top: -48px; left: var(--space-4);
+    width: 92px; height: 92px;
   }
-  @media (min-width: 640px) { .hero__avatar-wrap { top: -56px; left: var(--space-5); width: 112px; height: 112px; } }
+  @media (min-width: 640px) { .hero__avatar-wrap { top: -60px; left: var(--space-5); width: 116px; height: 116px; } }
 
   .avatar-xl {
     width: 100%; height: 100%;
@@ -98,17 +67,14 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 2rem; font-weight: 600;
     border: 4px solid var(--bg-elevated);
-    overflow: hidden;
-    text-transform: uppercase;
-    position: relative;
+    overflow: hidden; text-transform: uppercase;
   }
   @media (min-width: 640px) { .avatar-xl { font-size: 2.5rem; } }
   .avatar-xl img { width: 100%; height: 100%; object-fit: cover; }
 
   .avatar-edit {
-    position: absolute;
-    bottom: 0; right: 0;
-    width: 30px; height: 30px;
+    position: absolute; bottom: 0; right: 0;
+    width: 32px; height: 32px;
     border-radius: var(--radius-full);
     background: var(--brand); color: var(--brand-fg);
     border: 3px solid var(--bg-elevated);
@@ -118,47 +84,105 @@
   }
   .avatar-edit:hover { background: var(--brand-hover); }
 
-  .hero__name {
-    font-size: var(--text-xl); font-weight: 600;
-    letter-spacing: -0.02em; line-height: var(--leading-tight);
-    margin-bottom: 2px;
-    overflow-wrap: anywhere;
-  }
+  .hero__name { font-size: var(--text-xl); font-weight: 600; letter-spacing: -0.02em; line-height: var(--leading-tight); margin-bottom: 2px; overflow-wrap: anywhere; }
   @media (min-width: 640px) { .hero__name { font-size: var(--text-2xl); } }
 
-  .hero__headline {
-    font-size: var(--text-sm); color: var(--text-muted);
-    line-height: var(--leading-snug); margin-bottom: var(--space-3);
-    overflow-wrap: anywhere;
-  }
+  .hero__headline { font-size: var(--text-sm); color: var(--text-muted); line-height: var(--leading-snug); margin-bottom: var(--space-3); overflow-wrap: anywhere; }
 
-  .hero__badges {
-    display: flex; flex-wrap: wrap; gap: var(--space-2);
+  .hero__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-bottom: var(--space-4); }
+
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 0.2rem 0.65rem; border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+  .badge--role { background: var(--brand-subtle); color: var(--brand); }
+
+  /* Status switcher */
+  .status-switch {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0.2rem 0.6rem 0.2rem 0.55rem;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs); font-weight: 600;
+    letter-spacing: 0.03em; text-transform: uppercase;
+    background: var(--bg-sunken); color: var(--text-muted);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+  }
+  .status-switch:hover { border-color: var(--border-strong); color: var(--text); }
+  .status-switch .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--text-subtle); }
+  .status-switch[data-status="online"] { background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); }
+  .status-switch[data-status="online"] .dot { background: var(--success); }
+  .status-switch[data-status="away"]   { background: color-mix(in srgb, var(--warning) 15%, transparent); color: var(--warning); }
+  .status-switch[data-status="away"]   .dot { background: var(--warning); }
+  .status-switch[data-status="busy"]   { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+  .status-switch[data-status="busy"]   .dot { background: var(--danger); }
+  .status-switch[data-status="offline"] .dot { background: var(--text-subtle); }
+  .status-switch svg { opacity: 0.6; }
+
+  .status-pop {
+    position: absolute; z-index: 30;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    padding: 4px;
+    min-width: 180px;
+    display: none;
+  }
+  .status-pop[data-open] { display: block; animation: popIn 0.12s var(--ease); }
+  @keyframes popIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .status-pop button {
+    display: flex; align-items: center; gap: var(--space-2);
+    width: 100%; padding: 0.55rem 0.7rem;
+    background: transparent; border: none; border-radius: var(--radius-sm);
+    color: var(--text); font-size: var(--text-sm); font-family: inherit;
+    cursor: pointer; text-align: left;
+  }
+  .status-pop button:hover { background: var(--bg-sunken); }
+  .status-pop button .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .status-pop button[data-for="online"] .dot  { background: var(--success); }
+  .status-pop button[data-for="away"] .dot    { background: var(--warning); }
+  .status-pop button[data-for="busy"] .dot    { background: var(--danger); }
+  .status-pop button[data-for="offline"] .dot { background: var(--text-subtle); }
+  .status-pop button[data-active="1"] { background: var(--bg-sunken); font-weight: 600; }
+
+  .hero__actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+
+  .btn-primary {
+    appearance: none; background: var(--brand); color: var(--brand-fg);
+    border: none; padding: 0.55rem 1rem;
+    border-radius: var(--radius-md); font-size: var(--text-sm);
+    font-weight: 500; cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 38px; display: inline-flex; align-items: center; gap: var(--space-2);
+    text-decoration: none;
+  }
+  .btn-primary:hover { background: var(--brand-hover); }
+  .btn-secondary {
+    appearance: none; background: transparent;
+    border: 1px solid var(--border); color: var(--text-muted);
+    padding: 0.55rem 1rem; border-radius: var(--radius-md);
+    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 38px; display: inline-flex; align-items: center; gap: var(--space-2);
+    text-decoration: none;
+  }
+  .btn-secondary:hover { color: var(--text); border-color: var(--border-strong); }
+
+  /* ---------- Quick stats ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
     margin-bottom: var(--space-4);
   }
-  .badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 0.2rem 0.6rem; border-radius: var(--radius-full);
-    font-size: var(--text-xs); font-weight: 600;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+  .stat {
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: var(--space-3) var(--space-3);
+    text-align: center;
   }
-  .badge--role { background: var(--brand-subtle); color: var(--brand); }
-  .badge--status { background: var(--bg-sunken); color: var(--text-muted); }
-  .badge--online { background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); }
-  .badge--away   { background: color-mix(in srgb, var(--warning) 15%, transparent); color: var(--warning); }
-  .badge--offline{ background: var(--bg-sunken); color: var(--text-subtle); }
-  .badge__dot {
-    display: inline-block; width: 6px; height: 6px;
-    border-radius: 50%; background: currentColor;
-  }
+  .stat__num { font-size: var(--text-xl); font-weight: 700; color: var(--text); letter-spacing: -0.02em; line-height: 1.1; }
+  .stat__label { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--text-subtle); margin-top: 4px; }
 
-  .hero__actions {
-    display: flex; gap: var(--space-2);
-    margin-top: var(--space-2); flex-wrap: wrap;
-  }
-
-  /* --- Sections --- */
+  /* ---------- Sections ---------- */
   .section {
     background: var(--bg-elevated);
     border: 1px solid var(--border);
@@ -166,70 +190,48 @@
     margin-bottom: var(--space-4);
     overflow: hidden;
   }
-  .section__head {
-    padding: var(--space-3) var(--space-4);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    gap: var(--space-2);
-  }
-  .section__title {
-    font-size: var(--text-xs); font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--text-muted);
-    display: flex; align-items: center; gap: var(--space-2);
-  }
+  .section__head { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .section__title { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); display: flex; align-items: center; gap: var(--space-2); }
   .section__title svg { color: var(--text-subtle); }
   .section__body { padding: var(--space-4); }
 
-  .bio-text {
-    font-size: var(--text-sm); line-height: var(--leading-base);
-    color: var(--text); white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
+  .bio { font-size: var(--text-sm); line-height: var(--leading-base); white-space: pre-wrap; overflow-wrap: anywhere; }
   .muted { color: var(--text-subtle); font-style: italic; }
 
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-3) var(--space-4);
-  }
-  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+  .rows { display: flex; flex-direction: column; }
+  .row { display: flex; justify-content: space-between; gap: var(--space-3); padding: 0.65rem 0; border-bottom: 1px solid var(--border); font-size: var(--text-sm); }
+  .row:last-child { border-bottom: none; }
+  .row:first-child { padding-top: 0; }
+  .row dt { color: var(--text-muted); flex-shrink: 0; }
+  .row dd { color: var(--text); font-weight: 500; text-align: right; overflow-wrap: anywhere; min-width: 0; }
 
-  .field {
-    display: flex; flex-direction: column; gap: 2px;
-  }
-  .field--full { grid-column: 1 / -1; }
-  .field__label {
-    font-size: 0.6875rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    color: var(--text-subtle);
-  }
-  .field__value {
-    font-size: var(--text-sm); color: var(--text);
-    overflow-wrap: anywhere;
-  }
-  .field__value a { color: var(--brand); text-decoration: none; }
-  .field__value a:hover { text-decoration: underline; }
-
-  .social-link {
-    display: inline-flex; align-items: center; gap: var(--space-2);
-    padding: 0.4rem 0.75rem;
-    background: var(--bg-sunken);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm); color: var(--text);
-    text-decoration: none;
+  .link-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0.4rem 0.75rem; background: var(--bg-sunken);
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    font-size: var(--text-sm); color: var(--text); text-decoration: none;
     transition: all var(--duration-fast) var(--ease);
   }
-  .social-link:hover { border-color: var(--brand); color: var(--brand); }
+  .link-chip:hover { border-color: var(--brand); color: var(--brand); }
 
+  .danger-zone { padding: var(--space-5) var(--space-4); text-align: center; }
+  .btn-danger {
+    appearance: none; background: transparent; color: var(--danger);
+    border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);
+    padding: 0.65rem 1.2rem; border-radius: var(--radius-md);
+    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
+    transition: all var(--duration-fast) var(--ease); min-height: 42px;
+    display: inline-flex; align-items: center; gap: var(--space-2);
+  }
+  .btn-danger:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+
+  /* ---------- State helpers ---------- */
   .state { padding: var(--space-8) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
   .state[hidden] { display: none; }
   .state--error { color: var(--danger); }
-
   #content[hidden] { display: none; }
 
-  /* --- Modal --- */
+  /* ---------- Modal ---------- */
   .modal-backdrop {
     position: fixed; inset: 0; z-index: 50;
     background: rgba(0,0,0,0.5);
@@ -248,21 +250,13 @@
     transform: translateY(12px); transition: transform var(--duration) var(--ease);
   }
   .modal-backdrop[data-open] .modal { transform: translateY(0); }
-  .modal h2 {
-    font-size: var(--text-lg); font-weight: 600;
-    letter-spacing: -0.01em; margin-bottom: var(--space-2);
-  }
-  .modal .sub {
-    font-size: var(--text-sm); color: var(--text-muted);
-    margin-bottom: var(--space-5);
-  }
+  .modal h2 { font-size: var(--text-lg); font-weight: 600; letter-spacing: -0.01em; margin-bottom: var(--space-2); }
+  .modal .sub { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-5); }
+
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
   @media (max-width: 540px) { .form-row { grid-template-columns: 1fr; } }
   .form-field { margin-bottom: var(--space-3); }
-  .form-field label {
-    display: block; font-size: var(--text-sm);
-    font-weight: 500; color: var(--text); margin-bottom: var(--space-2);
-  }
+  .form-field label { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--text); margin-bottom: var(--space-2); }
   .form-field input, .form-field textarea, .form-field select {
     width: 100%; padding: 0.65rem 0.85rem;
     background: var(--bg); border: 1px solid var(--border);
@@ -275,37 +269,15 @@
     outline: none; border-color: var(--brand);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
   }
-  .form-field input:disabled, .form-field select:disabled {
-    opacity: 0.6; cursor: not-allowed; background: var(--bg-sunken);
-  }
+  .form-field input:disabled, .form-field select:disabled { opacity: 0.6; cursor: not-allowed; background: var(--bg-sunken); }
   .hint { font-size: var(--text-xs); color: var(--text-subtle); margin-top: 4px; }
 
-  .modal-alert {
-    display: none; padding: 0.7rem 0.9rem;
-    border-radius: var(--radius-md); font-size: var(--text-sm);
-    margin-bottom: var(--space-4); line-height: var(--leading-snug);
-    overflow-wrap: anywhere;
-  }
+  .modal-alert { display: none; padding: 0.7rem 0.9rem; border-radius: var(--radius-md); font-size: var(--text-sm); margin-bottom: var(--space-4); line-height: var(--leading-snug); overflow-wrap: anywhere; }
   .modal-alert[data-show] { display: block; }
-  .modal-alert--error {
-    background: color-mix(in srgb, var(--danger) 10%, transparent);
-    color: var(--danger);
-    border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
-  }
+  .modal-alert--error { background: color-mix(in srgb, var(--danger) 10%, transparent); color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent); }
 
-  .modal-actions {
-    display: flex; gap: var(--space-3);
-    margin-top: var(--space-5); justify-content: flex-end;
-  }
+  .modal-actions { display: flex; gap: var(--space-3); margin-top: var(--space-5); justify-content: flex-end; }
   @media (max-width: 540px) { .modal-actions { flex-direction: column-reverse; } }
-  .btn-danger {
-    appearance: none; background: transparent; color: var(--danger);
-    border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);
-    padding: 0.55rem 1rem; border-radius: var(--radius-md);
-    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
-    transition: all var(--duration-fast) var(--ease); min-height: 38px;
-  }
-  .btn-danger:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
 
   .toast {
     position: fixed; bottom: 84px; left: 50%;
@@ -342,6 +314,7 @@
 
   <div id="content" hidden>
 
+    <!-- Hero -->
     <section class="hero">
       <div class="hero__cover"></div>
       <div class="hero__body">
@@ -358,7 +331,16 @@
 
         <div class="hero__name" id="h-name">—</div>
         <div class="hero__headline" id="h-headline"></div>
-        <div class="hero__badges" id="h-badges"></div>
+
+        <div class="hero__chips">
+          <span class="badge badge--role" id="h-role">—</span>
+          <button class="status-switch" id="status-switch" data-status="offline" type="button">
+            <span class="dot"></span>
+            <span id="status-label">Offline</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </div>
+
         <div class="hero__actions">
           <button class="btn-primary" id="btn-edit">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -367,23 +349,45 @@
             </svg>
             Edit profile
           </button>
+          <a class="btn-secondary" href="settings.html">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.09-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            Settings
+          </a>
+        </div>
+
+        <!-- Status popover -->
+        <div class="status-pop" id="status-pop" role="menu">
+          <button type="button" data-for="online"  data-set="online"><span class="dot"></span> Online</button>
+          <button type="button" data-for="away"    data-set="away"><span class="dot"></span> Away</button>
+          <button type="button" data-for="busy"    data-set="busy"><span class="dot"></span> Busy</button>
+          <button type="button" data-for="offline" data-set="offline"><span class="dot"></span> Appear offline</button>
         </div>
       </div>
     </section>
 
-    <section class="section" id="s-about">
+    <!-- Quick stats -->
+    <div class="stats">
+      <div class="stat"><div class="stat__num" id="stat-courses">—</div><div class="stat__label">Courses</div></div>
+      <div class="stat"><div class="stat__num" id="stat-communities">—</div><div class="stat__label">Communities</div></div>
+      <div class="stat"><div class="stat__num" id="stat-since">—</div><div class="stat__label">Since</div></div>
+    </div>
+
+    <!-- About -->
+    <section class="section">
       <div class="section__head">
         <div class="section__title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
           About
         </div>
       </div>
-      <div class="section__body">
-        <div class="bio-text" id="f-bio"></div>
-      </div>
+      <div class="section__body"><div class="bio" id="f-bio"></div></div>
     </section>
 
-    <section class="section" id="s-academic">
+    <!-- Academic -->
+    <section class="section">
       <div class="section__head">
         <div class="section__title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
@@ -391,20 +395,24 @@
         </div>
       </div>
       <div class="section__body">
-        <div class="grid">
-          <div class="field"><div class="field__label">Institution</div><div class="field__value" id="f-institution">—</div></div>
-          <div class="field"><div class="field__label">Department</div><div class="field__value" id="f-department">—</div></div>
-          <div class="field" id="wrap-level"><div class="field__label">Level</div><div class="field__value" id="f-level">—</div></div>
-          <div class="field" id="wrap-matric"><div class="field__label">Matric number</div><div class="field__value" id="f-matric">—</div></div>
-          <div class="field" id="wrap-staff"><div class="field__label">Staff number</div><div class="field__value" id="f-staff">—</div></div>
-          <div class="field"><div class="field__label">Admission year</div><div class="field__value" id="f-admission">—</div></div>
-          <div class="field"><div class="field__label">Expected graduation</div><div class="field__value" id="f-graduation">—</div></div>
-          <div class="field"><div class="field__label">Member since</div><div class="field__value" id="f-member-since">—</div></div>
-        </div>
+        <dl class="rows">
+          <div class="row"><dt>Institution</dt><dd id="f-institution">—</dd></div>
+          <div class="row"><dt>Faculty</dt><dd id="f-faculty">—</dd></div>
+          <div class="row"><dt>Department</dt><dd id="f-department">—</dd></div>
+          <div class="row"><dt>Programme</dt><dd id="f-programme">—</dd></div>
+          <div class="row" id="row-level"><dt>Level</dt><dd id="f-level">—</dd></div>
+          <div class="row"><dt>Session</dt><dd id="f-session">—</dd></div>
+          <div class="row" id="row-matric"><dt>Matric number</dt><dd id="f-matric">—</dd></div>
+          <div class="row" id="row-staff"><dt>Staff number</dt><dd id="f-staff">—</dd></div>
+          <div class="row"><dt>Admission year</dt><dd id="f-admission">—</dd></div>
+          <div class="row"><dt>Expected graduation</dt><dd id="f-graduation">—</dd></div>
+          <div class="row"><dt>Member since</dt><dd id="f-member-since">—</dd></div>
+        </dl>
       </div>
     </section>
 
-    <section class="section" id="s-contact">
+    <!-- Contact -->
+    <section class="section">
       <div class="section__head">
         <div class="section__title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -412,13 +420,14 @@
         </div>
       </div>
       <div class="section__body">
-        <div class="grid">
-          <div class="field field--full"><div class="field__label">Email</div><div class="field__value" id="f-email">—</div></div>
-          <div class="field field--full" id="wrap-phone"><div class="field__label">Phone</div><div class="field__value" id="f-phone">—</div></div>
-        </div>
+        <dl class="rows">
+          <div class="row"><dt>Email</dt><dd id="f-email">—</dd></div>
+          <div class="row"><dt>Phone</dt><dd id="f-phone">—</dd></div>
+        </dl>
       </div>
     </section>
 
+    <!-- Links -->
     <section class="section" id="s-social" hidden>
       <div class="section__head">
         <div class="section__title">
@@ -429,8 +438,16 @@
       <div class="section__body" id="f-social"></div>
     </section>
 
-    <div style="padding:var(--space-6) 0;text-align:center;">
-      <button class="btn-danger" id="btn-signout" style="min-width:220px;">Sign out of UniConnect</button>
+    <!-- Sign out -->
+    <div class="danger-zone">
+      <button class="btn-danger" id="btn-signout">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <path d="M16 17l5-5-5-5"/>
+          <path d="M21 12H9"/>
+        </svg>
+        Sign out of UniConnect
+      </button>
     </div>
 
   </div>
@@ -441,7 +458,7 @@
 <div class="modal-backdrop" id="modal" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <h2 id="modal-title">Edit profile</h2>
-    <p class="sub">Update your public information. Role and institution can only be changed by an administrator.</p>
+    <p class="sub">Update your public information. Academic details are managed by your institution.</p>
 
     <div class="modal-alert modal-alert--error" id="modal-alert"></div>
 
@@ -450,18 +467,15 @@
         <label for="e-name">Full name</label>
         <input type="text" id="e-name" required maxlength="80">
       </div>
-
       <div class="form-field">
         <label for="e-headline">Headline <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
-        <input type="text" id="e-headline" maxlength="120" placeholder="e.g. Computer Science · 300 level · Aspiring backend engineer">
+        <input type="text" id="e-headline" maxlength="120" placeholder="e.g. Computer Science · 300 level">
         <div class="hint">One short line. Shows under your name.</div>
       </div>
-
       <div class="form-field">
         <label for="e-bio">Bio <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
         <textarea id="e-bio" maxlength="600" placeholder="A few sentences about yourself."></textarea>
       </div>
-
       <div class="form-row">
         <div class="form-field">
           <label for="e-phone">Phone <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
@@ -472,11 +486,11 @@
           <select id="e-status">
             <option value="online">Online</option>
             <option value="away">Away</option>
-            <option value="offline">Offline</option>
+            <option value="busy">Busy</option>
+            <option value="offline">Appear offline</option>
           </select>
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-field">
           <label for="e-admission">Admission year <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
@@ -487,28 +501,16 @@
           <input type="number" id="e-graduation" min="1950" max="2100" placeholder="2025">
         </div>
       </div>
-
       <div class="form-field" id="e-level-wrap">
         <label for="e-level">Level</label>
-        <select id="e-level">
-          <option value="">Not set</option>
-          <option value="100">100</option>
-          <option value="200">200</option>
-          <option value="300">300</option>
-          <option value="400">400</option>
-          <option value="500">500</option>
-          <option value="600">600</option>
-          <option value="700">700</option>
-        </select>
+        <select id="e-level"><option value="">Not set</option></select>
       </div>
-
       <div class="form-field">
         <label style="margin-bottom:var(--space-2);">Links <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
         <input type="url" id="e-github" maxlength="200" placeholder="GitHub URL" style="margin-bottom:var(--space-2);">
         <input type="url" id="e-linkedin" maxlength="200" placeholder="LinkedIn URL" style="margin-bottom:var(--space-2);">
         <input type="url" id="e-website" maxlength="200" placeholder="Personal website">
       </div>
-
       <div class="modal-actions">
         <button type="button" class="btn-danger" id="btn-cancel">Cancel</button>
         <button type="submit" class="btn-primary" id="btn-submit">Save changes</button>
@@ -543,17 +545,21 @@
     toast._t = setTimeout(() => el.removeAttribute('data-show'), 3500);
   }
 
-  // ---- Load ----
+  // -------- Load --------
   async function load() {
     const { data, error } = await supabase
       .from('profiles')
       .select(`
-        id, full_name, email, role, level, status,
-        matric_no, staff_no, avatar_url, created_at,
+        id, full_name, email, role, status, level, level_id,
+        matric_no, staff_no, avatar_url, member_since, created_at, last_seen_at,
         headline, bio, phone, admission_year, graduation_year, social_links,
-        institution_id, department_id,
+        institution_id, faculty_id, department_id, programme_id, session_id,
         institutions ( name ),
-        departments ( name )
+        faculties    ( name ),
+        departments  ( name ),
+        programmes   ( name ),
+        levels       ( display_name ),
+        academic_sessions ( name )
       `)
       .eq('id', meId)
       .single();
@@ -567,8 +573,12 @@
 
     profile = data;
     render();
+    loadStats();
     $('state-loading').hidden = true;
     $('content').hidden = false;
+
+    // Bump last_seen
+    supabase.rpc('touch_my_last_seen').then(() => {});
   }
 
   function setText(id, value, fallback = '—') {
@@ -580,102 +590,138 @@
       el.textContent = value;
     }
   }
-  function toggle(id, show) { const el = $(id); if (el) el.hidden = !show; }
+
+  function effectiveStatus(p) {
+    const raw = p.status || 'offline';
+    if (raw === 'offline') return 'offline';
+    const last = p.last_seen_at ? new Date(p.last_seen_at).getTime() : 0;
+    const age = Date.now() - last;
+    if (age > 24 * 60 * 60 * 1000) return 'offline';
+    if (age > 60 * 60 * 1000) return 'away';
+    return raw;
+  }
 
   function render() {
     const p = profile;
-    const name = p.full_name || '(no name set)';
-
-    // Header
+    const name = p.full_name || '(no name)';
     document.title = `${name} — UniConnect`;
     $('h-name').textContent = name;
 
-    if (p.headline) {
-      $('h-headline').textContent = p.headline;
-    } else {
-      $('h-headline').innerHTML = '<span class="muted">No headline yet</span>';
-    }
+    if (p.headline) $('h-headline').textContent = p.headline;
+    else $('h-headline').innerHTML = '<span class="muted">No headline yet</span>';
 
-    // Avatar
     const av = $('avatar-xl');
-    if (p.avatar_url) {
-      av.innerHTML = `<img src="${esc(p.avatar_url)}" alt="${esc(name)}">`;
-    } else {
-      av.textContent = initials(name);
-    }
+    if (p.avatar_url) av.innerHTML = `<img src="${esc(p.avatar_url)}" alt="${esc(name)}">`;
+    else av.textContent = initials(name);
 
-    // Badges
-    const badges = [];
-    badges.push(`<span class="badge badge--role">${esc(p.role)}</span>`);
-    const statusClass = p.status === 'online' ? 'badge--online'
-                      : p.status === 'away'   ? 'badge--away'
-                      : 'badge--offline';
-    badges.push(`<span class="badge badge--status ${statusClass}"><span class="badge__dot"></span>${esc(p.status || 'offline')}</span>`);
-    $('h-badges').innerHTML = badges.join('');
+    $('h-role').textContent = (p.role || 'student').toUpperCase();
+
+    // Status switcher
+    const eff = effectiveStatus(p);
+    const sw = $('status-switch');
+    sw.setAttribute('data-status', eff);
+    $('status-label').textContent =
+      eff === 'online' ? 'Online' :
+      eff === 'away'   ? 'Away' :
+      eff === 'busy'   ? 'Busy' : 'Offline';
+
+    document.querySelectorAll('#status-pop button').forEach(b => {
+      b.dataset.active = b.dataset.for === p.status ? '1' : '';
+    });
 
     // About
-    if (p.bio) {
-      $('f-bio').textContent = p.bio;
-    } else {
-      $('f-bio').innerHTML = '<span class="muted">No bio yet.</span>';
-    }
+    if (p.bio) $('f-bio').textContent = p.bio;
+    else $('f-bio').innerHTML = '<span class="muted">No bio yet.</span>';
 
     // Academic
     setText('f-institution', p.institutions?.name, 'Not assigned');
+    setText('f-faculty', p.faculties?.name, 'Not assigned');
     setText('f-department', p.departments?.name, 'Not assigned');
+    setText('f-programme', p.programmes?.name, 'Not assigned');
 
     const isStudent = p.role === 'student';
-    toggle('wrap-level', isStudent);
-    toggle('wrap-matric', isStudent);
-    toggle('wrap-staff', !isStudent);
+    $('row-level').hidden = !isStudent;
+    $('row-matric').hidden = !isStudent;
+    $('row-staff').hidden = isStudent;
 
     if (isStudent) {
-      setText('f-level', p.level ? `${p.level} level` : null);
+      setText('f-level', p.levels?.display_name, 'Not set');
       setText('f-matric', p.matric_no);
-    }
-    if (!isStudent) {
+    } else {
       setText('f-staff', p.staff_no);
     }
+    setText('f-session', p.academic_sessions?.name);
 
     setText('f-admission', p.admission_year);
     setText('f-graduation', p.graduation_year);
-    if (p.created_at) {
-      const d = new Date(p.created_at);
-      setText('f-member-since', d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
+
+    const since = p.member_since ? new Date(p.member_since) :
+                  p.created_at ? new Date(p.created_at) : null;
+    if (since) {
+      setText('f-member-since', since.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }));
+      $('stat-since').textContent = since.getFullYear();
     } else {
       setText('f-member-since', null);
+      $('stat-since').textContent = '—';
     }
 
     // Contact
-    if (p.email) $('f-email').innerHTML = `<a href="mailto:${esc(p.email)}">${esc(p.email)}</a>`;
-    else setText('f-email', null);
-    toggle('wrap-phone', true);
+    if (p.email) $('f-email').innerHTML = `<a href="mailto:${esc(p.email)}" style="color:var(--brand)">${esc(p.email)}</a>`;
     setText('f-phone', p.phone, 'Not provided');
 
-    // Social
+    // Links
     const links = p.social_links || {};
-    const linkItems = [];
-    if (links.github)   linkItems.push(link(links.github,   'GitHub'));
-    if (links.linkedin) linkItems.push(link(links.linkedin, 'LinkedIn'));
-    if (links.website)  linkItems.push(link(links.website,  'Website'));
-
-    if (linkItems.length) {
-      $('f-social').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:8px;">${linkItems.join('')}</div>`;
+    const li = [];
+    if (links.github)   li.push(`<a class="link-chip" href="${esc(links.github)}" target="_blank" rel="noopener">GitHub</a>`);
+    if (links.linkedin) li.push(`<a class="link-chip" href="${esc(links.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`);
+    if (links.website)  li.push(`<a class="link-chip" href="${esc(links.website)}" target="_blank" rel="noopener">Website</a>`);
+    if (li.length) {
+      $('f-social').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:8px;">${li.join('')}</div>`;
       $('s-social').hidden = false;
     } else {
       $('s-social').hidden = true;
     }
   }
 
-  function link(url, label) {
-    return `<a class="social-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`;
+  async function loadStats() {
+    const [c, m] = await Promise.all([
+      supabase.from('course_enrollments').select('id', { count: 'exact', head: true }).eq('user_id', meId).eq('status', 'active'),
+      supabase.from('community_members').select('community_id', { count: 'exact', head: true }).eq('user_id', meId),
+    ]);
+    $('stat-courses').textContent = c.count ?? '—';
+    $('stat-communities').textContent = m.count ?? '—';
   }
 
-  // ---- Edit modal ----
-  function openModal() {
+  // -------- Status switcher --------
+  const pop = $('status-pop');
+  $('status-switch').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (pop.hasAttribute('data-open')) pop.removeAttribute('data-open');
+    else pop.setAttribute('data-open', '1');
+  });
+  pop.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-set]');
+    if (!btn) return;
+    const value = btn.dataset.set;
+    pop.removeAttribute('data-open');
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ status: value, last_seen_at: new Date().toISOString() })
+      .eq('id', meId);
+
+    if (error) { toast(error.message, 'error'); return; }
+    profile.status = value;
+    profile.last_seen_at = new Date().toISOString();
+    render();
+    toast('Status updated.');
+  });
+  document.addEventListener('click', () => pop.removeAttribute('data-open'));
+
+  // -------- Edit modal --------
+  async function openModal() {
     const p = profile;
     $('modal-alert').removeAttribute('data-show');
-
     $('e-name').value = p.full_name || '';
     $('e-headline').value = p.headline || '';
     $('e-bio').value = p.bio || '';
@@ -683,19 +729,28 @@
     $('e-status').value = p.status || 'offline';
     $('e-admission').value = p.admission_year || '';
     $('e-graduation').value = p.graduation_year || '';
-    $('e-level').value = p.level ? String(p.level) : '';
+
+    // Levels
+    const levelSel = $('e-level');
+    if (p.role === 'student' && p.institution_id) {
+      const { data: lv } = await supabase
+        .from('levels').select('id, display_name').eq('institution_id', p.institution_id).order('ordinal');
+      levelSel.innerHTML = '<option value="">Not set</option>' + (lv || []).map(l =>
+        `<option value="${l.id}"${l.id === p.level_id ? ' selected' : ''}>${esc(l.display_name)}</option>`
+      ).join('');
+      $('e-level-wrap').hidden = false;
+    } else {
+      $('e-level-wrap').hidden = true;
+    }
 
     const links = p.social_links || {};
     $('e-github').value = links.github || '';
     $('e-linkedin').value = links.linkedin || '';
     $('e-website').value = links.website || '';
 
-    $('e-level-wrap').hidden = p.role !== 'student';
-
     $('modal').setAttribute('data-open', '1');
     $('modal').setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    setTimeout(() => $('e-name').focus(), 50);
   }
   function closeModal() {
     $('modal').removeAttribute('data-open');
@@ -706,11 +761,8 @@
   $('btn-edit').addEventListener('click', openModal);
   $('btn-cancel').addEventListener('click', closeModal);
   $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal();
-  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal(); });
 
-  // ---- Save ----
   $('form-edit').addEventListener('submit', async (e) => {
     e.preventDefault();
     const alertEl = $('modal-alert');
@@ -718,102 +770,61 @@
     alertEl.removeAttribute('data-show');
 
     const full_name = $('e-name').value.trim();
-    const headline = $('e-headline').value.trim() || null;
-    const bio = $('e-bio').value.trim() || null;
-    const phone = $('e-phone').value.trim() || null;
-    const status = $('e-status').value;
-    const admission_year = parseInt($('e-admission').value, 10) || null;
-    const graduation_year = parseInt($('e-graduation').value, 10) || null;
-
-    if (!full_name) {
-      alertEl.textContent = 'Full name cannot be empty.';
-      alertEl.setAttribute('data-show', '1');
-      return;
-    }
+    if (!full_name) { alertEl.textContent = 'Name cannot be empty.'; alertEl.setAttribute('data-show', '1'); return; }
 
     const social_links = {};
-    const gh = $('e-github').value.trim();
-    const li = $('e-linkedin').value.trim();
-    const ws = $('e-website').value.trim();
-    if (gh) social_links.github = gh;
-    if (li) social_links.linkedin = li;
-    if (ws) social_links.website = ws;
+    const gh = $('e-github').value.trim(); if (gh) social_links.github = gh;
+    const li = $('e-linkedin').value.trim(); if (li) social_links.linkedin = li;
+    const ws = $('e-website').value.trim(); if (ws) social_links.website = ws;
 
     const payload = {
-      full_name, headline, bio, phone, status,
-      admission_year, graduation_year, social_links,
+      full_name,
+      headline: $('e-headline').value.trim() || null,
+      bio: $('e-bio').value.trim() || null,
+      phone: $('e-phone').value.trim() || null,
+      status: $('e-status').value,
+      last_seen_at: new Date().toISOString(),
+      admission_year: parseInt($('e-admission').value, 10) || null,
+      graduation_year: parseInt($('e-graduation').value, 10) || null,
+      social_links,
     };
     if (profile.role === 'student') {
       const lv = $('e-level').value;
-      payload.level = lv ? parseInt(lv, 10) : null;
+      payload.level_id = lv || null;
     }
 
-    btn.disabled = true;
-    btn.textContent = 'Saving…';
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const { error } = await supabase.from('profiles').update(payload).eq('id', meId);
+    btn.disabled = false; btn.textContent = 'Save changes';
 
-    const { error } = await supabase
-      .from('profiles')
-      .update(payload)
-      .eq('id', meId);
-
-    btn.disabled = false;
-    btn.textContent = 'Save changes';
-
-    if (error) {
-      alertEl.textContent = error.message;
-      alertEl.setAttribute('data-show', '1');
-      return;
-    }
-
+    if (error) { alertEl.textContent = error.message; alertEl.setAttribute('data-show', '1'); return; }
     closeModal();
     toast('Profile updated.');
     await load();
   });
 
-  // ---- Avatar upload ----
+  // -------- Avatar upload --------
   $('btn-avatar').addEventListener('click', () => $('avatar-input').click());
-
   $('avatar-input').addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!file.type.startsWith('image/')) { toast('Please pick an image file.', 'error'); return; }
+    if (file.size > 5 * 1024 * 1024)    { toast('Image must be under 5 MB.', 'error'); return; }
 
-    if (!file.type.startsWith('image/')) {
-      toast('Please pick an image file.', 'error');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast('Image must be under 5 MB.', 'error');
-      return;
-    }
-
-    const btn = $('btn-avatar');
-    btn.disabled = true;
-
+    const btn = $('btn-avatar'); btn.disabled = true;
     try {
       const ext = (file.name.match(/\.[^.]+$/) || ['.jpg'])[0].toLowerCase();
       const rand = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36));
-      // Path: <user_id>/<random>.<ext> — storage policy requires this shape.
       const path = `${meId}/${rand}${ext}`;
-
-      const { error: upErr } = await supabase.storage
-        .from('avatars')
-        .upload(path, file, {
-          contentType: file.type,
-          cacheControl: '3600',
-          upsert: false,
-        });
+      const { error: upErr } = await supabase.storage.from('avatars').upload(path, file, {
+        contentType: file.type, cacheControl: '3600', upsert: false,
+      });
       if (upErr) throw upErr;
-
       const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path);
-      const publicUrl = pub?.publicUrl;
-      if (!publicUrl) throw new Error('Could not get public URL');
-
-      const { error: dbErr } = await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', meId);
+      const url = pub?.publicUrl;
+      if (!url) throw new Error('Could not get public URL');
+      const { error: dbErr } = await supabase.from('profiles').update({ avatar_url: url }).eq('id', meId);
       if (dbErr) throw dbErr;
-
       toast('Photo updated.');
       await load();
     } catch (err) {
@@ -824,20 +835,23 @@
     }
   });
 
-  // ---- Sign out ----
+  // -------- Sign out --------
   $('btn-signout').addEventListener('click', async () => {
     await supabase.auth.signOut();
     location.replace('login.html');
   });
 
-  // ---- Sign out ----
-  $('btn-signout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    location.replace('login.html');
-  });
+  // -------- Presence heartbeat --------
+  function heartbeat() {
+    supabase.rpc('touch_my_last_seen').then(() => {});
+  }
+  heartbeat();
+  setInterval(() => { if (!document.hidden) heartbeat(); }, 60000);
 
   load();
 </script>
 
+<script type="module" src="../js/bottom-nav.js"></script>
+<script type="module" src="../js/notifications.js"></script>
 </body>
 </html>
