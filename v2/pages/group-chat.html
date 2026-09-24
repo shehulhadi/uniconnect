@@ -321,7 +321,7 @@
   // ---- Step 1: load the group ----
   async function loadGroup() {
     const { data, error } = await supabase
-      .from('groups')
+      .from('communities')
       .select('id, name, description, type')
       .eq('id', groupId)
       .maybeSingle();
@@ -334,7 +334,7 @@
   // ---- Step 2: check membership ----
   async function checkMembership() {
     const { data, error } = await supabase
-      .from('group_members')
+      .from('community_members')
       .select('group_id')
       .eq('group_id', groupId)
       .eq('user_id', meId)
@@ -348,7 +348,7 @@
 
   async function loadMessages() {
     const { data, error } = await supabase
-      .from('group_messages')
+      .from('community_messages')
       .select('id, sender_id, body, created_at')
       .eq('group_id', groupId)
       .order('created_at', { ascending: true })
@@ -393,7 +393,7 @@
       .channel(`group:${groupId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'group_messages', filter: `group_id=eq.${groupId}` },
+        { event: 'INSERT', schema: 'public', table: 'community_messages', filter: `community_id=eq.${groupId}` },
         async (payload) => {
           const m = payload.new;
           log('realtime insert', m.id);
@@ -450,7 +450,7 @@
     sendBtn.disabled = true;
 
     const { data, error } = await supabase
-      .from('group_messages')
+      .from('community_messages')
       .insert({ group_id: groupId, sender_id: meId, body })
       .select('id, sender_id, body, created_at')
       .single();

@@ -371,10 +371,10 @@
   // ---- Groups feed ----
   async function loadGroups() {
     const { data, error } = await supabase
-      .from('group_members')
+      .from('community_members')
       .select(`
         joined_at,
-        groups ( id, name, type )
+        communities ( id, name, type )
       `)
       .eq('user_id', meId)
       .order('joined_at', { ascending: false })

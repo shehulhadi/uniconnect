@@ -299,10 +299,6 @@
         <select id="f-type" required>
           <option value="interest">Interest</option>
           <option value="study">Study</option>
-          <option value="department">Department</option>
-          <option value="faculty">Faculty</option>
-          <option value="level">Level</option>
-          <option value="course">Course</option>
         </select>
       </div>
       <div class="field">
@@ -366,10 +362,10 @@
 
   async function load() {
     const { data: groups, error: gErr } = await supabase
-      .from('groups')
+      .from('communities')
       .select(`
         id, name, description, type, created_at,
-        group_members ( count )
+        community_members ( count )
       `)
       .order('created_at', { ascending: false });
 
@@ -383,7 +379,7 @@
     }));
 
     const { data: mine, error: mErr } = await supabase
-      .from('group_members')
+      .from('community_members')
       .select('group_id')
       .eq('user_id', session.user.id);
 
@@ -450,17 +446,18 @@
 
       try {
         if (action === 'join') {
-          const { error } = await supabase.from('group_members').insert({
-            group_id: groupId,
+          const { error } = await supabase.from('community_members').insert({
+            community_id: groupId,
             user_id: session.user.id,
+            source: 'manual',
           });
           if (error) throw error;
           toast('Joined.');
         } else if (action === 'leave') {
           const { error } = await supabase
-            .from('group_members')
+            .from('community_members')
             .delete()
-            .eq('group_id', groupId)
+            .eq('community_id', groupId)
             .eq('user_id', session.user.id);
           if (error) throw error;
           toast('Left.');
@@ -527,12 +524,14 @@
 
     try {
       const { data: created, error: gErr } = await supabase
-        .from('groups')
+        .from('communities')
         .insert({
           institution_id: currentProfile.institution_id,
           name,
           description: desc || null,
           type,
+          kind: 'interest',
+          membership_mode: 'open',
           created_by: currentProfile.id,
         })
         .select('id')
@@ -540,10 +539,11 @@
 
       if (gErr) throw gErr;
 
-      const { error: mErr } = await supabase.from('group_members').insert({
-        group_id: created.id,
+      const { error: mErr } = await supabase.from('community_members').insert({
+        community_id: created.id,
         user_id: session.user.id,
         role: 'moderator',
+        source: 'manual',
       });
       if (mErr) throw mErr;
 
