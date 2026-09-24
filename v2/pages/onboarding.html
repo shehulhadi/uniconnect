@@ -137,6 +137,21 @@
 </style>
 </head>
 <body>
+<script>
+  // Runs before the module loads. If the module never executes,
+  // after 4 seconds we surface that fact visibly.
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      if (!window.__onbModuleRan) {
+        var el = document.getElementById('state-loading');
+        if (el && !el.hidden) {
+          el.innerHTML = 'JavaScript module did not run. Try clearing browser cache. <br><span style="font-size:12px;opacity:0.7;">file marker: onb-v7</span>';
+          el.style.color = 'var(--danger)';
+        }
+      }
+    }, 4000);
+  });
+</script>
 
 <header class="onb-topbar">
   <div class="onb-brand">
@@ -235,6 +250,8 @@
 
 <script type="module">
   import { supabase } from '../js/supabase.js';
+
+  window.__onbModuleRan = true;
 
   const $ = (id) => document.getElementById(id);
 
@@ -558,5 +575,6 @@
   }
 </script>
 
+<div style="position:fixed;bottom:4px;right:8px;font-size:10px;opacity:0.35;font-family:monospace;pointer-events:none;">onb-v7</div>
 </body>
 </html>
