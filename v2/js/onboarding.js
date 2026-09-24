@@ -162,10 +162,9 @@ export async function run() {
       if (!selectedId) return;
       const btn = $('btn-inst-continue');
       btn.disabled = true; btn.textContent = 'Saving…';
-      const { error: upErr } = await supabase
-        .from('profiles')
-        .update({ institution_id: selectedId, registration_step: 'academic' })
-        .eq('id', meId);
+      const { error: upErr } = await supabase.rpc('onboarding_set_institution', {
+        p_institution_id: selectedId,
+      });
       if (upErr) {
         btn.disabled = false; btn.textContent = 'Continue';
         $('alert').textContent = upErr.message;
@@ -286,17 +285,13 @@ export async function run() {
     btnCont.addEventListener('click', async () => {
       if (btnCont.disabled) return;
       btnCont.disabled = true; btnCont.textContent = 'Saving…';
-      const { error: upErr } = await supabase
-        .from('profiles')
-        .update({
-          faculty_id: selFaculty.value,
-          department_id: selDept.value,
-          programme_id: selProg.value,
-          level_id: selLevel.value,
-          session_id: selSession.value,
-          registration_step: 'verification'
-        })
-        .eq('id', meId);
+      const { error: upErr } = await supabase.rpc('onboarding_set_academic', {
+        p_faculty_id:    selFaculty.value,
+        p_department_id: selDept.value,
+        p_programme_id:  selProg.value,
+        p_level_id:      selLevel.value,
+        p_session_id:    selSession.value,
+      });
       if (upErr) {
         btnCont.disabled = false; btnCont.textContent = 'Continue';
         $('alert').textContent = upErr.message;
