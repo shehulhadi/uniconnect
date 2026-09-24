@@ -21,10 +21,7 @@
     border-bottom: 1px solid var(--border); min-height: 56px;
     flex-shrink: 0;
   }
-  .topbar__left {
-    display: flex; align-items: center; gap: var(--space-3);
-    min-width: 0;
-  }
+  .topbar__left { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
   .back {
     display: inline-flex; align-items: center; justify-content: center;
     width: 36px; height: 36px; border-radius: var(--radius-md);
@@ -52,6 +49,7 @@
     max-width: 720px; width: 100%;
     margin: 0 auto;
     padding: 0 var(--space-4);
+    overflow: hidden;
   }
 
   .msgs {
@@ -59,7 +57,6 @@
     overflow-y: auto;
     padding: var(--space-4) 0;
     display: flex; flex-direction: column; gap: var(--space-3);
-    scroll-behavior: smooth;
   }
   .msgs::-webkit-scrollbar { width: 6px; }
   .msgs::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
@@ -86,10 +83,7 @@
     align-items: flex-end;
     max-width: 85%;
   }
-  .msg--mine {
-    align-self: flex-end;
-    flex-direction: row-reverse;
-  }
+  .msg--mine { align-self: flex-end; flex-direction: row-reverse; }
   .msg__avatar {
     width: 32px; height: 32px; border-radius: var(--radius-full);
     background: var(--brand-subtle); color: var(--brand);
@@ -129,9 +123,7 @@
     background: var(--bg);
     padding: var(--space-3) 0 max(var(--space-3), env(safe-area-inset-bottom));
   }
-  .composer__row {
-    display: flex; gap: var(--space-2); align-items: flex-end;
-  }
+  .composer__row { display: flex; gap: var(--space-2); align-items: flex-end; }
   .composer textarea {
     flex: 1;
     min-height: 40px; max-height: 140px;
@@ -148,6 +140,7 @@
     outline: none; border-color: var(--brand);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
   }
+  .composer textarea:disabled { opacity: 0.6; cursor: not-allowed; }
   .send {
     appearance: none;
     background: var(--brand); color: var(--brand-fg);
@@ -169,9 +162,7 @@
     font-size: var(--text-sm);
   }
   .state--error { color: var(--danger); }
-  .state--empty {
-    margin: auto; max-width: 34ch;
-  }
+  .state--empty { margin: auto; max-width: 34ch; }
   .state--empty h3 {
     font-size: var(--text-base); color: var(--text);
     margin-bottom: var(--space-2); font-weight: 600;
@@ -182,9 +173,8 @@
     display: inline-block; width: 6px; height: 6px;
     border-radius: 50%; background: var(--success);
     margin-right: 4px; vertical-align: middle;
-    animation: pulse 2s ease-in-out infinite;
   }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .live-dot.off { background: var(--text-subtle); }
 </style>
 </head>
 <body>
@@ -197,8 +187,8 @@
       </svg>
     </a>
     <div class="head">
-      <div class="head__name" id="g-name">Group</div>
-      <div class="head__meta"><span class="live-dot"></span><span id="g-meta">Loading…</span></div>
+      <div class="head__name" id="g-name">Loading…</div>
+      <div class="head__meta"><span class="live-dot off" id="live-dot"></span><span id="g-meta">Connecting…</span></div>
     </div>
   </div>
 </header>
@@ -206,13 +196,12 @@
 <main class="main">
   <div class="msgs" id="msgs">
     <div class="state" id="state-loading">Loading messages…</div>
-    <div class="state state--error" id="state-error" hidden></div>
   </div>
 
-  <form class="composer" id="composer" hidden>
+  <form class="composer" id="composer">
     <div class="composer__row">
-      <textarea id="input" rows="1" placeholder="Write a message…" maxlength="2000" autocomplete="off"></textarea>
-      <button class="send" id="btn-send" type="submit">
+      <textarea id="input" rows="1" placeholder="Write a message…" maxlength="2000" autocomplete="off" disabled></textarea>
+      <button class="send" id="btn-send" type="submit" disabled>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
         </svg>
@@ -225,8 +214,13 @@
   import { supabase } from '../js/supabase.js';
 
   const $ = (id) => document.getElementById(id);
+  const log = (...a) => console.log('[group]', ...a);
+  const warn = (...a) => console.warn('[group]', ...a);
+
   const params = new URLSearchParams(location.search);
   const groupId = params.get('id');
+
+  log('boot, groupId =', groupId);
 
   if (!groupId) {
     location.replace('groups.html');
@@ -234,11 +228,19 @@
   }
 
   // ---- Auth guard ----
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session }, error: sessErr } = await supabase.auth.getSession();
+  if (sessErr) { log('session error', sessErr); }
   if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
   const meId = session.user.id;
+  log('me =', meId);
 
-  // ---- Cache of profiles so we don't refetch per message ----
+  // ---- Topbar status helper ----
+  function setMeta(text, isError) {
+    $('g-meta').textContent = text;
+    $('g-meta').style.color = isError ? 'var(--danger)' : '';
+  }
+
+  // ---- Profile cache ----
   const profilesCache = new Map();
   async function getProfile(userId) {
     if (profilesCache.has(userId)) return profilesCache.get(userId);
@@ -246,52 +248,23 @@
       .from('profiles')
       .select('id, full_name, email')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
     const val = data || { id: userId, full_name: 'Unknown', email: '' };
     profilesCache.set(userId, val);
     return val;
   }
 
-  // ---- Load group + verify membership ----
-  async function loadGroup() {
-    const { data, error } = await supabase
-      .from('groups')
-      .select('id, name, description, type, group_members ( count )')
-      .eq('id', groupId)
-      .single();
-
-    if (error) {
-      $('state-loading').hidden = true;
-      $('state-error').hidden = false;
-      $('state-error').textContent =
-        'Could not open this group. It may not exist, or you may not be a member.';
-      return null;
-    }
-
-    const count = data.group_members?.[0]?.count || 0;
-    $('g-name').textContent = data.name;
-    $('g-meta').textContent = `${count} member${count === 1 ? '' : 's'} · live`;
-    document.title = `${data.name} — UniConnect`;
-    return data;
-  }
-
-  // ---- Render one message ----
+  // ---- DOM helpers ----
   function el(tag, cls, text) {
     const e = document.createElement(tag);
     if (cls) e.className = cls;
     if (text != null) e.textContent = text;
     return e;
   }
-
   function fmtTime(iso) {
-    return new Date(iso).toLocaleTimeString(undefined, {
-      hour: '2-digit', minute: '2-digit'
-    });
+    return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
   }
-  function dateKey(iso) {
-    const d = new Date(iso);
-    return d.toDateString();
-  }
+  function dateKey(iso) { return new Date(iso).toDateString(); }
   function dateLabel(key) {
     const d = new Date(key);
     const now = new Date();
@@ -302,7 +275,7 @@
     return d.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
   }
 
-  async function makeMessageNode(m, opts = {}) {
+  async function makeMessageNode(m) {
     const isMine = m.sender_id === meId;
     const p = await getProfile(m.sender_id);
     const initials = (p.full_name || p.email || '?')
@@ -314,26 +287,48 @@
     const av = el('div', 'msg__avatar', initials);
     const bubble = el('div', 'msg__bubble');
 
-    if (!isMine) {
-      const sender = el('div', 'msg__sender', p.full_name || p.email || 'Unknown');
-      bubble.appendChild(sender);
-    }
+    if (!isMine) bubble.appendChild(el('div', 'msg__sender', p.full_name || p.email || 'Unknown'));
     bubble.appendChild(document.createTextNode(m.body));
-    const time = el('span', 'msg__time', fmtTime(m.created_at));
-    bubble.appendChild(time);
+    bubble.appendChild(el('span', 'msg__time', fmtTime(m.created_at)));
 
     wrap.appendChild(av);
     wrap.appendChild(bubble);
     return wrap;
   }
 
-  // ---- Load messages ----
-  const msgsEl = $('msgs');
-
-  function clearStates() {
-    $('state-loading')?.remove();
-    $('state-error')?.remove();
+  function scrollToBottom(smooth = true) {
+    requestAnimationFrame(() => {
+      msgsEl.scrollTo({ top: msgsEl.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+    });
   }
+
+  // ---- Step 1: load the group ----
+  async function loadGroup() {
+    const { data, error } = await supabase
+      .from('groups')
+      .select('id, name, description, type')
+      .eq('id', groupId)
+      .maybeSingle();
+
+    if (error) { log('loadGroup error', error); return { error }; }
+    if (!data)  { return { error: { message: 'Group not found.' } }; }
+    return { data };
+  }
+
+  // ---- Step 2: check membership ----
+  async function checkMembership() {
+    const { data, error } = await supabase
+      .from('group_members')
+      .select('group_id')
+      .eq('group_id', groupId)
+      .eq('user_id', meId)
+      .maybeSingle();
+    if (error) { log('membership error', error); return { error }; }
+    return { isMember: !!data };
+  }
+
+  // ---- Step 3: load messages ----
+  const msgsEl = $('msgs');
 
   async function loadMessages() {
     const { data, error } = await supabase
@@ -344,88 +339,70 @@
       .limit(200);
 
     if (error) {
-      $('state-loading').hidden = true;
-      $('state-error').hidden = false;
-      $('state-error').textContent = 'Could not load messages: ' + error.message;
+      log('loadMessages error', error);
+      msgsEl.innerHTML = '';
+      const e = el('div', 'state state--error', 'Could not load messages: ' + error.message);
+      msgsEl.appendChild(e);
       return;
     }
 
-    clearStates();
+    msgsEl.innerHTML = '';
 
     if (!data || data.length === 0) {
       const empty = el('div', 'state state--empty');
-      const h = el('h3', null, 'No messages yet');
-      const p = el('p', null, 'Say hello, or share what the group is working on.');
-      empty.appendChild(h);
-      empty.appendChild(p);
+      empty.appendChild(el('h3', null, 'No messages yet'));
+      empty.appendChild(el('p', null, 'Say hello, or share what the group is working on.'));
       msgsEl.appendChild(empty);
       return;
     }
 
-    let lastDateKey = null;
+    let lastKey = null;
     for (const m of data) {
       const k = dateKey(m.created_at);
-      if (k !== lastDateKey) {
+      if (k !== lastKey) {
         const d = el('div', 'date-divider');
         d.appendChild(el('span', null, dateLabel(k)));
         msgsEl.appendChild(d);
-        lastDateKey = k;
+        lastKey = k;
       }
-      const node = await makeMessageNode(m);
-      msgsEl.appendChild(node);
+      msgsEl.appendChild(await makeMessageNode(m));
     }
     scrollToBottom(false);
   }
 
-  function scrollToBottom(smooth = true) {
-    requestAnimationFrame(() => {
-      msgsEl.scrollTo({
-        top: msgsEl.scrollHeight,
-        behavior: smooth ? 'smooth' : 'auto',
-      });
-    });
-  }
-
-  // ---- Realtime subscription ----
+  // ---- Step 4: realtime ----
   let channel = null;
   function subscribe() {
     channel = supabase
       .channel(`group:${groupId}`)
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'group_messages',
-          filter: `group_id=eq.${groupId}`,
-        },
+        { event: 'INSERT', schema: 'public', table: 'group_messages', filter: `group_id=eq.${groupId}` },
         async (payload) => {
           const m = payload.new;
-          // Ignore if we already rendered it (our own insert already appended)
+          log('realtime insert', m.id);
           if (msgsEl.querySelector(`[data-id="${m.id}"]`)) return;
-
-          // Remove empty state if present
           msgsEl.querySelector('.state--empty')?.remove();
 
-          // Date divider if needed
-          const lastNode = msgsEl.querySelector('.msg:last-of-type, .date-divider:last-of-type');
           const k = dateKey(m.created_at);
-          const lastKey = lastNode?.dataset?.dateKey;
-          if (lastKey !== k) {
+          const lastDivider = msgsEl.querySelector('.date-divider:last-of-type');
+          if (lastDivider?.dataset.key !== k) {
             const d = el('div', 'date-divider');
-            d.dataset.dateKey = k;
+            d.dataset.key = k;
             d.appendChild(el('span', null, dateLabel(k)));
             msgsEl.appendChild(d);
           }
-
-          const node = await makeMessageNode(m);
-          msgsEl.appendChild(node);
+          msgsEl.appendChild(await makeMessageNode(m));
           scrollToBottom();
         }
       )
       .subscribe((status) => {
+        log('realtime status:', status);
+        const dot = $('live-dot');
         if (status === 'SUBSCRIBED') {
-          $('g-meta').textContent = $('g-meta').textContent.replace(' · live', ' · live');
+          dot.classList.remove('off');
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          dot.classList.add('off');
         }
       });
   }
@@ -435,13 +412,11 @@
   const input = $('input');
   const sendBtn = $('btn-send');
 
-  // Auto-grow textarea
   input.addEventListener('input', () => {
     input.style.height = 'auto';
     input.style.height = Math.min(input.scrollHeight, 140) + 'px';
   });
 
-  // Enter to send on desktop; newline on mobile (shift+enter always newline)
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(min-width: 768px)').matches) {
       e.preventDefault();
@@ -467,37 +442,69 @@
     sendBtn.disabled = false;
 
     if (error) {
-      // Recover the text so the user doesn't lose it
+      log('send error', error);
       input.value = body;
       input.dispatchEvent(new Event('input'));
-      // Show a transient alert via title change (lightweight, no modal here)
-      const old = $('g-meta').textContent;
-      $('g-meta').textContent = 'Send failed: ' + error.message;
-      $('g-meta').style.color = 'var(--danger)';
-      setTimeout(() => {
-        $('g-meta').textContent = old;
-        $('g-meta').style.color = '';
-      }, 4000);
+      setMeta('Send failed: ' + error.message, true);
+      setTimeout(() => setMeta('Connected · live'), 4000);
       return;
     }
 
-    // Optimistic append (skip waiting for the realtime echo)
     msgsEl.querySelector('.state--empty')?.remove();
-    const node = await makeMessageNode(data);
-    msgsEl.appendChild(node);
+    msgsEl.appendChild(await makeMessageNode(data));
     scrollToBottom();
   });
 
-  // ---- Boot ----
-  const group = await loadGroup();
-  if (!group) throw new Error('group not loaded');
+  function enableComposer() {
+    input.disabled = false;
+    sendBtn.disabled = false;
+  }
+  function disableComposer(reason) {
+    input.disabled = true;
+    sendBtn.disabled = true;
+    input.placeholder = reason;
+  }
 
+  // ================================================================
+  // BOOT
+  // ================================================================
+
+  // 1. Fetch group info
+  const gRes = await loadGroup();
+  if (gRes.error) {
+    $('g-name').textContent = 'Group';
+    setMeta(gRes.error.message, true);
+    msgsEl.innerHTML = '';
+    msgsEl.appendChild(el('div', 'state state--error', gRes.error.message));
+    throw new Error(gRes.error.message);
+  }
+
+  $('g-name').textContent = gRes.data.name;
+  document.title = `${gRes.data.name} — UniConnect`;
+  setMeta('Loading…');
+
+  // 2. Check membership before enabling the composer
+  const mRes = await checkMembership();
+  if (mRes.error) {
+    setMeta('Membership check failed', true);
+  } else if (!mRes.isMember) {
+    setMeta('You are not a member of this group');
+    disableComposer('Join the group to post messages');
+  } else {
+    enableComposer();
+  }
+
+  // 3. Load messages (don't block composer)
   await loadMessages();
-  subscribe();
-  form.hidden = false;
-  input.focus();
 
-  // Cleanup on leave
+  // 4. Subscribe to realtime
+  if (mRes.isMember) {
+    subscribe();
+    setMeta('Connected · live');
+  }
+
+  log('boot complete');
+
   window.addEventListener('beforeunload', () => {
     if (channel) supabase.removeChannel(channel);
   });
