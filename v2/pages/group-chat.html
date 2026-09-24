@@ -336,7 +336,7 @@
     const { data, error } = await supabase
       .from('community_members')
       .select('group_id')
-      .eq('group_id', groupId)
+      .eq('community_id', groupId)
       .eq('user_id', meId)
       .maybeSingle();
     if (error) { log('membership error', error); return { error }; }
@@ -350,7 +350,7 @@
     const { data, error } = await supabase
       .from('community_messages')
       .select('id, sender_id, body, created_at')
-      .eq('group_id', groupId)
+      .eq('community_id', groupId)
       .order('created_at', { ascending: true })
       .limit(200);
 
