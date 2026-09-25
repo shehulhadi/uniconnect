@@ -2,13 +2,17 @@
   "name": "Matric",
   "short_name": "Matric",
   "description": "One sign-in for your whole campus. Verified academic identity, courses, communities, and messages.",
-  "start_url": "./v2/pages/dashboard.html",
+  "start_url": "./v2/pages/landing.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#fafaf9",
   "theme_color": "#4f46e5",
-  "categories": ["education", "social", "productivity"],
+  "categories": [
+    "education",
+    "social",
+    "productivity"
+  ],
   "lang": "en",
   "icons": [
     {
@@ -35,5 +39,6 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "id": "/uniconnect/"
 }
