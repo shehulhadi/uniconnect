@@ -29,10 +29,7 @@
   @media (min-width: 640px) { .hero h1 { font-size: var(--text-3xl); } }
 
   .section { margin-bottom: var(--space-6); }
-  .section__head {
-    display: flex; align-items: baseline; justify-content: space-between;
-    margin-bottom: var(--space-3);
-  }
+  .section__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--space-3); }
   .section__title { font-size: var(--text-md); font-weight: 800; letter-spacing: -0.02em; }
 
   .list { display: flex; flex-direction: column; gap: var(--space-3); }
@@ -44,10 +41,7 @@
     padding: var(--space-4);
   }
 
-  .req__head {
-    display: flex; align-items: center; gap: var(--space-3);
-    margin-bottom: var(--space-3);
-  }
+  .req__head { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
   .req__avatar {
     width: 44px; height: 44px;
     border-radius: var(--radius-full);
@@ -57,16 +51,8 @@
     flex-shrink: 0; text-transform: uppercase;
   }
   .req__body { flex: 1; min-width: 0; }
-  .req__name {
-    font-size: var(--text-base); font-weight: 600;
-    letter-spacing: -0.01em;
-    overflow-wrap: anywhere;
-  }
-  .req__email {
-    font-size: var(--text-xs); color: var(--text-muted);
-    overflow-wrap: anywhere;
-    margin-top: 1px;
-  }
+  .req__name { font-size: var(--text-base); font-weight: 600; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+  .req__email { font-size: var(--text-xs); color: var(--text-muted); margin-top: 1px; overflow-wrap: anywhere; }
 
   .req__meta {
     display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px;
@@ -78,11 +64,8 @@
   .req__meta dt { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
   .req__meta dd { font-weight: 500; margin-top: 2px; overflow-wrap: anywhere; }
 
-  .req__actions {
-    display: flex; gap: var(--space-2);
-    margin-top: var(--space-3);
-    align-items: stretch;
-  }
+  .req__actions { display: flex; gap: var(--space-2); margin-top: var(--space-3); }
+
   .btn {
     appearance: none;
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
@@ -102,30 +85,29 @@
   .btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
   .decided {
-    background: var(--bg-sunken); border: 1px solid var(--border);
+    background: var(--bg-sunken);
+    border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: var(--space-3) var(--space-3);
+    padding: var(--space-3);
     font-size: var(--text-sm);
     display: flex; align-items: center; gap: var(--space-3);
   }
   .decided__icon {
     width: 32px; height: 32px;
     border-radius: var(--radius-full);
-    background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success);
+    background: color-mix(in srgb, var(--success) 14%, transparent);
+    color: var(--success);
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .decided__icon--rej {
-    background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger);
-  }
+  .decided__icon--rej { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
   .decided__body { flex: 1; min-width: 0; }
   .decided__name { font-weight: 500; }
   .decided__meta { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; }
 
   .empty {
     padding: var(--space-8) var(--space-4);
-    text-align: center; color: var(--text-muted);
-    font-size: var(--text-sm);
+    text-align: center; color: var(--text-muted); font-size: var(--text-sm);
   }
   .empty svg { color: var(--border-strong); margin-bottom: var(--space-3); }
 
@@ -133,7 +115,6 @@
   .state[hidden] { display: none; }
   .state--error { color: var(--danger); }
 
-  /* Modal */
   .modal-backdrop {
     position: fixed; inset: 0; z-index: 50;
     background: rgba(0,0,0,0.5);
@@ -145,10 +126,13 @@
   }
   .modal-backdrop[data-open] { opacity: 1; pointer-events: auto; }
   .modal {
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); width: 100%; max-width: 480px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    width: 100%; max-width: 480px;
     padding: var(--space-5);
-    transform: translateY(12px); transition: transform var(--duration) var(--ease);
+    transform: translateY(12px);
+    transition: transform var(--duration) var(--ease);
   }
   .modal-backdrop[data-open] .modal { transform: translateY(0); }
   .modal h2 { font-size: var(--text-lg); font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px; }
@@ -254,18 +238,14 @@
     toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
   }
 
-  // ---------- Check the caller has any business here ----------
-  const { data: hasPerm } = await supabase.rpc('has_permission', { p_permission: 'verification.approve' });
-  const { data: hasHod }  = await supabase.rpc('has_role', { p_role: 'HOD' });
-  const { data: hasUni }  = await supabase.rpc('has_role', { p_role: 'UNIVERSITY_ADMIN' });
-
+  const { data: hasHod } = await supabase.rpc('has_role', { p_role: 'HOD' });
+  const { data: hasUni } = await supabase.rpc('has_role', { p_role: 'UNIVERSITY_ADMIN' });
   if (!hasHod && !hasUni) {
     location.replace('dashboard.html');
     throw new Error('not an approver');
   }
   if (hasHod) $('hero-sub').textContent = 'Lecturer claims for your department.';
 
-  // ---------- Load queue + history ----------
   async function load() {
     const { data, error } = await supabase.rpc('list_pending_approvals');
     if (error) {
@@ -276,13 +256,10 @@
     }
     queue = data || [];
 
-    // Decided (my own history)
     const { data: dec } = await supabase
       .from('verification_requests')
-      .select(`
-        id, status, decided_at, notes, rejection_reason, claimed_role,
-        profiles!verification_requests_user_id_fkey ( full_name, email )
-      `)
+      .select(`id, status, decided_at, notes, claimed_role,
+               profiles!verification_requests_user_id_fkey ( full_name, email )`)
       .eq('decided_by', meId)
       .order('decided_at', { ascending: false })
       .limit(20);
@@ -355,7 +332,6 @@
     }
   }
 
-  // ---------- Actions ----------
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
@@ -404,7 +380,6 @@
     await load();
   });
 
-  // ---------- Realtime: new claims while page is open ----------
   channel = supabase
     .channel('approvals-live')
     .on('postgres_changes',
@@ -415,7 +390,6 @@
         () => load())
     .subscribe();
 
-  // ---------- Boot ----------
   await load();
 
   window.addEventListener('beforeunload', () => {
