@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Approvals — Matric</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/nav.css">
+<link rel="stylesheet" href="../css/notifications.css">
+<link rel="stylesheet" href="../css/topbar.css">
+<style>
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border); min-height: 56px;
+  }
+  .topbar__title { font-size: var(--text-base); font-weight: 600; letter-spacing: -0.01em; }
+  .topbar__right { display: flex; align-items: center; gap: var(--space-2); }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-10); }
+  @media (min-width: 640px) { .wrap { padding: var(--space-6) var(--space-6) var(--space-10); } }
+
+  .hero h1 { font-size: var(--text-2xl); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px; }
+  .hero p { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-5); }
+  @media (min-width: 640px) { .hero h1 { font-size: var(--text-3xl); } }
+
+  .section { margin-bottom: var(--space-6); }
+  .section__head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: var(--space-3);
+  }
+  .section__title { font-size: var(--text-md); font-weight: 800; letter-spacing: -0.02em; }
+
+  .list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+  .req {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+  }
+
+  .req__head {
+    display: flex; align-items: center; gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+  .req__avatar {
+    width: 44px; height: 44px;
+    border-radius: var(--radius-full);
+    background: var(--brand-subtle); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: var(--text-sm);
+    flex-shrink: 0; text-transform: uppercase;
+  }
+  .req__body { flex: 1; min-width: 0; }
+  .req__name {
+    font-size: var(--text-base); font-weight: 600;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+  .req__email {
+    font-size: var(--text-xs); color: var(--text-muted);
+    overflow-wrap: anywhere;
+    margin-top: 1px;
+  }
+
+  .req__meta {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px;
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-size: var(--text-sm);
+  }
+  .req__meta dt { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  .req__meta dd { font-weight: 500; margin-top: 2px; overflow-wrap: anywhere; }
+
+  .req__actions {
+    display: flex; gap: var(--space-2);
+    margin-top: var(--space-3);
+    align-items: stretch;
+  }
+  .btn {
+    appearance: none;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    font-family: inherit; font-size: var(--text-sm); font-weight: 500;
+    padding: 0.65rem 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 42px;
+    border: 1px solid transparent;
+    flex: 1;
+  }
+  .btn--primary { background: var(--brand); color: var(--brand-fg); }
+  .btn--primary:hover { background: var(--brand-hover); }
+  .btn--danger { background: transparent; color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
+  .btn--danger:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .decided {
+    background: var(--bg-sunken); border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-3);
+    font-size: var(--text-sm);
+    display: flex; align-items: center; gap: var(--space-3);
+  }
+  .decided__icon {
+    width: 32px; height: 32px;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .decided__icon--rej {
+    background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger);
+  }
+  .decided__body { flex: 1; min-width: 0; }
+  .decided__name { font-weight: 500; }
+  .decided__meta { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; }
+
+  .empty {
+    padding: var(--space-8) var(--space-4);
+    text-align: center; color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+  .empty svg { color: var(--border-strong); margin-bottom: var(--space-3); }
+
+  .state { padding: var(--space-6) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
+  .state[hidden] { display: none; }
+  .state--error { color: var(--danger); }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: var(--space-4);
+    opacity: 0; pointer-events: none;
+    transition: opacity var(--duration) var(--ease);
+  }
+  .modal-backdrop[data-open] { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); width: 100%; max-width: 480px;
+    padding: var(--space-5);
+    transform: translateY(12px); transition: transform var(--duration) var(--ease);
+  }
+  .modal-backdrop[data-open] .modal { transform: translateY(0); }
+  .modal h2 { font-size: var(--text-lg); font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px; }
+  .modal p.sub { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-4); }
+  .modal textarea {
+    width: 100%; min-height: 100px; padding: 0.7rem 0.85rem;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-md); font-family: inherit; font-size: var(--text-sm);
+    color: var(--text); resize: vertical;
+  }
+  .modal textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent); }
+  .modal-actions { display: flex; gap: var(--space-3); margin-top: var(--space-4); justify-content: flex-end; }
+  @media (max-width: 480px) { .modal-actions { flex-direction: column-reverse; } }
+
+  .toast {
+    position: fixed; bottom: 84px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: var(--bg);
+    padding: 0.65rem 1rem; border-radius: var(--radius-md);
+    font-size: var(--text-sm); font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none;
+    transition: all var(--duration) var(--ease);
+    z-index: 60; max-width: 90vw; text-align: center;
+  }
+  .toast[data-show] { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast[data-kind="error"] { background: var(--danger); color: white; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__title">Approvals</div>
+  <div class="topbar__right"></div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1>Verification requests</h1>
+    <p id="hero-sub">Lecturer claims awaiting your decision.</p>
+  </div>
+
+  <div class="state" id="state-loading">Loading…</div>
+  <div class="state state--error" id="state-error" hidden></div>
+
+  <section class="section" id="pending-section" hidden>
+    <div class="section__head"><div class="section__title">Pending</div></div>
+    <div class="list" id="pending-list"></div>
+  </section>
+
+  <section class="section" id="decided-section" hidden>
+    <div class="section__head"><div class="section__title">Recently decided</div></div>
+    <div class="list" id="decided-list"></div>
+  </section>
+</main>
+
+<div class="modal-backdrop" id="modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h2 id="modal-title">Confirm decision</h2>
+    <p class="sub" id="modal-sub">Add an optional note for the applicant.</p>
+    <textarea id="modal-note" maxlength="500" placeholder="Optional message…"></textarea>
+    <div class="modal-actions">
+      <button type="button" class="btn" id="btn-cancel" style="background:transparent;color:var(--text-muted);border-color:var(--border);">Cancel</button>
+      <button type="button" class="btn btn--primary" id="btn-confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { supabase } from '../js/supabase.js';
+
+  const $ = (id) => document.getElementById(id);
+  let meId = null;
+  let queue = [];
+  let decided = [];
+  let pendingDecision = null;
+  let channel = null;
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
+  meId = session.user.id;
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+  const initials = (name) => (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+  const timeAgo = (iso) => {
+    if (!iso) return '';
+    const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (diff < 60) return 'now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    return Math.floor(diff / 86400) + 'd ago';
+  };
+  function toast(msg, kind) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.setAttribute('data-show', '1');
+    if (kind) el.setAttribute('data-kind', kind); else el.removeAttribute('data-kind');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
+  }
+
+  // ---------- Check the caller has any business here ----------
+  const { data: hasPerm } = await supabase.rpc('has_permission', { p_permission: 'verification.approve' });
+  const { data: hasHod }  = await supabase.rpc('has_role', { p_role: 'HOD' });
+  const { data: hasUni }  = await supabase.rpc('has_role', { p_role: 'UNIVERSITY_ADMIN' });
+
+  if (!hasHod && !hasUni) {
+    location.replace('dashboard.html');
+    throw new Error('not an approver');
+  }
+  if (hasHod) $('hero-sub').textContent = 'Lecturer claims for your department.';
+
+  // ---------- Load queue + history ----------
+  async function load() {
+    const { data, error } = await supabase.rpc('list_pending_approvals');
+    if (error) {
+      $('state-loading').hidden = true;
+      $('state-error').hidden = false;
+      $('state-error').textContent = error.message;
+      return;
+    }
+    queue = data || [];
+
+    // Decided (my own history)
+    const { data: dec } = await supabase
+      .from('verification_requests')
+      .select(`
+        id, status, decided_at, notes, rejection_reason, claimed_role,
+        profiles!verification_requests_user_id_fkey ( full_name, email )
+      `)
+      .eq('decided_by', meId)
+      .order('decided_at', { ascending: false })
+      .limit(20);
+    decided = dec || [];
+
+    $('state-loading').hidden = true;
+    render();
+  }
+
+  function render() {
+    const pending = $('pending-list');
+    const decidedList = $('decided-list');
+
+    if (queue.length === 0) {
+      $('pending-section').hidden = false;
+      pending.innerHTML = `
+        <div class="empty">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <div>Nothing waiting. You're all caught up.</div>
+        </div>`;
+    } else {
+      $('pending-section').hidden = false;
+      pending.innerHTML = queue.map(r => `
+        <div class="req" data-id="${esc(r.request_id)}">
+          <div class="req__head">
+            <div class="req__avatar">${esc(initials(r.full_name))}</div>
+            <div class="req__body">
+              <div class="req__name">${esc(r.full_name || '(no name)')}</div>
+              <div class="req__email">${esc(r.email)}</div>
+            </div>
+          </div>
+          <dl class="req__meta">
+            <div><dt>Role</dt><dd>${esc(r.claimed_role || 'lecturer')}</dd></div>
+            <div><dt>Staff no.</dt><dd>${esc(r.staff_no || '—')}</dd></div>
+            <div><dt>Department</dt><dd>${esc(r.department_name || '—')}</dd></div>
+            <div><dt>Faculty</dt><dd>${esc(r.faculty_name || '—')}</dd></div>
+            <div><dt>Institution</dt><dd>${esc(r.institution_name || '—')}</dd></div>
+            <div><dt>Submitted</dt><dd>${timeAgo(r.submitted_at)}</dd></div>
+          </dl>
+          <div class="req__actions">
+            <button class="btn btn--danger" data-action="reject" data-id="${esc(r.request_id)}">Reject</button>
+            <button class="btn btn--primary" data-action="approve" data-id="${esc(r.request_id)}">Approve</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    if (decided.length === 0) {
+      $('decided-section').hidden = true;
+    } else {
+      $('decided-section').hidden = false;
+      decidedList.innerHTML = decided.map(d => {
+        const ok = d.status === 'verified';
+        const name = d.profiles?.full_name || d.profiles?.email || 'Unknown';
+        return `
+          <div class="decided">
+            <div class="decided__icon ${ok ? '' : 'decided__icon--rej'}">
+              ${ok
+                ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+                : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'}
+            </div>
+            <div class="decided__body">
+              <div class="decided__name">${esc(name)} — ${ok ? 'Approved' : 'Rejected'}</div>
+              <div class="decided__meta">${timeAgo(d.decided_at)}${d.notes ? ' · ' + esc(d.notes) : ''}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+  }
+
+  // ---------- Actions ----------
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+    const req = queue.find(q => q.request_id === id);
+    if (!req) return;
+    pendingDecision = { id, action, req };
+    $('modal-title').textContent = action === 'approve' ? 'Approve lecturer' : 'Reject lecturer';
+    $('modal-sub').textContent = action === 'approve'
+      ? `${req.full_name} will gain lecturer access to ${req.department_name || 'their department'}.`
+      : `${req.full_name} will be returned to onboarding with your note.`;
+    $('btn-confirm').textContent = action === 'approve' ? 'Approve' : 'Reject';
+    $('btn-confirm').className = 'btn ' + (action === 'approve' ? 'btn--primary' : 'btn--danger');
+    $('modal-note').value = '';
+    $('modal').setAttribute('data-open', '1');
+    $('modal').setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  });
+
+  function closeModal() {
+    $('modal').removeAttribute('data-open');
+    $('modal').setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    pendingDecision = null;
+  }
+
+  $('btn-cancel').addEventListener('click', closeModal);
+  $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
+
+  $('btn-confirm').addEventListener('click', async () => {
+    if (!pendingDecision) return;
+    const btn = $('btn-confirm');
+    btn.disabled = true;
+    const notes = $('modal-note').value.trim() || null;
+    const decision = pendingDecision.action === 'approve' ? 'verified' : 'rejected';
+    const { error } = await supabase.rpc('decide_verification', {
+      p_request_id: pendingDecision.id,
+      p_decision: decision,
+      p_notes: notes,
+    });
+    btn.disabled = false;
+    if (error) { toast(error.message, 'error'); return; }
+    toast(decision === 'verified' ? 'Approved.' : 'Rejected.');
+    closeModal();
+    await load();
+  });
+
+  // ---------- Realtime: new claims while page is open ----------
+  channel = supabase
+    .channel('approvals-live')
+    .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'verification_requests' },
+        () => load())
+    .on('postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'verification_requests' },
+        () => load())
+    .subscribe();
+
+  // ---------- Boot ----------
+  await load();
+
+  window.addEventListener('beforeunload', () => {
+    if (channel) supabase.removeChannel(channel);
+  });
+</script>
+
+<script type="module" src="../js/bottom-nav.js"></script>
+<script type="module" src="../js/notifications.js"></script>
+</body>
+</html>

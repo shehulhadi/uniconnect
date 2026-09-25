@@ -735,8 +735,8 @@
       </div>
 
       <section class="section">
-        ${sectionHead('Pending approvals', null, null)}
-        ${emptyInline('Approvals queue will appear here once enabled.')}
+        ${sectionHead('Pending approvals', 'approvals.html', 'View all')}
+        <div id="pending-approvals"><div class="skel"></div></div>
       </section>
 
       <section class="section">
@@ -750,7 +750,7 @@
       </section>
     `;
     $('content').innerHTML = html;
-    await Promise.all([loadHodStats(), loadHodStudentsByLevel(), loadHodLecturers()]);
+    await Promise.all([loadHodStats(), loadHodStudentsByLevel(), loadHodLecturers(), loadPendingApprovals()]);
   }
 
   async function loadHodStats() {
@@ -801,6 +801,26 @@
         <div class="row__meta"><span style="font-weight:700;color:var(--text);">${r.n}</span></div>
       </div>
     `).join('') + '</div>';
+  }
+
+  async function loadPendingApprovals() {
+    const body = document.getElementById('pending-approvals');
+    if (!body) return;
+
+    const { data, error } = await supabase.rpc('list_pending_approvals');
+    if (error || !data) { body.innerHTML = emptyInline('Nothing waiting.'); return; }
+    if (data.length === 0) { body.innerHTML = emptyInline('Nothing waiting. You\'re all caught up.'); return; }
+
+    body.innerHTML = '<div class="list">' + data.slice(0, 3).map(r => `
+      <a class="row" href="approvals.html">
+        <span class="row__icn row__icn--warn">${svg(I.user, 18)}</span>
+        <div class="row__body">
+          <div class="row__title">${esc(r.full_name || 'Unknown')} <span class="course-chip">${esc(r.claimed_role || 'lecturer')}</span></div>
+          <div class="row__sub">${esc(r.department_name || '')} · ${timeAgo(r.submitted_at)}</div>
+        </div>
+        <span class="row__meta">›</span>
+      </a>
+    `).join('') + (data.length > 3 ? `<div style="text-align:center;padding:8px;"><a class="section__link" href="approvals.html">+${data.length - 3} more</a></div>` : '') + '</div>';
   }
 
   async function loadHodLecturers() {
@@ -866,8 +886,8 @@
       </section>
 
       <section class="section">
-        ${sectionHead('Escalated by HODs', null, null)}
-        ${emptyInline('No escalations.')}
+        ${sectionHead('Pending approvals', 'approvals.html', 'View all')}
+        <div id="pending-approvals"><div class="skel"></div></div>
       </section>
 
       <section class="section">
@@ -876,7 +896,7 @@
       </section>
     `;
     $('content').innerHTML = html;
-    await Promise.all([loadDeanStats(), loadDeanDepartments()]);
+    await Promise.all([loadDeanStats(), loadDeanDepartments(), loadPendingApprovals()]);
   }
 
   async function loadDeanStats() {
