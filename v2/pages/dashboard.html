@@ -1012,6 +1012,92 @@
     }
   }
 
+
+  // ---------- Student: upcoming assignments ----------
+  async function loadStudentUpNext() {
+    const body = document.getElementById('up-next');
+    if (!body) return;
+    try {
+      const { data: ce } = await supabase.from('course_enrollments')
+        .select('course_id')
+        .eq('user_id', meId).eq('status', 'active');
+      const ids = (ce || []).map(r => r.course_id);
+      if (!ids.length) { body.innerHTML = emptyInline('Enrol in courses to see assignments.'); return; }
+
+      const { data, error } = await supabase.from('assignments')
+        .select('id, title, due_at, course_id, max_score, courses ( code )')
+        .in('course_id', ids)
+        .order('due_at', { ascending: true })
+        .limit(5);
+
+      if (error) { body.innerHTML = emptyInline('Could not load assignments.'); return; }
+      if (!data || !data.length) { body.innerHTML = emptyInline('No upcoming assignments.'); return; }
+
+      const { data: subs } = await supabase.from('assignment_submissions')
+        .select('assignment_id').eq('student_id', meId).in('assignment_id', data.map(a => a.id));
+      const submittedIds = new Set((subs || []).map(s => s.assignment_id));
+
+      const pending = data.filter(a => !submittedIds.has(a.id));
+      if (!pending.length) { body.innerHTML = emptyInline('You are all caught up.'); return; }
+
+      body.innerHTML = '<div class="list">' + pending.map(a => `
+        <a class="row" href="assignments.html">
+          <span class="row__icn row__icn--warn">${svg(I.doc, 18)}</span>
+          <div class="row__body">
+            <div class="row__title">${esc(a.title)} <span class="course-chip">${esc(a.courses?.code || '')}</span></div>
+            <div class="row__sub">${a.due_at ? 'Due ' + new Date(a.due_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'No due date'}</div>
+          </div>
+          <span class="row__meta" style="color:var(--text-subtle);">›</span>
+        </a>
+      `).join('') + '</div>';
+    } catch (err) {
+      console.error('[dashboard] loadStudentUpNext:', err);
+      body.innerHTML = emptyInline('Could not load assignments.');
+    }
+  }
+
+  // ---------- Lecturer: ungraded submissions ----------
+  async function loadLecturerAttention() {
+    const body = document.getElementById('lect-attention');
+    if (!body) return;
+    try {
+      const { data: ca } = await supabase.from('course_assignments')
+        .select('course_id').eq('lecturer_id', meId);
+      const ids = (ca || []).map(r => r.course_id);
+      if (!ids.length) { body.innerHTML = emptyInline('No courses assigned to you.'); return; }
+
+      const { data: asgs } = await supabase.from('assignments')
+        .select('id, title, courses ( code )').in('course_id', ids);
+      if (!asgs || !asgs.length) { body.innerHTML = emptyInline('No assignments created yet.'); return; }
+
+      const { data: subs } = await supabase.from('assignment_submissions')
+        .select('id, assignment_id, status, submitted_at, profiles:student_id ( full_name )')
+        .in('assignment_id', asgs.map(a => a.id))
+        .neq('status', 'graded')
+        .order('submitted_at', { ascending: false })
+        .limit(5);
+
+      if (!subs || !subs.length) { body.innerHTML = emptyInline('All submissions graded.'); return; }
+
+      const asgMap = Object.fromEntries(asgs.map(a => [a.id, a]));
+      body.innerHTML = '<div class="list">' + subs.map(s => {
+        const a = asgMap[s.assignment_id];
+        return `
+          <a class="row" href="assignments.html">
+            <span class="row__icn row__icn--warn">${svg(I.user, 18)}</span>
+            <div class="row__body">
+              <div class="row__title">${esc(s.profiles?.full_name || 'Student')} <span class="course-chip">${esc(a?.courses?.code || '')}</span></div>
+              <div class="row__sub">${esc(a?.title || '')} · ${timeAgo(s.submitted_at)}</div>
+            </div>
+            <span class="row__meta" style="color:var(--brand);font-weight:600;">Grade</span>
+          </a>`;
+      }).join('') + '</div>';
+    } catch (err) {
+      console.error('[dashboard] loadLecturerAttention:', err);
+      body.innerHTML = emptyInline('Could not load submissions.');
+    }
+  }
+
   // ---------- Wire it up ----------
   const renderers = {
     student: renderStudent,
