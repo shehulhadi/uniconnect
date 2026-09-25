@@ -14,6 +14,7 @@
 }
 
 .bottom-nav__item {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -37,10 +38,41 @@
 .bottom-nav__icon {
   display: flex; align-items: center; justify-content: center;
   width: 24px; height: 24px;
+  position: relative;
 }
 .bottom-nav__icon svg { width: 20px; height: 20px; }
 
 .bottom-nav__label { line-height: 1; }
+
+/* Badge */
+.bottom-nav__badge {
+  position: absolute;
+  top: -3px;
+  right: -8px;
+  min-width: 16px; height: 16px;
+  border-radius: 8px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+  border: 2px solid var(--bg-elevated);
+  letter-spacing: 0;
+}
+.bottom-nav__badge[data-show] { display: inline-flex; }
+
+.bottom-nav__badge[data-pulse] {
+  animation: navBadgePulse 0.55s var(--ease);
+}
+@keyframes navBadgePulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
 
 body.has-bottom-nav { padding-bottom: 72px; }
 

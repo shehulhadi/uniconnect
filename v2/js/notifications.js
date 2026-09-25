@@ -146,6 +146,7 @@ async function init() {
       .eq('id', id)
       .eq('user_id', meId);
     if (error) console.error('[notif] mark read', error);
+    window.dispatchEvent(new CustomEvent('matric:notifications-changed'));
   }
 
   async function markAllRead() {
@@ -159,6 +160,7 @@ async function init() {
       .eq('user_id', meId)
       .in('id', unreadIds);
     if (error) console.error('[notif] mark all', error);
+    window.dispatchEvent(new CustomEvent('matric:notifications-changed'));
   }
 
   // ---- Open / close ----
