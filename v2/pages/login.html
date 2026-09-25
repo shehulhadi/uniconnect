@@ -6,210 +6,336 @@
 <title>Sign in — Matric</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">
 <style>
-  /* --- Layout --- */
-  .auth {
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
     min-height: 100vh;
     min-height: 100dvh;
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-  @media (min-width: 900px) {
-    .auth { grid-template-columns: 1fr 1fr; }
+    overflow-x: hidden;
   }
 
-  /* --- Brand panel --- */
+  .auth {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  @media (min-width: 960px) {
+    .auth { grid-template-columns: 1.05fr 1fr; }
+  }
+
+  /* ---------------- Brand panel ---------------- */
   .brand {
     display: none;
-    background: #0c0a09;
-    color: #fafaf9;
-    padding: var(--space-8);
+    position: relative;
+    overflow: hidden;
+    padding: 3rem;
+    color: #fff;
+    background:
+      radial-gradient(120% 140% at 15% 0%, #24406e 0%, #4f46e5 45%, #0c0a09 100%);
     flex-direction: column;
     justify-content: space-between;
   }
-  @media (min-width: 900px) { .brand { display: flex; } }
+  @media (min-width: 960px) { .brand { display: flex; } }
 
-  .brand__mark {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    font-weight: 600;
-    font-size: var(--text-md);
-    letter-spacing: -0.01em;
+  .brand::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(70% 60% at 30% 20%, #000 0%, transparent 80%);
+    pointer-events: none;
+    animation: drift 60s linear infinite;
   }
-  .brand__mark svg { color: #818cf8; }
+  @keyframes drift {
+    from { background-position: 0 0, 0 0; }
+    to   { background-position: 44px 44px, 44px 44px; }
+  }
 
-  .brand__pitch {
+  .brand__top {
+    position: relative;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.15rem; font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .brand__top svg { color: #c7d2fe; }
+
+  .brand__mid {
+    position: relative;
     max-width: 34ch;
   }
-  .brand__pitch h1 {
-    font-size: var(--text-3xl);
-    font-weight: 600;
-    line-height: var(--leading-tight);
-    letter-spacing: -0.025em;
-    margin-bottom: var(--space-4);
+  .brand__eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.6875rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: #c7d2fe;
+    background: rgba(255,255,255,0.08);
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.12);
+    margin-bottom: 1.25rem;
   }
-  .brand__pitch h1 span { color: #818cf8; }
-  .brand__pitch p {
-    color: #a8a29e;
-    font-size: var(--text-md);
-    line-height: var(--leading-snug);
+  .brand__eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #a5b4fc;
+    box-shadow: 0 0 12px #a5b4fc;
+  }
+  .brand__title {
+    font-size: clamp(2rem, 4.2vw, 3rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin: 0 0 1rem;
+  }
+  .brand__title em {
+    font-style: normal;
+    color: #a5b4fc;
+  }
+  .brand__sub {
+    font-size: 1rem;
+    line-height: 1.55;
+    color: rgba(255,255,255,0.72);
+    margin: 0;
+  }
+
+  .brand__features {
+    position: relative;
+    display: flex; flex-direction: column; gap: 12px;
+    margin-top: 2rem;
+  }
+  .brand__feature {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.82);
+  }
+  .brand__feature svg {
+    width: 16px; height: 16px;
+    color: #a5b4fc;
+    flex-shrink: 0;
   }
 
   .brand__foot {
-    font-size: var(--text-sm);
-    color: #78716c;
+    position: relative;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.42);
+    letter-spacing: 0.02em;
   }
 
-  /* --- Form panel --- */
+  /* ---------------- Form panel ---------------- */
   .form-panel {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-6) var(--space-4);
+    padding: 2rem 1.5rem 3rem;
     background: var(--bg);
   }
-  @media (min-width: 900px) {
-    .form-panel { padding: var(--space-8); }
+  @media (min-width: 960px) {
+    .form-panel { padding: 3rem; }
   }
 
-  .form-wrap {
+  .form-card {
     width: 100%;
-    max-width: var(--container-narrow);
+    max-width: 420px;
   }
 
-  /* Mobile brand header */
-  .form-wrap__brand {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    font-weight: 600;
-    font-size: var(--text-md);
-    letter-spacing: -0.01em;
-    margin-bottom: var(--space-6);
+  /* Mobile brand */
+  .mobile-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.1rem; font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
     color: var(--text);
   }
-  .form-wrap__brand svg { color: var(--brand); }
-  @media (min-width: 900px) { .form-wrap__brand { display: none; } }
+  .mobile-brand svg { color: var(--brand); }
+  @media (min-width: 960px) { .mobile-brand { display: none; } }
 
-  /* --- Tabs --- */
-  .tabs {
+  /* Mode toggle — pill slider */
+  .mode-toggle {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr;
     background: var(--bg-sunken);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 3px;
-    margin-bottom: var(--space-6);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 1.75rem;
+    height: 46px;
   }
-  .tab {
-    appearance: none;
-    border: none;
-    background: transparent;
-    padding: 0.55rem 0.75rem;
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--text-muted);
-    border-radius: calc(var(--radius-md) - 3px);
-    cursor: pointer;
-    transition: all var(--duration-fast) var(--ease);
-    min-height: 40px;
-  }
-  .tab[aria-selected="true"] {
+  .mode-toggle__slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    bottom: 4px;
+    width: calc(50% - 4px);
     background: var(--bg-elevated);
-    color: var(--text);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    border-radius: 9px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    transition: transform 240ms cubic-bezier(0.2, 0, 0, 1);
   }
-
-  /* --- Fields --- */
-  h2.form-title {
-    font-size: var(--text-xl);
+  .mode-toggle[data-mode="signup"] .mode-toggle__slider {
+    transform: translateX(100%);
+  }
+  .mode-toggle__btn {
+    position: relative;
+    appearance: none;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 0.875rem;
     font-weight: 600;
-    letter-spacing: -0.015em;
-    margin-bottom: var(--space-2);
-  }
-  p.form-sub {
     color: var(--text-muted);
-    font-size: var(--text-sm);
-    margin-bottom: var(--space-5);
+    cursor: pointer;
+    z-index: 1;
+    transition: color 200ms ease;
+    padding: 0;
+  }
+  .mode-toggle__btn[aria-selected="true"] { color: var(--text); }
+
+  /* Header text */
+  .form-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin: 0 0 6px;
+  }
+  .form-sub {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0 0 1.75rem;
+    line-height: 1.5;
   }
 
-  .field { margin-bottom: var(--space-4); }
+  /* Fields */
+  .field {
+    margin-bottom: 1rem;
+    position: relative;
+  }
   .field label {
     display: block;
-    font-size: var(--text-sm);
+    font-size: 0.8125rem;
     font-weight: 500;
     color: var(--text);
-    margin-bottom: var(--space-2);
+    margin-bottom: 6px;
+  }
+  .field__input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .field__input-wrap svg.field__icon {
+    position: absolute;
+    left: 14px;
+    width: 16px;
+    height: 16px;
+    color: var(--text-subtle);
+    pointer-events: none;
+    transition: color 150ms ease;
   }
   .field input {
     width: 100%;
-    padding: 0.7rem 0.85rem;
+    padding: 0.85rem 0.9rem 0.85rem 2.75rem;
     background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    font-size: var(--text-base);
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 0.9375rem;
     color: var(--text);
-    transition: all var(--duration-fast) var(--ease);
-    min-height: 46px;
+    transition: all 150ms ease;
+    outline: none;
+    min-height: 50px;
+    -webkit-appearance: none;
   }
   .field input::placeholder { color: var(--text-subtle); }
   .field input:focus {
     border-color: var(--brand);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 12%, transparent);
   }
-
-  .field--pw { position: relative; }
-  .field--pw input { padding-right: 2.75rem; }
-  .pw-toggle {
+  .field input:focus + svg.field__icon,
+  .field__input-wrap:focus-within svg.field__icon {
+    color: var(--brand);
+  }
+  .field input[data-invalid] {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 10%, transparent);
+  }
+  .field__toggle {
     position: absolute;
-    right: 0.5rem;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    appearance: none;
+    background: transparent;
     border: none;
     color: var(--text-muted);
+    padding: 8px;
     cursor: pointer;
-    padding: 0.5rem;
-    border-radius: var(--radius-sm);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 150ms ease, background 150ms ease;
+  }
+  .field__toggle:hover { color: var(--text); background: var(--bg-sunken); }
+  .field__hint {
+    font-size: 0.75rem;
+    color: var(--text-subtle);
+    margin-top: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    min-width: 40px;
-    min-height: 40px;
+    gap: 6px;
   }
-  .pw-toggle:hover { color: var(--text); background: var(--bg-sunken); }
+  .field__hint[data-error] { color: var(--danger); }
+  .field__hint svg { width: 12px; height: 12px; }
 
-  /* --- Submit --- */
-  .submit {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background: var(--brand);
-    color: var(--brand-fg);
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: var(--text-base);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--duration-fast) var(--ease);
-    min-height: 46px;
-    margin-top: var(--space-2);
+  /* Password strength */
+  .strength {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
   }
-  .submit:hover:not(:disabled) { background: var(--brand-hover); }
-  .submit:active:not(:disabled) { background: var(--brand-active); }
-  .submit:disabled { opacity: 0.55; cursor: not-allowed; }
+  .strength__bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    transition: background 200ms ease;
+  }
+  .strength__bar[data-on] { background: var(--success); }
+  .strength__bar[data-on="medium"] { background: var(--warning); }
+  .strength__bar[data-on="weak"] { background: var(--danger); }
+  .strength__label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    margin-top: 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    transition: color 200ms ease;
+  }
+  .strength__label[data-level="strong"] { color: var(--success); }
+  .strength__label[data-level="medium"] { color: var(--warning); }
+  .strength__label[data-level="weak"]   { color: var(--danger); }
 
-  /* --- Alerts --- */
+  /* Alert */
   .alert {
     display: none;
-    padding: 0.7rem 0.9rem;
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm);
-    margin-bottom: var(--space-4);
-    line-height: var(--leading-snug);
+    padding: 0.75rem 0.9rem;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    margin-bottom: 1rem;
+    overflow-wrap: anywhere;
+    align-items: flex-start;
+    gap: 10px;
   }
+  .alert[data-show] { display: flex; }
+  .alert svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
   .alert--error {
     background: color-mix(in srgb, var(--danger) 10%, transparent);
     color: var(--danger);
@@ -220,128 +346,260 @@
     color: var(--success);
     border: 1px solid color-mix(in srgb, var(--success) 25%, transparent);
   }
-  .alert[data-show] { display: block; }
 
-  /* --- Panels --- */
-  .panel { display: none; }
-  .panel[data-active] { display: block; }
-
-  .foot-note {
-    text-align: center;
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    margin-top: var(--space-5);
+  /* Submit */
+  .btn-submit {
+    appearance: none;
+    width: 100%;
+    background: var(--brand);
+    color: var(--brand-fg);
+    border: none;
+    padding: 0.95rem 1rem;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    transition: all 150ms ease;
+    min-height: 50px;
+    margin-top: 0.5rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px;
   }
-  .foot-note button {
-    background: none;
+  .btn-submit:hover:not(:disabled) { background: var(--brand-hover); transform: translateY(-1px); }
+  .btn-submit:active:not(:disabled) { transform: translateY(0); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-submit .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Foot */
+  .form-foot {
+    margin-top: 1.25rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .form-foot button {
+    appearance: none;
+    background: transparent;
     border: none;
     color: var(--brand);
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
     padding: 0;
   }
-  .foot-note button:hover { color: var(--brand-hover); }
+  .form-foot button:hover { text-decoration: underline; }
+
+  .divider {
+    display: flex; align-items: center;
+    gap: 12px;
+    margin: 1.5rem 0;
+    color: var(--text-subtle);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .tiny-foot {
+    margin-top: 2rem;
+    font-size: 0.75rem;
+    color: var(--text-subtle);
+    text-align: center;
+    line-height: 1.55;
+  }
+  .tiny-foot a { color: var(--text-muted); text-decoration: none; }
+  .tiny-foot a:hover { color: var(--text); }
+
+  /* Panel transitions */
+  .panel { display: none; }
+  .panel[data-active] { display: block; animation: fadeIn 260ms cubic-bezier(0.2, 0, 0, 1); }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
-  <!-- PWA -->
-  <link rel="manifest" href="../../manifest.json">
-  <meta name="theme-color" content="#4f46e5">
-  <meta name="application-name" content="Matric">
-  <link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Matric">
-  <script src="../../v2/js/pwa.js" defer></script>
 </head>
 <body>
 
 <div class="auth">
 
-  <!-- Brand panel (desktop) -->
+  <!-- Brand panel -->
   <aside class="brand">
-    <div class="brand__mark">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <div class="brand__top">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
         <path d="M6 12v5c3 3 9 3 12 0v-5"/>
       </svg>
       Matric
     </div>
-    <div class="brand__pitch">
-      <h1>Every corner of campus, <span>one sign-in.</span></h1>
-      <p>Announcements, coursework, and conversation — organised by the role you hold.</p>
+
+    <div class="brand__mid">
+      <div class="brand__eyebrow"><span class="dot"></span> Built for Nigerian institutions</div>
+      <h1 class="brand__title">One sign-in.<br><em>Whole campus.</em></h1>
+      <p class="brand__sub">
+        Verify your academic identity once. Matric places you in your faculty, department,
+        courses, and communities — automatically. No searching, no joining, no lost notices.
+      </p>
+
+      <div class="brand__features">
+        <div class="brand__feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Verified academic identity
+        </div>
+        <div class="brand__feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Automatic course and community enrollment
+        </div>
+        <div class="brand__feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Scoped, role-aware permissions
+        </div>
+      </div>
     </div>
-    <div class="brand__foot">
-      &copy; 2026 Matric
-    </div>
+
+    <div class="brand__foot">© 2026 Matric — Asad Tech Concepts</div>
   </aside>
 
   <!-- Form panel -->
   <main class="form-panel">
-    <div class="form-wrap">
+    <div class="form-card">
 
-      <div class="form-wrap__brand">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <div class="mobile-brand">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
           <path d="M6 12v5c3 3 9 3 12 0v-5"/>
         </svg>
         Matric
       </div>
 
-      <div class="tabs" role="tablist">
-        <button class="tab" role="tab" aria-selected="true" data-mode="signin" id="tab-signin">Sign in</button>
-        <button class="tab" role="tab" aria-selected="false" data-mode="signup" id="tab-signup">Create account</button>
+      <!-- Mode toggle -->
+      <div class="mode-toggle" data-mode="signin" id="modeToggle">
+        <div class="mode-toggle__slider"></div>
+        <button type="button" class="mode-toggle__btn" data-mode="signin" aria-selected="true" id="btn-mode-signin">Sign in</button>
+        <button type="button" class="mode-toggle__btn" data-mode="signup" aria-selected="false" id="btn-mode-signup">Create account</button>
       </div>
 
-      <div class="alert" id="alert" role="alert"></div>
+      <div class="alert alert--error" id="alert" role="alert"></div>
 
-      <!-- Sign in -->
+      <!-- Sign in panel -->
       <section class="panel" data-active id="panel-signin">
         <h2 class="form-title">Welcome back</h2>
         <p class="form-sub">Sign in with your institutional email to continue.</p>
 
         <form id="form-signin" novalidate>
           <div class="field">
-            <label for="signin-email">Email</label>
-            <input type="email" id="signin-email" autocomplete="email" required placeholder="you@abu.edu.ng">
+            <label for="signin-email">Email address</label>
+            <div class="field__input-wrap">
+              <svg class="field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <input type="email" id="signin-email" autocomplete="email" inputmode="email" required placeholder="you@mau.edu.ng">
+            </div>
           </div>
-          <div class="field field--pw">
+
+          <div class="field">
             <label for="signin-password">Password</label>
-            <input type="password" id="signin-password" autocomplete="current-password" required minlength="8" placeholder="Your password">
-            <button type="button" class="pw-toggle" data-target="signin-password" aria-label="Show password">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
+            <div class="field__input-wrap">
+              <svg class="field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <input type="password" id="signin-password" autocomplete="current-password" required minlength="8" placeholder="Your password">
+              <button type="button" class="field__toggle" data-target="signin-password" aria-label="Show password">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
           </div>
-          <button type="submit" class="submit" id="btn-signin">Sign in</button>
+
+          <button type="submit" class="btn-submit" id="btn-signin">
+            <span>Sign in</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
         </form>
 
-        <p class="foot-note">New here? <button type="button" data-goto="signup">Create an account</button></p>
+        <p class="form-foot">New to Matric? <button type="button" data-goto="signup">Create an account</button></p>
       </section>
 
-      <!-- Sign up -->
+      <!-- Sign up panel -->
       <section class="panel" id="panel-signup">
         <h2 class="form-title">Create your account</h2>
-        <p class="form-sub">Use your institutional email to get started.</p>
+        <p class="form-sub">Three fields now. Your academic details come next.</p>
 
         <form id="form-signup" novalidate>
           <div class="field">
             <label for="signup-name">Full name</label>
-            <input type="text" id="signup-name" autocomplete="name" required placeholder="Hadi Eze">
+            <div class="field__input-wrap">
+              <svg class="field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <input type="text" id="signup-name" autocomplete="name" required placeholder="Muhammad Yakubu">
+            </div>
           </div>
+
           <div class="field">
-            <label for="signup-email">Email</label>
-            <input type="email" id="signup-email" autocomplete="email" required placeholder="you@abu.edu.ng">
+            <label for="signup-email">Email address</label>
+            <div class="field__input-wrap">
+              <svg class="field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <input type="email" id="signup-email" autocomplete="email" inputmode="email" required placeholder="you@mau.edu.ng">
+            </div>
+            <div class="field__hint">Use your institutional email if you have one.</div>
           </div>
-          <div class="field field--pw">
+
+          <div class="field">
             <label for="signup-password">Password</label>
-            <input type="password" id="signup-password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
-            <button type="button" class="pw-toggle" data-target="signup-password" aria-label="Show password">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
+            <div class="field__input-wrap">
+              <svg class="field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <input type="password" id="signup-password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
+              <button type="button" class="field__toggle" data-target="signup-password" aria-label="Show password">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="strength" id="strength-bars">
+              <div class="strength__bar" data-bar="0"></div>
+              <div class="strength__bar" data-bar="1"></div>
+              <div class="strength__bar" data-bar="2"></div>
+              <div class="strength__bar" data-bar="3"></div>
+            </div>
+            <div class="strength__label" id="strength-label">Password strength</div>
           </div>
-          <button type="submit" class="submit" id="btn-signup">Create account</button>
+
+          <button type="submit" class="btn-submit" id="btn-signup">
+            <span>Create account</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
         </form>
 
-        <p class="foot-note">Already have an account? <button type="button" data-goto="signin">Sign in</button></p>
+        <p class="form-foot">Already have an account? <button type="button" data-goto="signin">Sign in</button></p>
       </section>
+
+      <div class="tiny-foot">
+        By continuing, you agree to our <a href="#">terms of use</a>.<br>
+        Matric is a closed platform for verified members of participating institutions.
+      </div>
 
     </div>
   </main>
@@ -351,89 +609,118 @@
 <script type="module">
   import { supabase } from '../js/supabase.js';
 
-  // ---------- DOM ----------
-  const tabs    = document.querySelectorAll('.tab');
-  const panelIn = document.getElementById('panel-signin');
-  const panelUp = document.getElementById('panel-signup');
-  const alertEl = document.getElementById('alert');
+  const $ = (id) => document.getElementById(id);
+  const toggle = $('modeToggle');
 
-  // ---------- Helpers ----------
+  // ---------------- Helpers ----------------
   function showAlert(kind, msg) {
-    alertEl.className = 'alert alert--' + kind;
-    alertEl.textContent = msg;
-    alertEl.dataset.show = '1';
+    const el = $('alert');
+    el.className = 'alert alert--' + kind;
+    el.innerHTML = (kind === 'error'
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+    ) + '<span>' + msg + '</span>';
+    el.setAttribute('data-show', '1');
   }
-  function clearAlert() {
-    alertEl.removeAttribute('data-show');
-  }
-  function setMode(mode) {
-    tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.mode === mode)));
-    panelIn.toggleAttribute('data-active', mode === 'signin');
-    panelUp.toggleAttribute('data-active', mode === 'signup');
-    clearAlert();
-  }
+  function clearAlert() { $('alert').removeAttribute('data-show'); }
+
   function setBusy(btn, busy, label) {
     btn.disabled = busy;
-    btn.textContent = busy ? 'Working…' : label;
+    if (busy) {
+      btn.innerHTML = '<span class="spinner"></span><span>Working…</span>';
+    } else {
+      btn.innerHTML = '<span>' + label + '</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    }
   }
 
-  // ---------- Tabs ----------
-  tabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode)));
+  // ---------------- Mode ----------------
+  function setMode(mode) {
+    toggle.setAttribute('data-mode', mode);
+    document.querySelectorAll('.mode-toggle__btn').forEach(b =>
+      b.setAttribute('aria-selected', String(b.dataset.mode === mode))
+    );
+    document.querySelectorAll('.panel').forEach(p =>
+      p.toggleAttribute('data-active', p.id === 'panel-' + mode)
+    );
+    clearAlert();
+  }
+  toggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('.mode-toggle__btn');
+    if (btn) setMode(btn.dataset.mode);
+  });
   document.querySelectorAll('[data-goto]').forEach(b =>
     b.addEventListener('click', () => setMode(b.dataset.goto))
   );
 
-  // ---------- Password visibility ----------
-  document.querySelectorAll('.pw-toggle').forEach(btn => {
+  // URL param ?tab=register → signup
+  const params = new URLSearchParams(location.search);
+  if (params.get('tab') === 'register') setMode('signup');
+
+  // ---------------- Password visibility ----------------
+  document.querySelectorAll('.field__toggle').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = document.getElementById(btn.dataset.target);
       input.type = input.type === 'password' ? 'text' : 'password';
     });
   });
 
-  // ---------- Sign in ----------
-  document.getElementById('form-signin').addEventListener('submit', async (e) => {
+  // ---------------- Password strength ----------------
+  function scorePassword(pw) {
+    if (!pw) return 0;
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (pw.length >= 12) score++;
+    if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+    if (/\d/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    return Math.min(score, 4);
+  }
+  $('signup-password').addEventListener('input', (e) => {
+    const pw = e.target.value;
+    const score = scorePassword(pw);
+    document.querySelectorAll('.strength__bar').forEach((bar, i) => {
+      bar.removeAttribute('data-on');
+      if (i < score) {
+        bar.setAttribute('data-on', score <= 2 ? 'weak' : score === 3 ? 'medium' : '');
+      }
+    });
+    const label = $('strength-label');
+    if (!pw) { label.textContent = 'Password strength'; label.removeAttribute('data-level'); }
+    else if (score <= 2) { label.textContent = 'Weak'; label.setAttribute('data-level', 'weak'); }
+    else if (score === 3) { label.textContent = 'Medium'; label.setAttribute('data-level', 'medium'); }
+    else { label.textContent = 'Strong'; label.setAttribute('data-level', 'strong'); }
+  });
+
+  // ---------------- Sign in ----------------
+  $('form-signin').addEventListener('submit', async (e) => {
     e.preventDefault();
     clearAlert();
-
-    const email    = document.getElementById('signin-email').value.trim();
-    const password = document.getElementById('signin-password').value;
-    const btn      = document.getElementById('btn-signin');
-
-    if (!email || !password) {
-      showAlert('error', 'Enter your email and password.');
-      return;
-    }
-
+    const email = $('signin-email').value.trim();
+    const password = $('signin-password').value;
+    const btn = $('btn-signin');
+    if (!email || !password) { showAlert('error', 'Enter your email and password.'); return; }
     setBusy(btn, true);
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      onAuthenticated();
+      window.location.replace('dashboard.html');
     } catch (err) {
-      showAlert('error', err.message || 'Sign in failed.');
       setBusy(btn, false, 'Sign in');
+      showAlert('error', err.message || 'Sign in failed.');
     }
   });
 
-  // ---------- Sign up ----------
-  document.getElementById('form-signup').addEventListener('submit', async (e) => {
+  // ---------------- Sign up ----------------
+  $('form-signup').addEventListener('submit', async (e) => {
     e.preventDefault();
     clearAlert();
+    const fullName = $('signup-name').value.trim();
+    const email = $('signup-email').value.trim();
+    const password = $('signup-password').value;
+    const btn = $('btn-signup');
 
-    const fullName = document.getElementById('signup-name').value.trim();
-    const email    = document.getElementById('signup-email').value.trim();
-    const password = document.getElementById('signup-password').value;
-    const btn      = document.getElementById('btn-signup');
-
-    if (!fullName || !email || !password) {
-      showAlert('error', 'Fill in all fields.');
-      return;
-    }
-    if (password.length < 8) {
-      showAlert('error', 'Password must be at least 8 characters.');
-      return;
-    }
+    if (!fullName || !email || !password) { showAlert('error', 'Fill in all fields.'); return; }
+    if (password.length < 8) { showAlert('error', 'Password must be at least 8 characters.'); return; }
 
     setBusy(btn, true);
     try {
@@ -449,24 +736,18 @@
       } else {
         showAlert('success', 'Account created. Check your email to confirm before signing in.');
         setMode('signin');
-        document.getElementById('signin-email').value = email;
+        $('signin-email').value = email;
         setBusy(btn, false, 'Create account');
       }
     } catch (err) {
-      showAlert('error', err.message || 'Sign up failed.');
       setBusy(btn, false, 'Create account');
+      showAlert('error', err.message || 'Sign up failed.');
     }
   });
 
-  // ---------- Post-auth ----------
-  function onAuthenticated() {
-    window.location.replace('dashboard.html');
-  }
-
-  // ---------- Resume session if already signed in ----------
+  // ---------------- Resume session ----------------
   const { data: { session } } = await supabase.auth.getSession();
-  if (session) onAuthenticated();
-
+  if (session) window.location.replace('dashboard.html');
 </script>
 
 </body>
