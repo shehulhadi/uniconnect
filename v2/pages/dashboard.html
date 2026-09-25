@@ -495,8 +495,8 @@
       </div>
 
       <section class="section">
-        ${sectionHead('Up next', null, null)}
-        ${emptyInline('Your timetable will appear here once published.')}
+        ${sectionHead('Up next', 'assignments.html', 'All assignments')}
+        <div id="up-next"><div class="skel"></div></div>
       </section>
 
       <section class="section">
@@ -516,7 +516,7 @@
       </section>
     `;
     $('content').innerHTML = html;
-    await Promise.all([loadStudentStats(), loadStudentActivity(), loadStudentCourses()]);
+    await Promise.all([loadStudentStats(), loadStudentActivity(), loadStudentCourses(), loadStudentUpNext()]);
   }
 
   async function loadStudentStats() {
@@ -631,8 +631,8 @@
       </section>
 
       <section class="section">
-        ${sectionHead('Needs your attention', null, null)}
-        ${emptyInline('Submissions awaiting your review will appear here once assignments are enabled.')}
+        ${sectionHead('Needs your attention', 'assignments.html', 'All assignments')}
+        <div id="lect-attention"><div class="skel"></div></div>
       </section>
 
       <section class="section">
@@ -641,7 +641,7 @@
       </section>
     `;
     $('content').innerHTML = html;
-    await Promise.all([loadLecturerStats(), loadLecturerCourses()]);
+    await Promise.all([loadLecturerStats(), loadLecturerCourses(), loadLecturerAttention()]);
   }
 
   async function loadLecturerStats() {
