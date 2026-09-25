@@ -1020,11 +1020,18 @@
     dean: renderDean,
     staff: renderStaff,
   };
+  try {
+    await (renderers[dashType] || renderStudent)();
+    $('state-loading').hidden = true;
+    $('content').hidden = false;
+  } catch (err) {
+    console.error('[dashboard] boot failed:', err);
+    $('state-loading').hidden = true;
+    const errBox = $('state-error');
+    errBox.hidden = false;
+    errBox.textContent = 'Dashboard error: ' + (err && err.message ? err.message : String(err));
+  }
 
-  await (renderers[dashType] || renderStudent)();
-
-  $('state-loading').hidden = true;
-  $('content').hidden = false;
 
   // ---------- Chips handlers (student activity, dean departments) ----------
   document.addEventListener('click', (e) => {
