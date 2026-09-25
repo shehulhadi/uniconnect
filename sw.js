@@ -1,8 +1,8 @@
-// UniConnect — minimal service worker.
+// Matric — minimal service worker.
 // Its job is to make the app installable and to keep the shell usable
 // offline. It never caches Supabase API traffic.
 
-const CACHE = 'uniconnect-v1';
+const CACHE = 'matric-v1';
 
 const CORE = [
   './manifest.json',
