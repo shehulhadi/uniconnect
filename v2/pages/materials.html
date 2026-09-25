@@ -6,130 +6,173 @@
 <title>Materials — Matric</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/nav.css">
+<link rel="stylesheet" href="../css/notifications.css">
+<link rel="stylesheet" href="../css/topbar.css">
 <style>
   .topbar {
     position: sticky; top: 0; z-index: 10;
     display: flex; align-items: center; justify-content: space-between;
-    padding: var(--space-3) var(--space-5);
-    background: color-mix(in srgb, var(--bg) 85%, transparent);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
     border-bottom: 1px solid var(--border); min-height: 56px;
   }
-  .topbar__brand {
-    display: flex; align-items: center; gap: var(--space-2);
-    font-weight: 600; font-size: var(--text-base);
-    letter-spacing: -0.01em; color: var(--text);
-  }
-  .topbar__brand svg { color: var(--brand); }
+  .topbar__title { font-size: var(--text-base); font-weight: 600; letter-spacing: -0.01em; }
   .topbar__right { display: flex; align-items: center; gap: var(--space-2); }
-  .btn-ghost {
-    appearance: none; background: transparent;
-    border: 1px solid var(--border); color: var(--text-muted);
-    padding: 0.45rem 0.85rem; border-radius: var(--radius-md);
-    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
-    transition: all var(--duration-fast) var(--ease); min-height: 36px;
-    text-decoration: none; display: inline-flex; align-items: center;
-  }
-  .btn-ghost:hover {
-    border-color: var(--border-strong); color: var(--text);
-    background: var(--bg-elevated);
-  }
+
   .btn-primary {
     appearance: none; background: var(--brand); color: var(--brand-fg);
-    border: none; padding: 0.55rem 1rem;
+    border: none; padding: 0.5rem 0.9rem;
     border-radius: var(--radius-md); font-size: var(--text-sm);
     font-weight: 500; cursor: pointer;
     transition: all var(--duration-fast) var(--ease);
-    min-height: 38px; display: inline-flex;
-    align-items: center; gap: var(--space-2);
+    min-height: 36px; display: inline-flex; align-items: center; gap: 6px;
   }
-  .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
+  .btn-primary:hover { background: var(--brand-hover); }
   .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 
-  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-6) var(--space-4); }
-  @media (min-width: 640px) { .wrap { padding: var(--space-8) var(--space-6); } }
+  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-10); }
+  @media (min-width: 640px) { .wrap { padding: var(--space-6) var(--space-6) var(--space-10); } }
 
-  .head {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;
-  }
-  .head h1 {
-    font-size: var(--text-2xl); font-weight: 600;
-    letter-spacing: -0.02em; line-height: var(--leading-tight);
-    margin-bottom: var(--space-2);
-  }
-  @media (min-width: 640px) { .head h1 { font-size: var(--text-3xl); } }
-  .head p { color: var(--text-muted); font-size: var(--text-base); }
+  .hero h1 { font-size: var(--text-2xl); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px; }
+  .hero p { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-5); }
+  @media (min-width: 640px) { .hero h1 { font-size: var(--text-3xl); } }
 
-  .toolbar { display: flex; gap: var(--space-3); margin-bottom: var(--space-5); flex-wrap: wrap; align-items: center; }
-  .toolbar input {
-    flex: 1; min-width: 180px; padding: 0.6rem 0.85rem;
+  .search {
+    width: 100%; padding: 0.75rem 1rem;
     background: var(--bg-elevated); border: 1px solid var(--border);
     border-radius: var(--radius-md); font-size: var(--text-sm);
-    color: var(--text); min-height: 40px;
-  }
-  .toolbar input:focus {
-    outline: none; border-color: var(--brand);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
-  }
-
-  .list { display: flex; flex-direction: column; gap: var(--space-3); }
-  .mat {
-    display: flex; gap: var(--space-4); align-items: flex-start;
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: var(--space-4);
+    color: var(--text); margin-bottom: var(--space-3);
+    min-height: 46px;
     transition: border-color var(--duration-fast) var(--ease);
   }
+  .search:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent); }
+
+  .filters {
+    display: flex; gap: 6px;
+    overflow-x: auto; padding-bottom: 8px; margin-bottom: var(--space-4);
+    scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .chip {
+    appearance: none;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs); font-weight: 500;
+    cursor: pointer; flex-shrink: 0;
+    transition: all var(--duration-fast) var(--ease);
+    font-family: inherit;
+    min-height: 32px;
+    display: inline-flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--border-strong); color: var(--text); }
+  .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  .list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+  .mat {
+    display: flex; gap: var(--space-3);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    transition: border-color var(--duration-fast) var(--ease);
+    align-items: flex-start;
+  }
   .mat:hover { border-color: var(--border-strong); }
+
   .mat__icon {
-    width: 44px; height: 44px; border-radius: var(--radius-md);
-    background: var(--bg-sunken); color: var(--text-muted);
+    width: 46px; height: 46px;
+    border-radius: var(--radius-md);
+    background: var(--bg-sunken);
+    color: var(--text-muted);
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
+  .mat__icon[data-kind="pdf"]  { background: #fee2e2; color: #991b1b; }
+  .mat__icon[data-kind="doc"]  { background: #dbeafe; color: #1e40af; }
+  .mat__icon[data-kind="ppt"]  { background: #fef3c7; color: #92400e; }
+  .mat__icon[data-kind="zip"]  { background: #f5f5f4; color: #57534e; }
+  .mat__icon[data-kind="txt"]  { background: #e0e7ff; color: #3730a3; }
+  @media (prefers-color-scheme: dark) {
+    .mat__icon[data-kind="pdf"] { background: #450a0a; color: #fca5a5; }
+    .mat__icon[data-kind="doc"] { background: #172554; color: #93c5fd; }
+    .mat__icon[data-kind="ppt"] { background: #451a03; color: #fcd34d; }
+    .mat__icon[data-kind="txt"] { background: #1e1b4b; color: #a5b4fc; }
+  }
+
   .mat__body { flex: 1; min-width: 0; }
   .mat__meta {
-    display: flex; align-items: center; gap: var(--space-2);
-    margin-bottom: var(--space-2); flex-wrap: wrap;
+    display: flex; align-items: center; gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
     font-size: var(--text-xs); color: var(--text-subtle);
   }
   .course-code {
-    font-weight: 600; color: var(--brand); background: var(--brand-subtle);
-    padding: 0.15rem 0.5rem; border-radius: var(--radius-sm);
-    letter-spacing: 0.02em;
+    font-size: 0.6875rem; font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: var(--radius-sm);
+    background: var(--brand-subtle); color: var(--brand);
   }
-  .dot-sep { opacity: 0.5; }
   .mat__title {
-    font-size: var(--text-md); font-weight: 600;
+    font-size: var(--text-base); font-weight: 600;
     letter-spacing: -0.01em; line-height: var(--leading-snug);
-    margin-bottom: var(--space-1); overflow-wrap: anywhere;
+    margin-bottom: 4px;
+    overflow-wrap: anywhere;
   }
   .mat__desc {
     font-size: var(--text-sm); color: var(--text-muted);
-    line-height: var(--leading-snug); overflow-wrap: anywhere;
+    line-height: var(--leading-snug);
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 8px;
   }
-  .mat__action {
-    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-    width: 40px; height: 40px; border-radius: var(--radius-md);
-    border: 1px solid var(--border); background: transparent;
-    color: var(--text-muted); cursor: pointer;
-    transition: all var(--duration-fast) var(--ease);
+  .mat__meta-row {
+    display: flex; gap: var(--space-3); flex-wrap: wrap;
+    font-size: var(--text-xs); color: var(--text-subtle);
   }
-  .mat__action:hover:not(:disabled) {
-    color: var(--brand); border-color: var(--brand); background: var(--brand-subtle);
-  }
-  .mat__action:disabled { opacity: 0.5; cursor: wait; }
 
-  .state { padding: var(--space-10) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
+  .mat__actions {
+    display: flex; flex-direction: column; gap: 6px;
+    flex-shrink: 0;
+  }
+  .icon-btn {
+    width: 38px; height: 38px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: transparent; color: var(--text-muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all var(--duration-fast) var(--ease);
+    padding: 0;
+  }
+  .icon-btn:hover:not(:disabled) { color: var(--brand); border-color: var(--brand); background: var(--brand-subtle); }
+  .icon-btn[data-danger]:hover:not(:disabled) { color: var(--danger); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
+  .icon-btn:disabled { opacity: 0.5; cursor: wait; }
+
+  .empty {
+    padding: var(--space-10) var(--space-4);
+    text-align: center; color: var(--text-muted);
+    font-size: var(--text-sm); line-height: var(--leading-snug);
+  }
+  .empty svg { color: var(--border-strong); margin-bottom: var(--space-3); }
+  .empty h3 { font-size: var(--text-base); color: var(--text); margin-bottom: var(--space-2); font-weight: 600; }
+
+  .state { padding: var(--space-6) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
   .state[hidden] { display: none; }
   .state--error { color: var(--danger); }
-  .state h3 { font-size: var(--text-md); color: var(--text); margin-bottom: var(--space-2); font-weight: 600; }
-  .state p { max-width: 40ch; margin: 0 auto; }
-  #list[hidden] { display: none; }
 
-  /* --- Modal --- */
+  /* Modal */
   .modal-backdrop {
     position: fixed; inset: 0; z-index: 50;
     background: rgba(0,0,0,0.5);
@@ -143,43 +186,40 @@
   .modal {
     background: var(--bg-elevated); border: 1px solid var(--border);
     border-radius: var(--radius-lg); width: 100%; max-width: 520px;
-    max-height: 90vh; overflow-y: auto; padding: var(--space-6);
+    max-height: 90vh; max-height: 90dvh; overflow-y: auto;
+    padding: var(--space-5);
     transform: translateY(12px); transition: transform var(--duration) var(--ease);
   }
   .modal-backdrop[data-open] .modal { transform: translateY(0); }
-  .modal h2 {
-    font-size: var(--text-lg); font-weight: 600;
-    letter-spacing: -0.01em; margin-bottom: var(--space-2);
-  }
-  .modal .sub { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-5); }
-  .modal .field { margin-bottom: var(--space-4); }
-  .modal label {
-    display: block; font-size: var(--text-sm);
-    font-weight: 500; color: var(--text); margin-bottom: var(--space-2);
-  }
-  .modal input[type="text"], .modal textarea {
-    width: 100%; padding: 0.7rem 0.85rem;
+  .modal h2 { font-size: var(--text-lg); font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px; }
+  .modal .sub { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-4); }
+  .modal .field { margin-bottom: var(--space-3); }
+  .modal label { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .modal input, .modal textarea {
+    width: 100%; padding: 0.75rem 0.9rem;
     background: var(--bg); border: 1px solid var(--border);
-    border-radius: var(--radius-md); font-size: var(--text-base);
-    color: var(--text); transition: all var(--duration-fast) var(--ease);
+    border-radius: var(--radius-md); font-size: var(--text-sm);
+    color: var(--text); font-family: inherit;
+    transition: all var(--duration-fast) var(--ease);
+    min-height: 46px;
   }
-  .modal input[type="text"]:focus, .modal textarea:focus {
-    border-color: var(--brand); outline: none;
+  .modal textarea { min-height: 90px; resize: vertical; line-height: var(--leading-base); }
+  .modal input:focus, .modal textarea:focus {
+    outline: none; border-color: var(--brand);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
   }
-  .modal textarea { min-height: 90px; resize: vertical; font-family: inherit; line-height: var(--leading-base); }
 
   /* File drop */
   .drop {
-    border: 2px dashed var(--border-strong); border-radius: var(--radius-md);
-    padding: var(--space-5) var(--space-4); text-align: center;
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: var(--space-5) var(--space-4);
+    text-align: center;
     cursor: pointer; background: var(--bg-sunken);
     transition: all var(--duration-fast) var(--ease);
   }
-  .drop:hover, .drop[data-drag] {
-    border-color: var(--brand); background: var(--brand-subtle);
-  }
-  .drop__icon { color: var(--text-muted); margin-bottom: var(--space-2); }
+  .drop:hover, .drop[data-drag] { border-color: var(--brand); background: var(--brand-subtle); }
+  .drop__icon { color: var(--text-muted); margin-bottom: 8px; }
   .drop__title { font-weight: 500; font-size: var(--text-sm); color: var(--text); margin-bottom: 2px; }
   .drop__hint { font-size: var(--text-xs); color: var(--text-subtle); }
   .drop__file {
@@ -189,14 +229,11 @@
     margin-top: var(--space-3); text-align: left;
   }
   .drop__file-meta { flex: 1; min-width: 0; }
-  .drop__file-name {
-    font-size: var(--text-sm); font-weight: 500;
-    overflow-wrap: anywhere; line-height: var(--leading-snug);
-  }
+  .drop__file-name { font-size: var(--text-sm); font-weight: 500; overflow-wrap: anywhere; line-height: var(--leading-snug); }
   .drop__file-size { font-size: var(--text-xs); color: var(--text-subtle); margin-top: 2px; }
   .drop__remove {
     background: none; border: none; color: var(--text-muted);
-    cursor: pointer; padding: 0.4rem; border-radius: var(--radius-sm);
+    cursor: pointer; padding: 6px; border-radius: var(--radius-sm);
     display: flex; align-items: center; justify-content: center;
     min-width: 32px; min-height: 32px;
   }
@@ -205,7 +242,7 @@
   .modal-alert {
     display: none; padding: 0.7rem 0.9rem;
     border-radius: var(--radius-md); font-size: var(--text-sm);
-    margin-bottom: var(--space-4); line-height: var(--leading-snug);
+    margin-bottom: var(--space-3); line-height: var(--leading-snug);
     overflow-wrap: anywhere;
   }
   .modal-alert[data-show] { display: block; }
@@ -220,96 +257,73 @@
     margin-top: var(--space-5); justify-content: flex-end;
   }
   @media (max-width: 480px) { .modal-actions { flex-direction: column-reverse; } }
-  .btn-danger {
-    appearance: none; background: transparent; color: var(--danger);
-    border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);
-    padding: 0.55rem 1rem; border-radius: var(--radius-md);
+  .btn-ghost {
+    appearance: none; background: transparent;
+    border: 1px solid var(--border); color: var(--text-muted);
+    padding: 0.65rem 1rem; border-radius: var(--radius-md);
     font-size: var(--text-sm); font-weight: 500; cursor: pointer;
-    transition: all var(--duration-fast) var(--ease); min-height: 38px;
+    transition: all var(--duration-fast) var(--ease); min-height: 42px;
   }
-  .btn-danger:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--border-strong); }
 
   .toast {
-    position: fixed; bottom: var(--space-4); left: 50%;
+    position: fixed; bottom: 84px; left: 50%;
     transform: translateX(-50%) translateY(20px);
     background: var(--text); color: var(--bg);
     padding: 0.65rem 1rem; border-radius: var(--radius-md);
     font-size: var(--text-sm); font-weight: 500;
     box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     opacity: 0; pointer-events: none;
-    transition: all var(--duration) var(--ease); z-index: 60;
-    max-width: 90vw; text-align: center;
+    transition: all var(--duration) var(--ease);
+    z-index: 60; max-width: 90vw; text-align: center;
   }
   .toast[data-show] { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast[data-kind="error"] { background: var(--danger); color: white; }
 </style>
-  <link rel="stylesheet" href="../css/nav.css">
-  <link rel="stylesheet" href="../css/notifications.css">
-  <link rel="stylesheet" href="../css/topbar.css">
-  <!-- PWA -->
-  <link rel="manifest" href="../../manifest.json">
-  <meta name="theme-color" content="#4f46e5">
-  <meta name="application-name" content="Matric">
-  <link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Matric">
-  <script src="../../v2/js/pwa.js" defer></script>
 </head>
 <body>
 
 <header class="topbar">
-  <div class="topbar__brand">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-    </svg>
-    Matric
-  </div>
-  <div class="topbar__right"></div>
-</header>
-
-<main class="wrap">
-
-  <div class="head">
-    <div>
-      <h1>Course materials</h1>
-      <p>Lecture notes, handouts, and study resources.</p>
-    </div>
+  <div class="topbar__title">Materials</div>
+  <div class="topbar__right">
     <button class="btn-primary" id="btn-upload" hidden>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
       Upload
     </button>
   </div>
+</header>
 
-  <div class="toolbar">
-    <input type="search" id="search" placeholder="Search by title or course code…" aria-label="Search materials">
+<main class="wrap">
+  <div class="hero">
+    <h1>Course materials</h1>
+    <p>Lecture notes, handouts, and study resources.</p>
+  </div>
+
+  <input type="search" class="search" id="search" placeholder="Search by title, course, or uploader…" autocomplete="off">
+
+  <div class="filters" id="filters">
+    <button class="chip" data-course="all" aria-pressed="true">All courses</button>
   </div>
 
   <div class="state" id="state-loading">Loading…</div>
   <div class="state state--error" id="state-error" hidden></div>
-  <div class="state" id="state-empty" hidden>
-    <h3>No materials yet</h3>
-    <p>When your lecturers upload notes, they'll appear here.</p>
-  </div>
-  <div class="list" id="list" hidden></div>
-
+  <div id="feed" hidden></div>
 </main>
 
-<!-- Upload modal -->
+<!-- Upload / Edit modal -->
 <div class="modal-backdrop" id="modal" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <h2 id="modal-title">Upload material</h2>
-    <p class="sub">Lecturers and staff can share resources with their institution.</p>
+    <p class="sub" id="modal-sub">Share a resource with your institution.</p>
 
     <div class="modal-alert modal-alert--error" id="modal-alert"></div>
 
-    <form id="form-upload">
-      <div class="field">
+    <form id="form-mat">
+      <div class="field" id="file-field">
         <label>File</label>
         <div class="drop" id="drop" role="button" tabindex="0">
           <div class="drop__icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
               <path d="M17 8l-5-5-5 5"/>
               <path d="M12 3v12"/>
@@ -335,22 +349,22 @@
       </div>
 
       <div class="field">
-        <label for="f-course">Course code</label>
-        <input type="text" id="f-course" required maxlength="20" placeholder="e.g. CSC 301" autocapitalize="characters">
+        <label for="m-course">Course code</label>
+        <input type="text" id="m-course" required maxlength="20" placeholder="e.g. CSC 301" autocapitalize="characters">
       </div>
 
       <div class="field">
-        <label for="f-title">Title</label>
-        <input type="text" id="f-title" required maxlength="150" placeholder="e.g. Lecture 5 — Binary Trees">
+        <label for="m-title">Title</label>
+        <input type="text" id="m-title" required maxlength="150" placeholder="e.g. Lecture 5 — Binary Trees">
       </div>
 
       <div class="field">
-        <label for="f-desc">Description <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
-        <textarea id="f-desc" maxlength="500" placeholder="A short note about what this covers…"></textarea>
+        <label for="m-desc">Description <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
+        <textarea id="m-desc" maxlength="500" placeholder="A short note about what this covers…"></textarea>
       </div>
 
       <div class="modal-actions">
-        <button type="button" class="btn-danger" id="btn-cancel">Cancel</button>
+        <button type="button" class="btn-ghost" id="btn-cancel">Cancel</button>
         <button type="submit" class="btn-primary" id="btn-submit">Upload</button>
       </div>
     </form>
@@ -363,94 +377,60 @@
   import { supabase } from '../js/supabase.js';
 
   const $ = (id) => document.getElementById(id);
-  let allMaterials = [];
-  let query = '';
-  let currentProfile = null;
+  let meId = null;
+  let meProfile = null;
+  let all = [];
+  let activeCourse = 'all';
+  let search = '';
+  let canManage = false;
+  let editingId = null;
   let selectedFile = null;
 
-  // ---- Auth guard ----
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    window.location.replace('login.html');
-    throw new Error('unauthenticated');
-  }
+  if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
+  meId = session.user.id;
 
-  // ---- Profile ----
-  const { data: profile, error: pErr } = await supabase
-    .from('profiles')
-    .select('id, full_name, role, institution_id')
-    .eq('id', session.user.id)
-    .single();
-
-  if (pErr) {
-    showError('Could not load profile: ' + pErr.message);
-    throw pErr;
-  }
-  currentProfile = profile;
-
-  const canUpload = ['lecturer','staff','hod','admin','leadership'].includes(profile.role);
-  if (canUpload && profile.institution_id) {
-    $('btn-upload').hidden = false;
-  }
-
-  // ---- Load ----
-  function showError(msg) {
-    $('state-loading').hidden = true;
-    $('state-error').textContent = msg;
-    $('state-error').hidden = false;
-  }
-
-  async function load() {
-    const { data, error } = await supabase
-      .from('materials')
-      .select(`
-        id, course_code, title, description, file_name,
-        file_size, file_type, storage_path, downloads, created_at,
-        uploader:profiles!materials_uploader_id_fkey ( full_name )
-      `)
-      .order('created_at', { ascending: false });
-
-    if (error) { showError('Could not load materials: ' + error.message); return; }
-
-    allMaterials = data || [];
-    $('state-loading').hidden = true;
-    render();
-  }
-
-  // ---- Helpers ----
-  function formatSize(bytes) {
-    if (!bytes) return '';
-    const kb = bytes / 1024;
-    if (kb < 1024) return kb.toFixed(1) + ' KB';
-    return (kb / 1024).toFixed(1) + ' MB';
-  }
-  function formatTime(iso) {
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+  const timeAgo = (iso) => {
     if (!iso) return '';
-    const d = new Date(iso);
-    const diff = (Date.now() - d.getTime()) / 1000;
+    const diff = (Date.now() - new Date(iso).getTime()) / 1000;
     if (diff < 60) return 'just now';
-    if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
     if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
     if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+  const fmtSize = (bytes) => {
+    if (!bytes) return '';
+    const kb = bytes / 1024;
+    if (kb < 1024) return kb.toFixed(0) + ' KB';
+    return (kb / 1024).toFixed(1) + ' MB';
+  };
+  const initials = (name) => (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+
+  function toast(msg, kind) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.setAttribute('data-show', '1');
+    if (kind) el.setAttribute('data-kind', kind); else el.removeAttribute('data-kind');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
   }
-  function escapeHtml(s) {
-    return String(s ?? '')
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-  function fileIcon(mime, name) {
-    const s = (mime || '') + ' ' + (name || '');
-    if (/pdf/i.test(s)) return 'pdf';
-    if (/word|docx?/i.test(s)) return 'doc';
-    if (/presentation|powerpoint|pptx?/i.test(s)) return 'ppt';
-    if (/zip/i.test(s)) return 'zip';
-    if (/^text\/|\.txt$/i.test(s)) return 'txt';
+
+  function fileKind(mime, name) {
+    const s = ((mime || '') + ' ' + (name || '')).toLowerCase();
+    if (s.includes('pdf')) return 'pdf';
+    if (s.includes('word') || /docx?/.test(s)) return 'doc';
+    if (s.includes('presentation') || s.includes('powerpoint') || /pptx?/.test(s)) return 'ppt';
+    if (s.includes('zip')) return 'zip';
+    if (s.includes('text') || /\.txt$/.test(s)) return 'txt';
     return 'file';
   }
   function iconSvg(kind) {
-    const base = (paths) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
-    const doc  = '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>';
+    const base = (p) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+    const doc = '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>';
     switch (kind) {
       case 'pdf': return base(doc + '<path d="M9 15h1.5a1.5 1.5 0 0 0 0-3H9v6M14 18v-6h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1z"/>');
       case 'doc': return base(doc + '<path d="M9 13l1.5 5 1.5-5 1.5 5L15 13"/>');
@@ -461,90 +441,222 @@
     }
   }
 
-  // ---- Render list ----
+  // ---------- Load profile ----------
+  const { data: prof } = await supabase
+    .from('profiles')
+    .select('id, full_name, role, institution_id')
+    .eq('id', meId)
+    .single();
+  meProfile = prof || {};
+
+  const { data: canCreate } = await supabase.rpc('has_permission', { p_permission: 'materials.create' });
+  canManage = !!canCreate;
+  if (canManage) $('btn-upload').hidden = false;
+
+  // ---------- Load materials ----------
+  async function load() {
+    const body = $('feed');
+    body.innerHTML = '<div class="state">Loading…</div>';
+
+    const { data, error } = await supabase
+      .from('materials')
+      .select(`
+        id, course_code, title, description, file_name,
+        file_size, file_type, storage_path, downloads, created_at, uploader_id,
+        profiles:uploader_id ( full_name, avatar_url )
+      `)
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (error) {
+      $('state-loading').hidden = true;
+      $('state-error').hidden = false;
+      $('state-error').textContent = 'Could not load materials: ' + error.message;
+      return;
+    }
+
+    all = data || [];
+    populateCourses();
+    $('state-loading').hidden = true;
+    $('feed').hidden = false;
+    render();
+  }
+
+  function populateCourses() {
+    const set = new Set();
+    all.forEach(m => { if (m.course_code) set.add(m.course_code); });
+    const courses = Array.from(set).sort();
+    const filters = $('filters');
+    filters.innerHTML = '<button class="chip" data-course="all" aria-pressed="true">All courses</button>' +
+      courses.map(c => `<button class="chip" data-course="${esc(c)}" aria-pressed="false">${esc(c)}</button>`).join('');
+    filters.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        activeCourse = chip.dataset.course;
+        filters.querySelectorAll('.chip').forEach(c =>
+          c.setAttribute('aria-pressed', String(c.dataset.course === activeCourse)));
+        render();
+      });
+    });
+  }
+
   function render() {
-    const q = query.trim().toLowerCase();
-    const filtered = !q ? allMaterials : allMaterials.filter(m =>
-      (m.title || '').toLowerCase().includes(q) ||
-      (m.course_code || '').toLowerCase().includes(q)
-    );
+    const body = $('feed');
+    const q = search.trim().toLowerCase();
 
-    $('list').hidden = filtered.length === 0;
-    $('state-empty').hidden = filtered.length !== 0;
+    const filtered = all.filter(m => {
+      if (activeCourse !== 'all' && m.course_code !== activeCourse) return false;
+      if (!q) return true;
+      return (m.title || '').toLowerCase().includes(q)
+          || (m.course_code || '').toLowerCase().includes(q)
+          || (m.profiles?.full_name || '').toLowerCase().includes(q)
+          || (m.description || '').toLowerCase().includes(q);
+    });
 
-    $('list').innerHTML = filtered.map(m => `
-      <article class="mat">
-        <div class="mat__icon" aria-hidden="true">${iconSvg(fileIcon(m.file_type, m.file_name))}</div>
+    if (filtered.length === 0) {
+      body.innerHTML = `
+        <div class="empty">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+          <h3>${q || activeCourse !== 'all' ? 'Nothing matches' : 'No materials yet'}</h3>
+          <p>${q || activeCourse !== 'all' ? 'Try another filter or search term.' : 'Lecturers can upload materials here.'}</p>
+        </div>`;
+      return;
+    }
+
+    body.innerHTML = '<div class="list">' + filtered.map(m => card(m)).join('') + '</div>';
+  }
+
+  function card(m) {
+    const kind = fileKind(m.file_type, m.file_name);
+    const uploader = m.profiles?.full_name || 'Unknown';
+    const isMine = m.uploader_id === meId;
+    const canEdit = isMine || canManage;
+
+    return `
+      <article class="mat" data-id="${esc(m.id)}">
+        <div class="mat__icon" data-kind="${esc(kind)}">${iconSvg(kind)}</div>
         <div class="mat__body">
           <div class="mat__meta">
-            <span class="course-code">${escapeHtml(m.course_code)}</span>
-            <span class="dot-sep">·</span>
-            <span>${escapeHtml(m.uploader?.full_name || 'Unknown')}</span>
-            <span class="dot-sep">·</span>
-            <span>${formatTime(m.created_at)}</span>
-            <span class="dot-sep">·</span>
-            <span>${formatSize(m.file_size)}</span>
+            <span class="course-code">${esc(m.course_code)}</span>
+            <span>·</span>
+            <span>${timeAgo(m.created_at)}</span>
           </div>
-          <h2 class="mat__title">${escapeHtml(m.title)}</h2>
-          ${m.description ? `<p class="mat__desc">${escapeHtml(m.description)}</p>` : ''}
+          <h3 class="mat__title">${esc(m.title)}</h3>
+          ${m.description ? `<p class="mat__desc">${esc(m.description)}</p>` : ''}
+          <div class="mat__meta-row">
+            <span>By ${esc(uploader)}</span>
+            <span>·</span>
+            <span>${esc(fmtSize(m.file_size))}</span>
+            <span>·</span>
+            <span>${m.downloads || 0} download${(m.downloads || 0) === 1 ? '' : 's'}</span>
+          </div>
         </div>
-        <button class="mat__action" data-id="${m.id}" title="Download" aria-label="Download ${escapeHtml(m.title)}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <path d="M7 10l5 5 5-5"/>
-            <path d="M12 15V3"/>
-          </svg>
-        </button>
-      </article>
-    `).join('');
+        <div class="mat__actions">
+          <button class="icon-btn" data-action="download" data-id="${esc(m.id)}" title="Download" aria-label="Download">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <path d="M7 10l5 5 5-5"/>
+              <path d="M12 15V3"/>
+            </svg>
+          </button>
+          ${canEdit ? `
+            <button class="icon-btn" data-action="edit" data-id="${esc(m.id)}" title="Edit" aria-label="Edit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/>
+              </svg>
+            </button>
+            <button class="icon-btn" data-action="delete" data-id="${esc(m.id)}" data-danger title="Delete" aria-label="Delete">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </button>
+          ` : ''}
+        </div>
+      </article>`;
   }
 
-  // ---- Toast ----
-  function toast(msg, kind) {
-    const el = $('toast');
-    el.textContent = msg;
-    el.setAttribute('data-show', '1');
-    if (kind) el.setAttribute('data-kind', kind); else el.removeAttribute('data-kind');
-    clearTimeout(toast._t);
-    toast._t = setTimeout(() => el.removeAttribute('data-show'), 3500);
-  }
+  // ---------- Search ----------
+  $('search').addEventListener('input', (e) => {
+    search = e.target.value;
+    render();
+  });
 
-  // ---- Download ----
-  $('list').addEventListener('click', async (e) => {
-    const btn = e.target.closest('.mat__action');
+  // ---------- Actions ----------
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action]');
     if (!btn) return;
-    const m = allMaterials.find(x => x.id === btn.dataset.id);
+    const action = btn.dataset.action;
+    const id = btn.dataset.id;
+    const m = all.find(x => x.id === id);
     if (!m) return;
 
-    btn.disabled = true;
-    try {
-      const { data, error } = await supabase
-        .storage.from('materials')
-        .createSignedUrl(m.storage_path, 60, { download: m.file_name });
-      if (error) throw error;
+    if (action === 'download') {
+      btn.disabled = true;
+      try {
+        const { data, error } = await supabase
+          .storage.from('materials')
+          .createSignedUrl(m.storage_path, 60, { download: m.file_name });
+        if (error) throw error;
+        const a = document.createElement('a');
+        a.href = data.signedUrl;
+        a.download = m.file_name;
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        // Optimistic counter
+        supabase.from('materials').update({ downloads: (m.downloads || 0) + 1 }).eq('id', id).then(() => {});
+      } catch (err) {
+        toast(err.message || 'Download failed', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+      return;
+    }
 
-      const a = document.createElement('a');
-      a.href = data.signedUrl;
-      a.download = m.file_name;
-      a.rel = 'noopener';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } catch (err) {
-      toast(err.message || 'Download failed', 'error');
-    } finally {
-      btn.disabled = false;
+    if (action === 'edit') {
+      editingId = id;
+      $('modal-title').textContent = 'Edit material';
+      $('modal-sub').textContent = 'Update the title, course, or description.';
+      $('m-course').value = m.course_code || '';
+      $('m-title').value = m.title || '';
+      $('m-desc').value = m.description || '';
+      $('btn-submit').textContent = 'Save changes';
+      $('file-field').hidden = true;
+      $('modal-alert').removeAttribute('data-show');
+      $('modal').setAttribute('data-open', '1');
+      $('modal').setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+
+    if (action === 'delete') {
+      if (!confirm(`Delete "${m.title}"? This cannot be undone.`)) return;
+      try {
+        await supabase.storage.from('materials').remove([m.storage_path]).catch(() => {});
+        const { error } = await supabase.from('materials').delete().eq('id', id);
+        if (error) throw error;
+        toast('Deleted.');
+        await load();
+      } catch (err) {
+        toast(err.message || 'Delete failed', 'error');
+      }
     }
   });
 
-  // ---- Search ----
-  $('search').addEventListener('input', (e) => { query = e.target.value; render(); });
-
-  // ---- Upload: modal control ----
-  function openModal() {
+  // ---------- Modal: open / close ----------
+  function openUpload() {
+    editingId = null;
+    selectedFile = null;
+    $('modal-title').textContent = 'Upload material';
+    $('modal-sub').textContent = 'Share a resource with your institution.';
+    $('btn-submit').textContent = 'Upload';
+    $('form-mat').reset();
+    $('file-meta').hidden = true;
+    $('file-field').hidden = false;
     $('modal-alert').removeAttribute('data-show');
-    $('form-upload').reset();
-    clearFile();
     $('modal').setAttribute('data-open', '1');
     $('modal').setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -554,30 +666,16 @@
     $('modal').removeAttribute('data-open');
     $('modal').setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-    clearFile();
-  }
-  function clearFile() {
+    editingId = null;
     selectedFile = null;
-    $('file-input').value = '';
-    $('file-meta').hidden = true;
-  }
-  function setFile(file) {
-    if (!file) return clearFile();
-    selectedFile = file;
-    $('file-icon').innerHTML = iconSvg(fileIcon(file.type, file.name));
-    $('file-name').textContent = file.name;
-    $('file-size').textContent = formatSize(file.size);
-    $('file-meta').hidden = false;
   }
 
-  $('btn-upload').addEventListener('click', openModal);
+  $('btn-upload').addEventListener('click', openUpload);
   $('btn-cancel').addEventListener('click', closeModal);
   $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal();
-  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal(); });
 
-  // ---- Upload: file picker ----
+  // ---------- File picker ----------
   $('drop').addEventListener('click', () => $('file-input').click());
   $('drop').addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file-input').click(); }
@@ -591,92 +689,105 @@
     if (f) setFile(f);
   });
   $('file-input').addEventListener('change', (e) => setFile(e.target.files?.[0]));
-  $('btn-remove-file').addEventListener('click', clearFile);
+  $('btn-remove-file').addEventListener('click', () => {
+    selectedFile = null;
+    $('file-input').value = '';
+    $('file-meta').hidden = true;
+  });
 
-  // ---- Upload: submit ----
-  $('form-upload').addEventListener('submit', async (e) => {
+  function setFile(file) {
+    if (!file) return;
+    selectedFile = file;
+    const kind = fileKind(file.type, file.name);
+    $('file-icon').innerHTML = iconSvg(kind);
+    $('file-icon').setAttribute('data-kind', kind);
+    $('file-name').textContent = file.name;
+    $('file-size').textContent = fmtSize(file.size);
+    $('file-meta').hidden = false;
+  }
+
+  // ---------- Submit ----------
+  $('form-mat').addEventListener('submit', async (e) => {
     e.preventDefault();
     const alertEl = $('modal-alert');
     const btn = $('btn-submit');
     alertEl.removeAttribute('data-show');
 
-    const course = $('f-course').value.trim().toUpperCase();
-    const title  = $('f-title').value.trim();
-    const desc   = $('f-desc').value.trim();
+    const course = $('m-course').value.trim().toUpperCase();
+    const title = $('m-title').value.trim();
+    const desc = $('m-desc').value.trim();
 
-    if (!selectedFile) { alertEl.textContent = 'Pick a file to upload.'; alertEl.setAttribute('data-show','1'); return; }
-    if (!course)       { alertEl.textContent = 'Course code is required.'; alertEl.setAttribute('data-show','1'); return; }
-    if (!title)        { alertEl.textContent = 'Title is required.'; alertEl.setAttribute('data-show','1'); return; }
-    if (!currentProfile.institution_id) {
-      alertEl.textContent = 'Your account is not assigned to an institution.';
-      alertEl.setAttribute('data-show','1'); return;
-    }
-    if (selectedFile.size > 50 * 1024 * 1024) {
-      alertEl.textContent = 'File is too large. Maximum is 50 MB.';
-      alertEl.setAttribute('data-show','1'); return;
-    }
+    if (!course) { alertEl.textContent = 'Course code is required.'; alertEl.setAttribute('data-show', '1'); return; }
+    if (!title)  { alertEl.textContent = 'Title is required.'; alertEl.setAttribute('data-show', '1'); return; }
 
     btn.disabled = true;
-    btn.textContent = 'Uploading…';
+    btn.textContent = editingId ? 'Saving…' : 'Uploading…';
 
     try {
-      // 1. Build a unique, institution-scoped storage path.
-      //    Pattern: <institution_id>/<random-uuid>.<ext>
-      //    The first segment is what the RLS policy checks.
-      const ext = (selectedFile.name.match(/\.[^.]+$/) || [''])[0].toLowerCase();
-      const rand = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
-      const path = `${currentProfile.institution_id}/${rand}${ext}`;
+      if (editingId) {
+        const { error } = await supabase
+          .from('materials')
+          .update({ course_code: course, title, description: desc || null })
+          .eq('id', editingId);
+        if (error) throw error;
+        toast('Updated.');
+      } else {
+        if (!selectedFile) { alertEl.textContent = 'Pick a file to upload.'; alertEl.setAttribute('data-show', '1'); btn.disabled = false; btn.textContent = 'Upload'; return; }
+        if (!meProfile.institution_id) throw new Error('Your account is not attached to an institution.');
+        if (selectedFile.size > 50 * 1024 * 1024) throw new Error('File is too large. Maximum 50 MB.');
 
-      // 2. Upload the blob.
-      const { error: upErr } = await supabase.storage
-        .from('materials')
-        .upload(path, selectedFile, {
+        const ext = (selectedFile.name.match(/\.[^.]+$/) || [''])[0].toLowerCase();
+        const rand = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36));
+        const path = `${meProfile.institution_id}/${rand}${ext}`;
+
+        const { error: upErr } = await supabase.storage.from('materials').upload(path, selectedFile, {
           contentType: selectedFile.type || 'application/octet-stream',
           upsert: false,
         });
-      if (upErr) throw new Error('Upload failed: ' + upErr.message);
+        if (upErr) throw new Error('Upload failed: ' + upErr.message);
 
-      // 3. Insert the row.
-      const { error: dbErr } = await supabase.from('materials').insert({
-        institution_id: currentProfile.institution_id,
-        uploader_id: currentProfile.id,
-        course_code: course,
-        title,
-        description: desc || null,
-        storage_path: path,
-        file_name: selectedFile.name,
-        file_size: selectedFile.size,
-        file_type: selectedFile.type || 'application/octet-stream',
-      });
+        const { error: dbErr } = await supabase.from('materials').insert({
+          institution_id: meProfile.institution_id,
+          uploader_id: meId,
+          course_code: course,
+          title,
+          description: desc || null,
+          storage_path: path,
+          file_name: selectedFile.name,
+          file_size: selectedFile.size,
+          file_type: selectedFile.type || 'application/octet-stream',
+        });
 
-      if (dbErr) {
-        // Row insert failed — clean up the orphan file so storage doesn't fill up.
-        await supabase.storage.from('materials').remove([path]).catch(() => {});
-        throw new Error('Save failed: ' + dbErr.message);
+        if (dbErr) {
+          await supabase.storage.from('materials').remove([path]).catch(() => {});
+          throw new Error('Save failed: ' + dbErr.message);
+        }
+        toast('Uploaded.');
       }
-
       closeModal();
-      toast('Uploaded.');
       await load();
     } catch (err) {
-      alertEl.textContent = err.message || 'Upload failed.';
-      alertEl.setAttribute('data-show','1');
+      alertEl.textContent = err.message || 'Something went wrong.';
+      alertEl.setAttribute('data-show', '1');
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Upload';
+      btn.textContent = editingId ? 'Save changes' : 'Upload';
     }
   });
 
-  // ---- Sign out ----
-  $('btn-signout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    window.location.replace('login.html');
-  });
+  // ---------- Realtime ----------
+  supabase
+    .channel('materials-live')
+    .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'materials' },
+        () => load())
+    .subscribe();
 
-  load();
+  // ---------- Boot ----------
+  await load();
 </script>
 
-  <script type="module" src="../js/bottom-nav.js"></script>
-  <script type="module" src="../js/notifications.js"></script>
+<script type="module" src="../js/bottom-nav.js"></script>
+<script type="module" src="../js/notifications.js"></script>
 </body>
 </html>
