@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Materials — Matric</title>
+<title>Library — Matric</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,89 +13,52 @@
 <link rel="stylesheet" href="../css/notifications.css">
 <link rel="stylesheet" href="../css/topbar.css">
 <style>
-  .topbar {
-    position: sticky; top: 0; z-index: 10;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    border-bottom: 1px solid var(--border); min-height: 56px;
-  }
+  .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); min-height: 56px; }
   .topbar__title { font-size: var(--text-base); font-weight: 600; letter-spacing: -0.01em; }
   .topbar__right { display: flex; align-items: center; gap: var(--space-2); }
 
-  .btn-primary {
-    appearance: none; background: var(--brand); color: var(--brand-fg);
-    border: none; padding: 0.5rem 0.9rem;
-    border-radius: var(--radius-md); font-size: var(--text-sm);
-    font-weight: 500; cursor: pointer;
-    transition: all var(--duration-fast) var(--ease);
-    min-height: 36px; display: inline-flex; align-items: center; gap: 6px;
-  }
+  .btn-primary { appearance: none; background: var(--brand); color: var(--brand-fg); border: none; padding: 0.5rem 0.9rem; border-radius: var(--radius-md); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 150ms var(--ease); min-height: 36px; display: inline-flex; align-items: center; gap: 6px; }
   .btn-primary:hover { background: var(--brand-hover); }
   .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 
-  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-10); }
-  @media (min-width: 640px) { .wrap { padding: var(--space-6) var(--space-6) var(--space-10); } }
+  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-4) var(--space-3) var(--space-10); }
+  @media (min-width: 640px) { .wrap { padding: var(--space-5) var(--space-6) var(--space-10); } }
 
-  .hero h1 { font-size: var(--text-2xl); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px; }
-  .hero p { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-5); }
-  @media (min-width: 640px) { .hero h1 { font-size: var(--text-3xl); } }
+  .search { width: 100%; padding: 0.75rem 0.95rem; background: var(--bg-sunken); border: 1px solid transparent; border-radius: var(--radius-md); font-size: 14px; color: var(--text); margin: 0 4px var(--space-3); min-height: 44px; transition: all 150ms var(--ease); font-family: inherit; width: calc(100% - 8px); }
+  .search::placeholder { color: var(--text-subtle); }
+  .search:focus { outline: none; background: var(--bg-elevated); border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 12%, transparent); }
 
-  .search {
-    width: 100%; padding: 0.75rem 1rem;
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: var(--radius-md); font-size: var(--text-sm);
-    color: var(--text); margin-bottom: var(--space-3);
-    min-height: 46px;
-    transition: border-color var(--duration-fast) var(--ease);
-  }
-  .search:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent); }
-
-  .filters {
-    display: flex; gap: 6px;
-    overflow-x: auto; padding-bottom: 8px; margin-bottom: var(--space-4);
-    scrollbar-width: none;
-  }
-  .filters::-webkit-scrollbar { display: none; }
-  .chip {
-    appearance: none;
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    padding: 0.4rem 0.75rem;
-    border-radius: var(--radius-full);
-    font-size: var(--text-xs); font-weight: 500;
-    cursor: pointer; flex-shrink: 0;
-    transition: all var(--duration-fast) var(--ease);
-    font-family: inherit;
-    min-height: 32px;
-    display: inline-flex; align-items: center; gap: 5px;
-    white-space: nowrap;
-  }
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding: 0 4px 10px; margin-bottom: var(--space-3); scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { appearance: none; background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 0.4rem 0.85rem; border-radius: var(--radius-full); font-size: 13px; font-weight: 500; cursor: pointer; flex-shrink: 0; transition: all 150ms var(--ease); font-family: inherit; min-height: 34px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
   .chip:hover { border-color: var(--border-strong); color: var(--text); }
   .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
 
-  .list { display: flex; flex-direction: column; gap: var(--space-3); }
+  .list { display: flex; flex-direction: column; gap: 4px; padding: 0 4px; }
 
+  /* ---------- Material card — cleaner anatomy ---------- */
   .mat {
-    display: flex; gap: var(--space-3);
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-4);
-    transition: border-color var(--duration-fast) var(--ease);
-    align-items: flex-start;
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    transition: background 150ms var(--ease);
+    cursor: pointer;
+    width: 100%; text-align: left;
+    font-family: inherit; color: var(--text);
   }
-  .mat:hover { border-color: var(--border-strong); }
+  .mat:hover { background: var(--bg-sunken); }
 
   .mat__icon {
-    width: 46px; height: 46px;
-    border-radius: var(--radius-md);
-    background: var(--bg-sunken);
-    color: var(--text-muted);
+    width: 48px; height: 48px;
+    border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
+    background: var(--bg-sunken);
+    color: var(--text-muted);
   }
+  .mat__icon svg { width: 22px; height: 22px; }
   .mat__icon[data-kind="pdf"]  { background: #fee2e2; color: #991b1b; }
   .mat__icon[data-kind="doc"]  { background: #dbeafe; color: #1e40af; }
   .mat__icon[data-kind="ppt"]  { background: #fef3c7; color: #92400e; }
@@ -108,176 +71,115 @@
     .mat__icon[data-kind="txt"] { background: #1e1b4b; color: #a5b4fc; }
   }
 
-  .mat__body { flex: 1; min-width: 0; }
-  .mat__meta {
-    display: flex; align-items: center; gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 6px;
-    font-size: var(--text-xs); color: var(--text-subtle);
-  }
-  .course-code {
-    font-size: 0.6875rem; font-weight: 800;
-    letter-spacing: 0.05em;
-    padding: 2px 7px;
-    border-radius: var(--radius-sm);
-    background: var(--brand-subtle); color: var(--brand);
+  .mat__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+
+  .mat__top {
+    display: flex; align-items: baseline; gap: 8px;
+    min-width: 0;
   }
   .mat__title {
-    font-size: var(--text-base); font-weight: 600;
-    letter-spacing: -0.01em; line-height: var(--leading-snug);
-    margin-bottom: 4px;
+    font-size: 15px; font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    color: var(--text);
+    overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     overflow-wrap: anywhere;
-  }
-  .mat__desc {
-    font-size: var(--text-sm); color: var(--text-muted);
-    line-height: var(--leading-snug);
-    overflow-wrap: anywhere;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-  .mat__meta-row {
-    display: flex; gap: var(--space-3); flex-wrap: wrap;
-    font-size: var(--text-xs); color: var(--text-subtle);
+    min-width: 0;
   }
 
-  .mat__actions {
-    display: flex; flex-direction: column; gap: 6px;
-    flex-shrink: 0;
+  .mat__meta {
+    font-size: 13px; color: var(--text-muted);
+    overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .icon-btn {
-    width: 38px; height: 38px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    background: transparent; color: var(--text-muted);
-    cursor: pointer;
+  .mat__meta .code {
+    font-weight: 600;
+    color: var(--text);
+  }
+  .mat__meta .sep { opacity: 0.5; margin: 0 5px; }
+
+  /* Right-side action */
+  .mat__action {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-subtle);
     display: flex; align-items: center; justify-content: center;
-    transition: all var(--duration-fast) var(--ease);
+    cursor: pointer;
+    transition: all 150ms var(--ease);
     padding: 0;
   }
-  .icon-btn:hover:not(:disabled) { color: var(--brand); border-color: var(--brand); background: var(--brand-subtle); }
-  .icon-btn[data-danger]:hover:not(:disabled) { color: var(--danger); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
-  .icon-btn:disabled { opacity: 0.5; cursor: wait; }
+  .mat__action:hover { background: var(--bg-elevated); color: var(--brand); }
+  .mat__action:disabled { opacity: 0.5; cursor: wait; }
+  .mat__action svg { width: 20px; height: 20px; }
 
-  .empty {
-    padding: var(--space-10) var(--space-4);
-    text-align: center; color: var(--text-muted);
-    font-size: var(--text-sm); line-height: var(--leading-snug);
+  /* Overflow row (more actions) */
+  .mat__wrapper {
+    display: flex; align-items: center; gap: 4px;
   }
-  .empty svg { color: var(--border-strong); margin-bottom: var(--space-3); }
-  .empty h3 { font-size: var(--text-base); color: var(--text); margin-bottom: var(--space-2); font-weight: 600; }
 
-  .state { padding: var(--space-6) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
+  /* Long-press hint menu — implemented as a bottom sheet in JS */
+
+  /* ---------- Sheet ---------- */
+  .sheet-backdrop { position: fixed; inset: 0; z-index: 70; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 200ms var(--ease); }
+  .sheet-backdrop[data-open] { opacity: 1; pointer-events: auto; }
+  .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 71; background: var(--bg-elevated); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 260ms cubic-bezier(0.2, 0, 0, 1); max-height: 70vh; overflow-y: auto; box-shadow: 0 -8px 32px rgba(0,0,0,0.16); }
+  .sheet[data-open] { transform: translateY(0); }
+  .sheet__grab { width: 40px; height: 4px; border-radius: 2px; background: var(--border-strong); margin: 6px auto 8px; }
+  .sheet__head { padding: 8px 16px 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  .sheet__title { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; overflow-wrap: anywhere; }
+  .sheet__sub { font-size: 12px; color: var(--text-muted); margin-top: 3px; overflow-wrap: anywhere; }
+  .sheet__item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: transparent; border: none; width: 100%; text-align: left; font-family: inherit; font-size: 15px; font-weight: 500; color: var(--text); cursor: pointer; border-radius: 12px; transition: background 120ms var(--ease); }
+  .sheet__item:hover { background: var(--bg-sunken); }
+  .sheet__item svg { width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0; }
+  .sheet__item--danger { color: var(--danger); }
+  .sheet__item--danger svg { color: var(--danger); }
+  .sheet__item--danger:hover { background: color-mix(in srgb, var(--danger) 8%, transparent); }
+
+  .empty { padding: 56px 24px; text-align: center; color: var(--text-muted); font-size: 14px; }
+  .empty svg { color: var(--border-strong); margin-bottom: 12px; }
+  .empty h3 { font-size: 15px; color: var(--text); margin-bottom: 6px; font-weight: 600; }
+
+  .state { padding: 32px 16px; text-align: center; color: var(--text-muted); font-size: 14px; }
   .state[hidden] { display: none; }
   .state--error { color: var(--danger); }
 
   /* Modal */
-  .modal-backdrop {
-    position: fixed; inset: 0; z-index: 50;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    display: flex; align-items: center; justify-content: center;
-    padding: var(--space-4);
-    opacity: 0; pointer-events: none;
-    transition: opacity var(--duration) var(--ease);
-  }
+  .modal-backdrop { position: fixed; inset: 0; z-index: 70; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 200ms var(--ease); }
   .modal-backdrop[data-open] { opacity: 1; pointer-events: auto; }
-  .modal {
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); width: 100%; max-width: 520px;
-    max-height: 90vh; max-height: 90dvh; overflow-y: auto;
-    padding: var(--space-5);
-    transform: translateY(12px); transition: transform var(--duration) var(--ease);
-  }
+  .modal { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 520px; max-height: 92vh; max-height: 92dvh; overflow-y: auto; padding: 20px; transform: translateY(12px); transition: transform 200ms var(--ease); }
   .modal-backdrop[data-open] .modal { transform: translateY(0); }
-  .modal h2 { font-size: var(--text-lg); font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px; }
-  .modal .sub { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-4); }
-  .modal .field { margin-bottom: var(--space-3); }
-  .modal label { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--text); margin-bottom: 6px; }
-  .modal input, .modal textarea {
-    width: 100%; padding: 0.75rem 0.9rem;
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: var(--radius-md); font-size: var(--text-sm);
-    color: var(--text); font-family: inherit;
-    transition: all var(--duration-fast) var(--ease);
-    min-height: 46px;
-  }
-  .modal textarea { min-height: 90px; resize: vertical; line-height: var(--leading-base); }
-  .modal input:focus, .modal textarea:focus {
-    outline: none; border-color: var(--brand);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
-  }
-
-  /* File drop */
-  .drop {
-    border: 2px dashed var(--border-strong);
-    border-radius: var(--radius-md);
-    padding: var(--space-5) var(--space-4);
-    text-align: center;
-    cursor: pointer; background: var(--bg-sunken);
-    transition: all var(--duration-fast) var(--ease);
-  }
-  .drop:hover, .drop[data-drag] { border-color: var(--brand); background: var(--brand-subtle); }
-  .drop__icon { color: var(--text-muted); margin-bottom: 8px; }
-  .drop__title { font-weight: 500; font-size: var(--text-sm); color: var(--text); margin-bottom: 2px; }
-  .drop__hint { font-size: var(--text-xs); color: var(--text-subtle); }
-  .drop__file {
-    display: flex; align-items: center; gap: var(--space-3);
-    padding: var(--space-3); background: var(--bg-elevated);
-    border: 1px solid var(--border); border-radius: var(--radius-md);
-    margin-top: var(--space-3); text-align: left;
-  }
-  .drop__file-meta { flex: 1; min-width: 0; }
-  .drop__file-name { font-size: var(--text-sm); font-weight: 500; overflow-wrap: anywhere; line-height: var(--leading-snug); }
-  .drop__file-size { font-size: var(--text-xs); color: var(--text-subtle); margin-top: 2px; }
-  .drop__remove {
-    background: none; border: none; color: var(--text-muted);
-    cursor: pointer; padding: 6px; border-radius: var(--radius-sm);
-    display: flex; align-items: center; justify-content: center;
-    min-width: 32px; min-height: 32px;
-  }
-  .drop__remove:hover { background: var(--bg-sunken); color: var(--danger); }
-
-  .modal-alert {
-    display: none; padding: 0.7rem 0.9rem;
-    border-radius: var(--radius-md); font-size: var(--text-sm);
-    margin-bottom: var(--space-3); line-height: var(--leading-snug);
-    overflow-wrap: anywhere;
-  }
+  .modal h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.015em; margin-bottom: 6px; }
+  .modal .sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  .modal .field { margin-bottom: 12px; }
+  .modal label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .modal input, .modal textarea { width: 100%; padding: 0.75rem 0.9rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--text); font-family: inherit; transition: all 150ms var(--ease); min-height: 46px; }
+  .modal textarea { min-height: 90px; resize: vertical; line-height: 1.5; }
+  .modal input:focus, .modal textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 12%, transparent); }
+  .modal-alert { display: none; padding: 0.7rem 0.9rem; border-radius: 10px; font-size: 13px; margin-bottom: 12px; }
   .modal-alert[data-show] { display: block; }
-  .modal-alert--error {
-    background: color-mix(in srgb, var(--danger) 10%, transparent);
-    color: var(--danger);
-    border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
-  }
-
-  .modal-actions {
-    display: flex; gap: var(--space-3);
-    margin-top: var(--space-5); justify-content: flex-end;
-  }
+  .modal-alert--error { background: color-mix(in srgb, var(--danger) 10%, transparent); color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
   @media (max-width: 480px) { .modal-actions { flex-direction: column-reverse; } }
-  .btn-ghost {
-    appearance: none; background: transparent;
-    border: 1px solid var(--border); color: var(--text-muted);
-    padding: 0.65rem 1rem; border-radius: var(--radius-md);
-    font-size: var(--text-sm); font-weight: 500; cursor: pointer;
-    transition: all var(--duration-fast) var(--ease); min-height: 42px;
-  }
+  .btn-ghost { appearance: none; background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 0.65rem 1rem; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 150ms var(--ease); min-height: 42px; font-family: inherit; }
   .btn-ghost:hover { color: var(--text); border-color: var(--border-strong); }
 
-  .toast {
-    position: fixed; bottom: 84px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--text); color: var(--bg);
-    padding: 0.65rem 1rem; border-radius: var(--radius-md);
-    font-size: var(--text-sm); font-weight: 500;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    opacity: 0; pointer-events: none;
-    transition: all var(--duration) var(--ease);
-    z-index: 60; max-width: 90vw; text-align: center;
-  }
+  .drop { border: 2px dashed var(--border-strong); border-radius: 10px; padding: 20px 16px; text-align: center; cursor: pointer; background: var(--bg-sunken); transition: all 150ms var(--ease); }
+  .drop:hover, .drop[data-drag] { border-color: var(--brand); background: var(--brand-subtle); }
+  .drop__icon { color: var(--text-muted); margin-bottom: 8px; }
+  .drop__title { font-weight: 500; font-size: 14px; color: var(--text); margin-bottom: 2px; }
+  .drop__hint { font-size: 12px; color: var(--text-subtle); }
+  .drop__file { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 10px; margin-top: 12px; text-align: left; }
+  .drop__file-meta { flex: 1; min-width: 0; }
+  .drop__file-name { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; line-height: 1.4; }
+  .drop__file-size { font-size: 12px; color: var(--text-subtle); margin-top: 2px; }
+  .drop__remove { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 6px; display: flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; }
+  .drop__remove:hover { background: var(--bg-sunken); color: var(--danger); }
+
+  .toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 0.65rem 1rem; border-radius: 12px; font-size: 14px; font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,0.2); opacity: 0; pointer-events: none; transition: all 200ms var(--ease); z-index: 80; max-width: 90vw; text-align: center; }
   .toast[data-show] { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast[data-kind="error"] { background: var(--danger); color: white; }
 </style>
@@ -285,7 +187,7 @@
 <body>
 
 <header class="topbar">
-  <div class="topbar__title">Materials</div>
+  <div class="topbar__title">Library</div>
   <div class="topbar__right">
     <button class="btn-primary" id="btn-upload" hidden>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -295,14 +197,10 @@
 </header>
 
 <main class="wrap">
-  <div class="hero">
-    <h1>Course materials</h1>
-    <p>Lecture notes, handouts, and study resources.</p>
-  </div>
 
-  <input type="search" class="search" id="search" placeholder="Search by title, course, or uploader…" autocomplete="off">
+  <input type="search" class="search" id="search" placeholder="Search library…" autocomplete="off">
 
-  <div class="filters" id="filters">
+  <div class="chips" id="filters">
     <button class="chip" data-course="all" aria-pressed="true">All courses</button>
   </div>
 
@@ -311,64 +209,17 @@
   <div id="feed" hidden></div>
 </main>
 
+<!-- Overflow sheet -->
+<div class="sheet-backdrop" id="sheet-backdrop"></div>
+<div class="sheet" id="sheet" aria-hidden="true">
+  <div class="sheet__grab"></div>
+  <div id="sheet-body"></div>
+</div>
+
 <!-- Upload / Edit modal -->
 <div class="modal-backdrop" id="modal" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <h2 id="modal-title">Upload material</h2>
-    <p class="sub" id="modal-sub">Share a resource with your institution.</p>
-
-    <div class="modal-alert modal-alert--error" id="modal-alert"></div>
-
-    <form id="form-mat">
-      <div class="field" id="file-field">
-        <label>File</label>
-        <div class="drop" id="drop" role="button" tabindex="0">
-          <div class="drop__icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <path d="M17 8l-5-5-5 5"/>
-              <path d="M12 3v12"/>
-            </svg>
-          </div>
-          <div class="drop__title">Choose a file</div>
-          <div class="drop__hint">PDF, Word, PowerPoint, ZIP, or text — up to 50 MB</div>
-        </div>
-        <input type="file" id="file-input" hidden
-               accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/zip,text/plain">
-        <div id="file-meta" hidden>
-          <div class="drop__file">
-            <div class="mat__icon" id="file-icon" aria-hidden="true"></div>
-            <div class="drop__file-meta">
-              <div class="drop__file-name" id="file-name">—</div>
-              <div class="drop__file-size" id="file-size">—</div>
-            </div>
-            <button type="button" class="drop__remove" id="btn-remove-file" aria-label="Remove file">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="m-course">Course code</label>
-        <input type="text" id="m-course" required maxlength="20" placeholder="e.g. CSC 301" autocapitalize="characters">
-      </div>
-
-      <div class="field">
-        <label for="m-title">Title</label>
-        <input type="text" id="m-title" required maxlength="150" placeholder="e.g. Lecture 5 — Binary Trees">
-      </div>
-
-      <div class="field">
-        <label for="m-desc">Description <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
-        <textarea id="m-desc" maxlength="500" placeholder="A short note about what this covers…"></textarea>
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn-ghost" id="btn-cancel">Cancel</button>
-        <button type="submit" class="btn-primary" id="btn-submit">Upload</button>
-      </div>
-    </form>
+  <div class="modal" role="dialog" aria-modal="true">
+    <div id="modal-body"></div>
   </div>
 </div>
 
@@ -378,12 +229,10 @@
   import { supabase } from '../js/supabase.js';
 
   const $ = (id) => document.getElementById(id);
-  let meId = null;
-  let meProfile = null;
-  let all = [];
+  let meId = null, me = null;
+  let all = [], canManage = false;
   let activeCourse = 'all';
   let search = '';
-  let canManage = false;
   let editingId = null;
   let selectedFile = null;
 
@@ -391,26 +240,18 @@
   if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
   meId = session.user.id;
 
-  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   const timeAgo = (iso) => {
     if (!iso) return '';
-    const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    const d = new Date(iso);
+    const diff = (Date.now() - d.getTime()) / 1000;
     if (diff < 60) return 'just now';
     if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
     if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
     if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   };
-  const fmtSize = (bytes) => {
-    if (!bytes) return '';
-    const kb = bytes / 1024;
-    if (kb < 1024) return kb.toFixed(0) + ' KB';
-    return (kb / 1024).toFixed(1) + ' MB';
-  };
-  const initials = (name) => (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
-
+  const fmtSize = (b) => { if (!b) return ''; const kb = b / 1024; return kb < 1024 ? kb.toFixed(0) + ' KB' : (kb/1024).toFixed(1) + ' MB'; };
   function toast(msg, kind) {
     const el = $('toast');
     el.textContent = msg;
@@ -430,7 +271,7 @@
     return 'file';
   }
   function iconSvg(kind) {
-    const base = (p) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+    const base = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
     const doc = '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>';
     switch (kind) {
       case 'pdf': return base(doc + '<path d="M9 15h1.5a1.5 1.5 0 0 0 0-3H9v6M14 18v-6h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1z"/>');
@@ -442,37 +283,29 @@
     }
   }
 
-  // ---------- Load profile ----------
-  const { data: prof } = await supabase
-    .from('profiles')
-    .select('id, full_name, role, institution_id')
-    .eq('id', meId)
-    .single();
-  meProfile = prof || {};
+  const { data: prof } = await supabase.from('profiles')
+    .select('id, full_name, role, institution_id').eq('id', meId).single();
+  me = prof || {};
 
   const { data: canCreate } = await supabase.rpc('has_permission', { p_permission: 'materials.create' });
   canManage = !!canCreate;
   if (canManage) $('btn-upload').hidden = false;
 
-  // ---------- Load materials ----------
   async function load() {
     const body = $('feed');
     body.innerHTML = '<div class="state">Loading…</div>';
-
     const { data, error } = await supabase
       .from('materials')
-      .select(`
-        id, course_code, title, description, file_name,
-        file_size, file_type, storage_path, downloads, created_at, uploader_id,
-        profiles:uploader_id ( full_name, avatar_url )
-      `)
+      .select(`id, course_code, title, description, file_name, file_size, file_type,
+               storage_path, downloads, created_at, uploader_id,
+               profiles:uploader_id ( full_name, avatar_url )`)
       .order('created_at', { ascending: false })
       .limit(200);
 
     if (error) {
       $('state-loading').hidden = true;
       $('state-error').hidden = false;
-      $('state-error').textContent = 'Could not load materials: ' + error.message;
+      $('state-error').textContent = 'Could not load library: ' + error.message;
       return;
     }
 
@@ -509,19 +342,15 @@
       if (!q) return true;
       return (m.title || '').toLowerCase().includes(q)
           || (m.course_code || '').toLowerCase().includes(q)
-          || (m.profiles?.full_name || '').toLowerCase().includes(q)
-          || (m.description || '').toLowerCase().includes(q);
+          || (m.profiles?.full_name || '').toLowerCase().includes(q);
     });
 
     if (filtered.length === 0) {
-      body.innerHTML = `
-        <div class="empty">
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-          </svg>
-          <h3>${q || activeCourse !== 'all' ? 'Nothing matches' : 'No materials yet'}</h3>
-          <p>${q || activeCourse !== 'all' ? 'Try another filter or search term.' : 'Lecturers can upload materials here.'}</p>
-        </div>`;
+      body.innerHTML = `<div class="empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <h3>${q || activeCourse !== 'all' ? 'Nothing matches' : 'No materials yet'}</h3>
+        <p style="margin:6px 0 0;">${q || activeCourse !== 'all' ? 'Try another filter.' : 'Lecturers can upload materials here.'}</p>
+      </div>`;
       return;
     }
 
@@ -531,109 +360,136 @@
   function card(m) {
     const kind = fileKind(m.file_type, m.file_name);
     const uploader = m.profiles?.full_name || 'Unknown';
+    const metaLine = `<span class="code">${esc(m.course_code)}</span><span class="sep">·</span>${esc(uploader)}<span class="sep">·</span>${esc(fmtSize(m.file_size))}`;
+
+    return `
+      <button class="mat" data-id="${esc(m.id)}" type="button">
+        <div class="mat__icon" data-kind="${esc(kind)}">${iconSvg(kind)}</div>
+        <div class="mat__body">
+          <div class="mat__top">
+            <span class="mat__title">${esc(m.title)}</span>
+          </div>
+          <div class="mat__meta">${metaLine}</div>
+        </div>
+        <span class="mat__action" data-action="menu" data-id="${esc(m.id)}" role="button" aria-label="Actions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1.5"/>
+            <circle cx="6" cy="12" r="1.5"/>
+            <circle cx="18" cy="12" r="1.5"/>
+          </svg>
+        </span>
+      </button>`;
+  }
+
+  $('search').addEventListener('input', (e) => { search = e.target.value; render(); });
+
+  // Click handling: action menu button vs. row (open sheet for both)
+  document.addEventListener('click', (e) => {
+    const menuBtn = e.target.closest('[data-action="menu"]');
+    if (menuBtn) {
+      e.stopPropagation();
+      const id = menuBtn.dataset.id;
+      const m = all.find(x => x.id === id);
+      if (m) openMaterialSheet(m);
+      return;
+    }
+    const row = e.target.closest('.mat');
+    if (row) {
+      const id = row.dataset.id;
+      const m = all.find(x => x.id === id);
+      if (m) openMaterialSheet(m);
+    }
+  });
+
+  // ---- Overflow sheet ----
+  function openSheet(html) {
+    $('sheet-body').innerHTML = html;
+    $('sheet').setAttribute('data-open', '1');
+    $('sheet').setAttribute('aria-hidden', 'false');
+    $('sheet-backdrop').setAttribute('data-open', '1');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSheet() {
+    $('sheet').removeAttribute('data-open');
+    $('sheet').setAttribute('aria-hidden', 'true');
+    $('sheet-backdrop').removeAttribute('data-open');
+    document.body.style.overflow = '';
+  }
+  $('sheet-backdrop').addEventListener('click', closeSheet);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeSheet(); closeModal(); } });
+
+  function openMaterialSheet(m) {
+    const kind = fileKind(m.file_type, m.file_name);
     const isMine = m.uploader_id === meId;
     const canEdit = isMine || canManage;
 
-    return `
-      <article class="mat" data-id="${esc(m.id)}">
-        <div class="mat__icon" data-kind="${esc(kind)}">${iconSvg(kind)}</div>
-        <div class="mat__body">
-          <div class="mat__meta">
-            <span class="course-code">${esc(m.course_code)}</span>
-            <span>·</span>
-            <span>${timeAgo(m.created_at)}</span>
-          </div>
-          <h3 class="mat__title">${esc(m.title)}</h3>
-          ${m.description ? `<p class="mat__desc">${esc(m.description)}</p>` : ''}
-          <div class="mat__meta-row">
-            <span>By ${esc(uploader)}</span>
-            <span>·</span>
-            <span>${esc(fmtSize(m.file_size))}</span>
-            <span>·</span>
-            <span>${m.downloads || 0} download${(m.downloads || 0) === 1 ? '' : 's'}</span>
-          </div>
-        </div>
-        <div class="mat__actions">
-          <button class="icon-btn" data-action="download" data-id="${esc(m.id)}" title="Download" aria-label="Download">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <path d="M7 10l5 5 5-5"/>
-              <path d="M12 15V3"/>
-            </svg>
-          </button>
-          ${canEdit ? `
-            <button class="icon-btn" data-action="edit" data-id="${esc(m.id)}" title="Edit" aria-label="Edit">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/>
-              </svg>
-            </button>
-            <button class="icon-btn" data-action="delete" data-id="${esc(m.id)}" data-danger title="Delete" aria-label="Delete">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-              </svg>
-            </button>
-          ` : ''}
-        </div>
-      </article>`;
+    const items = [
+      { label: 'Download', icon: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>', action: 'download', id: m.id },
+    ];
+    if (canEdit) {
+      items.push({ label: 'Edit details', icon: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/>', action: 'edit', id: m.id });
+      items.push({ label: 'Delete', icon: '<path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>', action: 'delete', id: m.id, danger: true });
+    }
+
+    openSheet(`
+      <div class="sheet__head">
+        <div class="sheet__title">${esc(m.title)}</div>
+        <div class="sheet__sub">${esc(m.course_code)} · ${esc(fmtSize(m.file_size))} · ${esc(m.file_name)}</div>
+      </div>
+      ${items.map(i => `
+        <button class="sheet__item ${i.danger ? 'sheet__item--danger' : ''}"
+                data-sheet-action="${esc(i.action)}" data-sheet-id="${esc(i.id)}" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${i.icon}</svg>
+          <span>${esc(i.label)}</span>
+        </button>
+      `).join('')}
+    `);
   }
 
-  // ---------- Search ----------
-  $('search').addEventListener('input', (e) => {
-    search = e.target.value;
-    render();
-  });
-
-  // ---------- Actions ----------
   document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const action = btn.dataset.action;
-    const id = btn.dataset.id;
+    const item = e.target.closest('[data-sheet-action]');
+    if (!item) return;
+    const action = item.dataset.sheetAction;
+    const id = item.dataset.sheetId;
     const m = all.find(x => x.id === id);
     if (!m) return;
+    item.disabled = true;
 
     if (action === 'download') {
-      btn.disabled = true;
       try {
-        const { data, error } = await supabase
-          .storage.from('materials')
+        const { data, error } = await supabase.storage.from('materials')
           .createSignedUrl(m.storage_path, 60, { download: m.file_name });
         if (error) throw error;
         const a = document.createElement('a');
-        a.href = data.signedUrl;
-        a.download = m.file_name;
-        a.rel = 'noopener';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        // Optimistic counter
+        a.href = data.signedUrl; a.download = m.file_name; a.rel = 'noopener';
+        document.body.appendChild(a); a.click(); a.remove();
         supabase.from('materials').update({ downloads: (m.downloads || 0) + 1 }).eq('id', id).then(() => {});
+        closeSheet();
       } catch (err) {
         toast(err.message || 'Download failed', 'error');
-      } finally {
-        btn.disabled = false;
+        item.disabled = false;
       }
       return;
     }
 
     if (action === 'edit') {
+      closeSheet();
       editingId = id;
-      $('modal-title').textContent = 'Edit material';
-      $('modal-sub').textContent = 'Update the title, course, or description.';
-      $('m-course').value = m.course_code || '';
-      $('m-title').value = m.title || '';
-      $('m-desc').value = m.description || '';
-      $('btn-submit').textContent = 'Save changes';
-      $('file-field').hidden = true;
-      $('modal-alert').removeAttribute('data-show');
-      $('modal').setAttribute('data-open', '1');
-      $('modal').setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+      openUploadModal();
+      // Prefill
+      setTimeout(() => {
+        $('m-course').value = m.course_code || '';
+        $('m-title').value = m.title || '';
+        $('m-desc').value = m.description || '';
+        $('m-modal-title').textContent = 'Edit material';
+        $('m-submit').textContent = 'Save changes';
+        $('m-file-field').hidden = true;
+      }, 40);
       return;
     }
 
     if (action === 'delete') {
+      closeSheet();
       if (!confirm(`Delete "${m.title}"? This cannot be undone.`)) return;
       try {
         await supabase.storage.from('materials').remove([m.storage_path]).catch(() => {});
@@ -647,22 +503,121 @@
     }
   });
 
-  // ---------- Modal: open / close ----------
-  function openUpload() {
-    editingId = null;
-    selectedFile = null;
-    $('modal-title').textContent = 'Upload material';
-    $('modal-sub').textContent = 'Share a resource with your institution.';
-    $('btn-submit').textContent = 'Upload';
-    $('form-mat').reset();
-    $('file-meta').hidden = true;
-    $('file-field').hidden = false;
-    $('modal-alert').removeAttribute('data-show');
+  // ---- Upload modal ----
+  function openUploadModal() {
+    $('modal-body').innerHTML = `
+      <h2 id="m-modal-title">Upload material</h2>
+      <p class="sub">Share a resource with your institution.</p>
+      <div class="modal-alert modal-alert--error" id="m-alert"></div>
+      <form id="m-form">
+        <div class="field" id="m-file-field">
+          <label>File</label>
+          <div class="drop" id="m-drop" role="button" tabindex="0">
+            <div class="drop__icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+            </div>
+            <div class="drop__title">Choose a file</div>
+            <div class="drop__hint">PDF, Word, PowerPoint, ZIP, or text · up to 50 MB</div>
+          </div>
+          <input type="file" id="m-file-input" hidden accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.txt">
+          <div id="m-file-meta" hidden>
+            <div class="drop__file">
+              <div class="mat__icon" id="m-file-icon"></div>
+              <div class="drop__file-meta">
+                <div class="drop__file-name" id="m-file-name">—</div>
+                <div class="drop__file-size" id="m-file-size">—</div>
+              </div>
+              <button type="button" class="drop__remove" id="m-remove"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="m-course">Course code</label>
+          <input type="text" id="m-course" required maxlength="20" placeholder="e.g. CSC 301" autocapitalize="characters">
+        </div>
+        <div class="field">
+          <label for="m-title">Title</label>
+          <input type="text" id="m-title" required maxlength="150" placeholder="e.g. Lecture 5 — Binary Trees">
+        </div>
+        <div class="field">
+          <label for="m-desc">Description <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
+          <textarea id="m-desc" maxlength="500" placeholder="A short note about what this covers…"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="m-cancel">Cancel</button>
+          <button type="submit" class="btn-primary" id="m-submit">Upload</button>
+        </div>
+      </form>
+    `;
     $('modal').setAttribute('data-open', '1');
     $('modal').setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    setTimeout(() => $('drop').focus(), 50);
+
+    $('m-cancel').addEventListener('click', closeModal);
+    $('m-drop').addEventListener('click', () => $('m-file-input').click());
+    $('m-file-input').addEventListener('change', (e) => setFile(e.target.files?.[0]));
+    $('m-remove').addEventListener('click', () => {
+      selectedFile = null;
+      $('m-file-input').value = '';
+      $('m-file-meta').hidden = true;
+    });
+
+    $('m-form').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const btn = $('m-submit');
+      const alertEl = $('m-alert');
+      alertEl.removeAttribute('data-show');
+      const course = $('m-course').value.trim().toUpperCase();
+      const title = $('m-title').value.trim();
+      const desc = $('m-desc').value.trim();
+      if (!course || !title) { alertEl.textContent = 'Course and title are required.'; alertEl.setAttribute('data-show','1'); return; }
+      btn.disabled = true; btn.textContent = editingId ? 'Saving…' : 'Uploading…';
+      try {
+        if (editingId) {
+          const { error } = await supabase.from('materials')
+            .update({ course_code: course, title, description: desc || null }).eq('id', editingId);
+          if (error) throw error;
+          toast('Updated.');
+        } else {
+          if (!selectedFile) throw new Error('Pick a file to upload.');
+          if (!me.institution_id) throw new Error('No institution.');
+          if (selectedFile.size > 50 * 1024 * 1024) throw new Error('File exceeds 50 MB.');
+          const ext = (selectedFile.name.match(/\.[^.]+$/) || [''])[0].toLowerCase();
+          const rand = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36));
+          const path = `${me.institution_id}/${rand}${ext}`;
+          const { error: upErr } = await supabase.storage.from('materials').upload(path, selectedFile, { contentType: selectedFile.type || 'application/octet-stream' });
+          if (upErr) throw upErr;
+          const { error: dbErr } = await supabase.from('materials').insert({
+            institution_id: me.institution_id, uploader_id: meId, course_code: course, title,
+            description: desc || null, storage_path: path, file_name: selectedFile.name,
+            file_size: selectedFile.size, file_type: selectedFile.type || 'application/octet-stream',
+          });
+          if (dbErr) { await supabase.storage.from('materials').remove([path]).catch(() => {}); throw dbErr; }
+          toast('Uploaded.');
+        }
+        editingId = null;
+        closeModal();
+        await load();
+      } catch (err) {
+        alertEl.textContent = err.message || 'Something went wrong.';
+        alertEl.setAttribute('data-show', '1');
+      } finally {
+        btn.disabled = false; btn.textContent = editingId ? 'Save changes' : 'Upload';
+      }
+    });
   }
+
+  function setFile(file) {
+    if (!file) return;
+    selectedFile = file;
+    const kind = fileKind(file.type, file.name);
+    $('m-file-icon').innerHTML = iconSvg(kind);
+    $('m-file-icon').setAttribute('data-kind', kind);
+    $('m-file-name').textContent = file.name;
+    $('m-file-size').textContent = fmtSize(file.size);
+    $('m-file-meta').hidden = false;
+  }
+
   function closeModal() {
     $('modal').removeAttribute('data-open');
     $('modal').setAttribute('aria-hidden', 'true');
@@ -670,121 +625,14 @@
     editingId = null;
     selectedFile = null;
   }
-
-  $('btn-upload').addEventListener('click', openUpload);
-  $('btn-cancel').addEventListener('click', closeModal);
   $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal(); });
 
-  // ---------- File picker ----------
-  $('drop').addEventListener('click', () => $('file-input').click());
-  $('drop').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file-input').click(); }
-  });
-  $('drop').addEventListener('dragover', (e) => { e.preventDefault(); $('drop').setAttribute('data-drag','1'); });
-  $('drop').addEventListener('dragleave', () => $('drop').removeAttribute('data-drag'));
-  $('drop').addEventListener('drop', (e) => {
-    e.preventDefault();
-    $('drop').removeAttribute('data-drag');
-    const f = e.dataTransfer?.files?.[0];
-    if (f) setFile(f);
-  });
-  $('file-input').addEventListener('change', (e) => setFile(e.target.files?.[0]));
-  $('btn-remove-file').addEventListener('click', () => {
-    selectedFile = null;
-    $('file-input').value = '';
-    $('file-meta').hidden = true;
-  });
+  $('btn-upload').addEventListener('click', () => { editingId = null; openUploadModal(); });
 
-  function setFile(file) {
-    if (!file) return;
-    selectedFile = file;
-    const kind = fileKind(file.type, file.name);
-    $('file-icon').innerHTML = iconSvg(kind);
-    $('file-icon').setAttribute('data-kind', kind);
-    $('file-name').textContent = file.name;
-    $('file-size').textContent = fmtSize(file.size);
-    $('file-meta').hidden = false;
-  }
+  const params = new URLSearchParams(location.search);
+  const initCourse = params.get('course');
+  if (initCourse) activeCourse = initCourse;
 
-  // ---------- Submit ----------
-  $('form-mat').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const alertEl = $('modal-alert');
-    const btn = $('btn-submit');
-    alertEl.removeAttribute('data-show');
-
-    const course = $('m-course').value.trim().toUpperCase();
-    const title = $('m-title').value.trim();
-    const desc = $('m-desc').value.trim();
-
-    if (!course) { alertEl.textContent = 'Course code is required.'; alertEl.setAttribute('data-show', '1'); return; }
-    if (!title)  { alertEl.textContent = 'Title is required.'; alertEl.setAttribute('data-show', '1'); return; }
-
-    btn.disabled = true;
-    btn.textContent = editingId ? 'Saving…' : 'Uploading…';
-
-    try {
-      if (editingId) {
-        const { error } = await supabase
-          .from('materials')
-          .update({ course_code: course, title, description: desc || null })
-          .eq('id', editingId);
-        if (error) throw error;
-        toast('Updated.');
-      } else {
-        if (!selectedFile) { alertEl.textContent = 'Pick a file to upload.'; alertEl.setAttribute('data-show', '1'); btn.disabled = false; btn.textContent = 'Upload'; return; }
-        if (!meProfile.institution_id) throw new Error('Your account is not attached to an institution.');
-        if (selectedFile.size > 50 * 1024 * 1024) throw new Error('File is too large. Maximum 50 MB.');
-
-        const ext = (selectedFile.name.match(/\.[^.]+$/) || [''])[0].toLowerCase();
-        const rand = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36));
-        const path = `${meProfile.institution_id}/${rand}${ext}`;
-
-        const { error: upErr } = await supabase.storage.from('materials').upload(path, selectedFile, {
-          contentType: selectedFile.type || 'application/octet-stream',
-          upsert: false,
-        });
-        if (upErr) throw new Error('Upload failed: ' + upErr.message);
-
-        const { error: dbErr } = await supabase.from('materials').insert({
-          institution_id: meProfile.institution_id,
-          uploader_id: meId,
-          course_code: course,
-          title,
-          description: desc || null,
-          storage_path: path,
-          file_name: selectedFile.name,
-          file_size: selectedFile.size,
-          file_type: selectedFile.type || 'application/octet-stream',
-        });
-
-        if (dbErr) {
-          await supabase.storage.from('materials').remove([path]).catch(() => {});
-          throw new Error('Save failed: ' + dbErr.message);
-        }
-        toast('Uploaded.');
-      }
-      closeModal();
-      await load();
-    } catch (err) {
-      alertEl.textContent = err.message || 'Something went wrong.';
-      alertEl.setAttribute('data-show', '1');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = editingId ? 'Save changes' : 'Upload';
-    }
-  });
-
-  // ---------- Realtime ----------
-  supabase
-    .channel('materials-live')
-    .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'materials' },
-        () => load())
-    .subscribe();
-
-  // ---------- Boot ----------
   await load();
 </script>
 
