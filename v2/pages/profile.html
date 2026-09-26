@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">
 <link rel="stylesheet" href="../css/nav.css">
+<link rel="stylesheet" href="../css/drawer.css">
 <link rel="stylesheet" href="../css/notifications.css">
 <style>
   .topbar {
@@ -450,18 +451,6 @@
       <div class="section__body" id="f-social"></div>
     </section>
 
-    <!-- Sign out -->
-    <div class="danger-zone">
-      <button class="btn-danger" id="btn-signout">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <path d="M16 17l5-5-5-5"/>
-          <path d="M21 12H9"/>
-        </svg>
-        Sign out of Matric
-      </button>
-    </div>
-
   </div>
 
 </main>
@@ -847,10 +836,7 @@
   });
 
   // -------- Sign out --------
-  $('btn-signout').addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    location.replace('login.html');
-  });
+  // Sign out lives in the drawer (bottom-nav.js).
 
   // -------- Presence heartbeat --------
   function heartbeat() {
