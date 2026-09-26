@@ -515,9 +515,14 @@
         ${sectionHead('My courses', 'groups.html', 'View all')}
         <div id="my-courses"><div class="skel" style="height:60px;"></div><div class="skel" style="height:60px;"></div></div>
       </section>
+
+      <section class="section">
+        ${sectionHead('Recent materials', 'materials.html', 'View all')}
+        <div id="recent-materials"><div class="skel"></div></div>
+      </section>
     `;
     $('content').innerHTML = html;
-    await Promise.all([loadStudentStats(), loadStudentActivity(), loadStudentCourses(), loadStudentUpNext()]);
+    await Promise.all([loadStudentStats(), loadStudentActivity(), loadStudentCourses(), loadStudentUpNext(), loadRecentMaterials()]);
   }
 
   async function loadStudentStats() {
@@ -640,9 +645,14 @@
         ${sectionHead('My courses', 'materials.html', 'View all')}
         <div id="my-courses"><div class="skel" style="height:60px;"></div><div class="skel" style="height:60px;"></div></div>
       </section>
+
+      <section class="section">
+        ${sectionHead('Recent materials', 'materials.html', 'View all')}
+        <div id="recent-materials"><div class="skel"></div></div>
+      </section>
     `;
     $('content').innerHTML = html;
-    await Promise.all([loadLecturerStats(), loadLecturerCourses(), loadLecturerAttention()]);
+    await Promise.all([loadLecturerStats(), loadLecturerCourses(), loadLecturerAttention(), loadRecentMaterials()]);
   }
 
   async function loadLecturerStats() {
@@ -1096,6 +1106,51 @@
     } catch (err) {
       console.error('[dashboard] loadLecturerAttention:', err);
       body.innerHTML = emptyInline('Could not load submissions.');
+    }
+  }
+
+
+  // ---------- Recent materials (shared) ----------
+  async function loadRecentMaterials() {
+    const body = document.getElementById('recent-materials');
+    if (!body) return;
+    try {
+      const { data, error } = await supabase
+        .from('materials')
+        .select('id, title, course_code, file_type, file_name, created_at, downloads')
+        .order('created_at', { ascending: false })
+        .limit(4);
+
+      if (error) { body.innerHTML = emptyInline('Could not load materials.'); return; }
+      if (!data || !data.length) { body.innerHTML = emptyInline('No materials uploaded yet.'); return; }
+
+      const kindFor = (m) => {
+        const s = ((m.file_type || '') + ' ' + (m.file_name || '')).toLowerCase();
+        if (s.includes('pdf')) return 'pdf';
+        if (s.includes('word') || /docx?/.test(s)) return 'doc';
+        if (s.includes('presentation') || /pptx?/.test(s)) return 'ppt';
+        if (s.includes('zip')) return 'zip';
+        if (s.includes('text') || /\.txt$/.test(s)) return 'txt';
+        return 'file';
+      };
+      const iconPath = (k) => {
+        const doc = '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>';
+        return doc;
+      };
+
+      body.innerHTML = '<div class="list">' + data.map(m => `
+        <a class="row" href="materials.html">
+          <span class="row__icn">${svg(iconPath(kindFor(m)), 18)}</span>
+          <div class="row__body">
+            <div class="row__title">${esc(m.title)} <span class="course-chip">${esc(m.course_code || '')}</span></div>
+            <div class="row__sub">${timeAgo(m.created_at)} · ${m.downloads || 0} download${(m.downloads || 0) === 1 ? '' : 's'}</div>
+          </div>
+          <span class="row__meta" style="color:var(--text-subtle);">›</span>
+        </a>
+      `).join('') + '</div>';
+    } catch (err) {
+      console.error('[dashboard] loadRecentMaterials:', err);
+      body.innerHTML = emptyInline('Could not load materials.');
     }
   }
 
