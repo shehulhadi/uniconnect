@@ -71,6 +71,7 @@ function ensureRolePicker(selected) {
 }
 
 let chosenRole = 'student';
+let chosenCourseIds = new Set();
 
 function setRole(role) {
   chosenRole = role;
@@ -81,14 +82,64 @@ function setRole(role) {
     b.style.boxShadow = on ? '0 1px 2px rgba(0,0,0,0.04)' : 'none';
     b.setAttribute('aria-pressed', String(on));
   });
-  // Hide programme and level for lecturers
-  const progField = $('sel-programme')?.closest('.field');
+  const progField  = $('sel-programme')?.closest('.field');
   const levelField = $('sel-level')?.closest('.field');
-  if (progField)  progField.hidden  = (role === 'lecturer');
-  if (levelField) levelField.hidden = (role === 'lecturer');
+  const courseField = $('course-picker-field');
+  if (progField)   progField.hidden   = (role === 'lecturer');
+  if (levelField)  levelField.hidden  = (role === 'lecturer');
+  if (courseField) courseField.hidden = (role !== 'lecturer');
+  if (role !== 'lecturer') chosenCourseIds.clear();
+  refreshCoursePicker();
 }
 
 // =====================================================================
+
+// ---------------- Course picker ----------------
+let departmentCourses = [];
+
+function refreshCoursePicker() {
+  const wrap = document.getElementById('course-picker');
+  if (!wrap) return;
+
+  if (chosenRole !== 'lecturer') {
+    wrap.innerHTML = '<div class="course-picker__empty">Select a department first</div>';
+    return;
+  }
+  if (!departmentCourses.length) {
+    wrap.innerHTML = '<div class="course-picker__empty">No courses in this department yet</div>';
+    return;
+  }
+
+  wrap.innerHTML = departmentCourses.map(c => {
+    const checked = chosenCourseIds.has(c.id);
+    return `
+      <button class="course-picker__item" data-course-id="${c.id}" ${checked ? 'data-checked' : ''} type="button">
+        <span class="course-picker__check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        <span class="course-picker__body">
+          <span class="course-picker__code">${c.code}</span>
+          <span class="course-picker__title">${c.title}</span>
+        </span>
+      </button>`;
+  }).join('');
+
+  wrap.querySelectorAll('.course-picker__item').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.courseId;
+      if (chosenCourseIds.has(id)) {
+        chosenCourseIds.delete(id);
+        el.removeAttribute('data-checked');
+      } else {
+        chosenCourseIds.add(id);
+        el.setAttribute('data-checked', '');
+      }
+      // Trigger the outer refreshContinue via a custom event
+      document.dispatchEvent(new CustomEvent('course-selection-changed'));
+    });
+  });
+}
+
 export async function run() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) { location.replace('login.html'); return; }
@@ -220,8 +271,12 @@ export async function run() {
       const base = selFaculty.value && selDept.value && selSession.value;
       const needsProgLvl = (chosenRole === 'student');
       const extra = needsProgLvl ? (selProg.value && selLevel.value) : true;
-      btnCont.disabled = !(base && extra);
+      const coursesOk = (chosenRole !== 'lecturer') || (chosenCourseIds.size > 0);
+      btnCont.disabled = !(base && extra && coursesOk);
     }
+
+    // Respond to picker changes
+    document.addEventListener('course-selection-changed', refreshContinue);
 
     const { data: fac, error: facErr } = await supabase
       .from('faculties').select('id, name').eq('institution_id', instId).order('name');
@@ -243,6 +298,23 @@ export async function run() {
       fillSelect(selDept, data || [], 'id', 'name', 'Select a department', preselect);
       selDept.disabled = false;
       refreshContinue();
+      // Reset courses until a department is chosen
+      departmentCourses = [];
+      chosenCourseIds.clear();
+      if (selDept.value) await loadCoursesForDepartment(selDept.value);
+      refreshCoursePicker();
+    }
+
+    async function loadCoursesForDepartment(deptId) {
+      departmentCourses = [];
+      if (!deptId) { refreshCoursePicker(); return; }
+      const { data } = await supabase
+        .from('courses')
+        .select('id, code, title')
+        .eq('department_id', deptId)
+        .order('code');
+      departmentCourses = data || [];
+      refreshCoursePicker();
     }
 
     async function loadProgrammes(deptId, preselect) {
@@ -306,6 +378,7 @@ export async function run() {
     btnCont.addEventListener('click', async () => {
       if (btnCont.disabled) return;
       btnCont.disabled = true; btnCont.textContent = 'Saving…';
+      const courseIds = chosenRole === 'lecturer' ? Array.from(chosenCourseIds) : null;
       const { error: upErr } = await supabase.rpc('onboarding_set_academic', {
         p_role:          chosenRole,
         p_faculty_id:    selFaculty.value,
@@ -313,6 +386,7 @@ export async function run() {
         p_programme_id:  chosenRole === 'student' ? selProg.value : null,
         p_level_id:      chosenRole === 'student' ? selLevel.value : null,
         p_session_id:    selSession.value,
+        p_course_ids:    courseIds,
       });
       if (upErr) {
         btnCont.disabled = false; btnCont.textContent = 'Continue';
