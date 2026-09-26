@@ -95,22 +95,63 @@ function setRole(role) {
 // =====================================================================
 
 // ---------------- Course picker ----------------
-let departmentCourses = [];
+let allCourses = [];
+let allCoursesLoaded = false;
+
+async function loadAllCourses() {
+  if (allCoursesLoaded) return;
+  try {
+    const { data, error } = await supabase
+      .from('courses')
+      .select('id, code, title, department_id')
+      .order('code');
+    if (error) {
+      console.error('[picker] could not load courses:', error.message);
+    } else {
+      allCourses = data || [];
+      console.log('[picker] loaded', allCourses.length, 'courses total');
+    }
+  } catch (err) {
+    console.error('[picker] exception loading courses:', err);
+  }
+  allCoursesLoaded = true;
+  refreshCoursePicker();
+}
 
 function refreshCoursePicker() {
   const wrap = document.getElementById('course-picker');
-  if (!wrap) return;
+  if (!wrap) {
+    console.log('[picker] no #course-picker in DOM');
+    return;
+  }
 
   if (chosenRole !== 'lecturer') {
     wrap.innerHTML = '<div class="course-picker__empty">Select a department first</div>';
     return;
   }
-  if (!departmentCourses.length) {
-    wrap.innerHTML = '<div class="course-picker__empty">No courses in this department yet</div>';
+
+  const deptSelect = document.getElementById('sel-department');
+  const deptId = deptSelect ? deptSelect.value : '';
+  console.log('[picker] role=lecturer, deptId=', deptId, 'total courses=', allCourses.length);
+
+  if (!deptId) {
+    wrap.innerHTML = '<div class="course-picker__empty">Select a department first</div>';
     return;
   }
 
-  wrap.innerHTML = departmentCourses.map(c => {
+  const filtered = allCourses.filter(c => c.department_id === deptId);
+  console.log('[picker] matched', filtered.length, 'courses in dept', deptId);
+
+  if (!filtered.length) {
+    if (!allCoursesLoaded) {
+      wrap.innerHTML = '<div class="course-picker__empty">Loading courses…</div>';
+    } else {
+      wrap.innerHTML = '<div class="course-picker__empty">No courses in this department yet</div>';
+    }
+    return;
+  }
+
+  wrap.innerHTML = filtered.map(c => {
     const checked = chosenCourseIds.has(c.id);
     return `
       <button class="course-picker__item" data-course-id="${c.id}" ${checked ? 'data-checked' : ''} type="button">
@@ -134,188 +175,10 @@ function refreshCoursePicker() {
         chosenCourseIds.add(id);
         el.setAttribute('data-checked', '');
       }
-      // Trigger the outer refreshContinue via a custom event
       document.dispatchEvent(new CustomEvent('course-selection-changed'));
     });
   });
 }
-
-export async function run() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) { location.replace('login.html'); return; }
-  const meId = session.user.id;
-
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('id, email, full_name, role, registration_step, verification_status, institution_id, faculty_id, department_id, programme_id, level_id, session_id, matric_no, staff_no')
-    .eq('id', meId)
-    .single();
-
-  if (error) { fail('Could not load your account: ' + error.message); return; }
-  if (profile.registration_step === 'complete') { location.replace('dashboard.html'); return; }
-
-  const current = stepIndex(profile.registration_step);
-
-  $('state-loading').hidden = true;
-  $('wizard').hidden = false;
-  renderStepper(current);
-  showPanel(current);
-  $('step-label').textContent = `Step ${current + 1} of ${STEPS.length}`;
-  $('step-title').textContent = STEPS[current].title;
-  $('step-sub').textContent   = STEPS[current].sub;
-
-  // ---------------- Panel 1: Account ----------------
-  if (current === 0) {
-    $('p-email').textContent = profile.email;
-    $('p-account-hint').textContent = 'Your account is active. You can continue to the next step.';
-    $('btn-account-continue').addEventListener('click', async () => {
-      const btn = $('btn-account-continue');
-      btn.disabled = true; btn.textContent = 'Saving…';
-      const { error: upErr } = await supabase
-        .from('profiles').update({ registration_step: 'institution' }).eq('id', meId);
-      if (upErr) {
-        btn.disabled = false; btn.textContent = 'Continue';
-        $('alert').textContent = upErr.message; $('alert').setAttribute('data-show', '1'); return;
-      }
-      location.reload();
-    });
-  }
-
-  // ---------------- Panel 2: Institution ----------------
-  if (current === 1) {
-    let institutions = [];
-    let selectedId = profile.institution_id || null;
-
-    function renderInstitutions(filter) {
-      const q = (filter || '').trim().toLowerCase();
-      const filtered = !q ? institutions : institutions.filter(i =>
-        (i.name || '').toLowerCase().includes(q) || (i.domain || '').toLowerCase().includes(q));
-      const el = $('inst-list'); if (!el) return;
-      if (filtered.length === 0) {
-        el.innerHTML = '<div class="inst-loading">No institutions match that search.</div>'; return;
-      }
-      el.innerHTML = filtered.map(i => {
-        const initials = (i.name || '?').split(/[\s,]+/).filter(Boolean).slice(0,2).map(s => s[0]).join('').toUpperCase();
-        const meta = i.domain || i.slug || '';
-        const sel = i.id === selectedId ? ' data-selected="1"' : '';
-        return `<button class="inst-card" data-id="${i.id}"${sel} type="button">
-          <div class="inst-card__icon">${initials}</div>
-          <div class="inst-card__body">
-            <div class="inst-card__name">${i.name}</div>
-            ${meta ? `<div class="inst-card__meta">${meta}</div>` : ''}
-          </div>
-        </button>`;
-      }).join('');
-    }
-
-    const { data: list, error: listErr } = await supabase
-      .from('institutions').select('id, name, slug, domain').order('name');
-    if (listErr) {
-      $('inst-list').innerHTML = `<div class="inst-loading" style="color:var(--danger);">${listErr.message}</div>`;
-    } else {
-      institutions = list || []; renderInstitutions('');
-    }
-    if (selectedId) $('btn-inst-continue').disabled = false;
-    $('inst-search').addEventListener('input', (e) => renderInstitutions(e.target.value));
-    $('inst-list').addEventListener('click', (e) => {
-      const card = e.target.closest('.inst-card'); if (!card) return;
-      selectedId = card.dataset.id;
-      document.querySelectorAll('.inst-card').forEach(el => el.removeAttribute('data-selected'));
-      card.setAttribute('data-selected', '1');
-      $('btn-inst-continue').disabled = false;
-    });
-    $('btn-inst-back').addEventListener('click', async () => {
-      await supabase.from('profiles').update({ registration_step: 'account' }).eq('id', meId);
-      location.reload();
-    });
-    $('btn-inst-continue').addEventListener('click', async () => {
-      if (!selectedId) return;
-      const btn = $('btn-inst-continue');
-      btn.disabled = true; btn.textContent = 'Saving…';
-      const { error: upErr } = await supabase.rpc('onboarding_set_institution', { p_institution_id: selectedId });
-      if (upErr) {
-        btn.disabled = false; btn.textContent = 'Continue';
-        $('alert').textContent = upErr.message; $('alert').setAttribute('data-show', '1'); return;
-      }
-      location.reload();
-    });
-  }
-
-  // ---------------- Panel 3: Academic (with role picker) ----------------
-  if (current === 2) {
-    const selFaculty = $('sel-faculty');
-    const selDept    = $('sel-department');
-    const selProg    = $('sel-programme');
-    const selLevel   = $('sel-level');
-    const selSession = $('sel-session');
-    const btnCont    = $('btn-acad-continue');
-
-    const instId = profile.institution_id;
-    if (!instId) { fail('Institution is not set.'); return; }
-
-    // Role picker at top
-    const startRole = (profile.role === 'lecturer') ? 'lecturer' : 'student';
-    ensureRolePicker(startRole);
-    document.querySelectorAll('#role-choice button').forEach(b => {
-      b.addEventListener('click', () => { setRole(b.dataset.role); refreshContinue(); });
-    });
-
-    function fillSelect(select, items, vKey, lKey, placeholder, selected) {
-      select.innerHTML = ['<option value="">' + placeholder + '</option>']
-        .concat(items.map(i => {
-          const sel = (selected && selected === i[vKey]) ? ' selected' : '';
-          return `<option value="${i[vKey]}"${sel}>${i[lKey]}</option>`;
-        })).join('');
-    }
-    function refreshContinue() {
-      const base = selFaculty.value && selDept.value && selSession.value;
-      const needsProgLvl = (chosenRole === 'student');
-      const extra = needsProgLvl ? (selProg.value && selLevel.value) : true;
-      const coursesOk = (chosenRole !== 'lecturer') || (chosenCourseIds.size > 0);
-      btnCont.disabled = !(base && extra && coursesOk);
-    }
-
-    // Respond to picker changes
-    document.addEventListener('course-selection-changed', refreshContinue);
-
-    const { data: fac, error: facErr } = await supabase
-      .from('faculties').select('id, name').eq('institution_id', instId).order('name');
-    if (facErr) { fail('Could not load faculties: ' + facErr.message); return; }
-    fillSelect(selFaculty, fac || [], 'id', 'name', 'Select a faculty', profile.faculty_id);
-
-    async function loadDepartments(facultyId, preselect) {
-      selDept.disabled = true;
-      selDept.innerHTML = '<option value="">Loading…</option>';
-      selProg.disabled = true;
-      selProg.innerHTML = '<option value="">Select a department first</option>';
-      if (!facultyId) {
-        selDept.innerHTML = '<option value="">Select a faculty first</option>';
-        refreshContinue(); return;
-      }
-      const { data, error } = await supabase
-        .from('departments').select('id, name').eq('faculty_id', facultyId).order('name');
-      if (error) { selDept.innerHTML = '<option value="">Could not load</option>'; refreshContinue(); return; }
-      fillSelect(selDept, data || [], 'id', 'name', 'Select a department', preselect);
-      selDept.disabled = false;
-      refreshContinue();
-      // Reset courses until a department is chosen
-      departmentCourses = [];
-      chosenCourseIds.clear();
-      if (selDept.value) await loadCoursesForDepartment(selDept.value);
-      refreshCoursePicker();
-    }
-
-    async function loadCoursesForDepartment(deptId) {
-      departmentCourses = [];
-      if (!deptId) { refreshCoursePicker(); return; }
-      const { data } = await supabase
-        .from('courses')
-        .select('id, code, title')
-        .eq('department_id', deptId)
-        .order('code');
-      departmentCourses = data || [];
-      refreshCoursePicker();
-    }
 
     async function loadProgrammes(deptId, preselect) {
       selProg.disabled = true;
@@ -363,6 +226,8 @@ export async function run() {
       await loadProgrammes(selDept.value, null); refreshContinue();
     });
     [selProg, selLevel, selSession].forEach(el => el.addEventListener('change', refreshContinue));
+
+    await loadAllCourses();
 
     if (profile.faculty_id) {
       await loadDepartments(profile.faculty_id, profile.department_id);
