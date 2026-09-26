@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Messages — Matric</title>
+<title>Connect — Matric</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">
 <link rel="stylesheet" href="../css/nav.css">
 <link rel="stylesheet" href="../css/drawer.css">
@@ -26,7 +26,7 @@
   .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-4) var(--space-4) var(--space-10); }
   @media (min-width: 640px) { .wrap { padding: var(--space-5) var(--space-6) var(--space-10); } }
 
-  /* Tabs */
+  /* ---------- Tabs ---------- */
   .tabs {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -35,18 +35,22 @@
     border-radius: var(--radius-md);
     padding: 3px;
     margin-bottom: var(--space-4);
+    position: sticky;
+    top: 56px;
+    z-index: 5;
   }
   .tab {
     appearance: none; border: none; background: transparent;
-    padding: 0.55rem 0.5rem;
-    font-size: var(--text-sm); font-weight: 500;
+    padding: 0.6rem 0.5rem;
+    font-size: var(--text-sm); font-weight: 600;
     color: var(--text-muted);
     border-radius: calc(var(--radius-md) - 3px);
     cursor: pointer;
     transition: all var(--duration-fast) var(--ease);
     display: flex; align-items: center; justify-content: center; gap: 6px;
-    min-height: 40px;
-    position: relative;
+    min-height: 42px; position: relative;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
   }
   .tab:hover { color: var(--text); }
   .tab[aria-selected="true"] { background: var(--bg-elevated); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
@@ -61,24 +65,16 @@
 
   .panel[hidden] { display: none; }
 
+  /* ---------- Shared UI ---------- */
   .search {
     width: 100%; padding: 0.7rem 0.9rem;
     background: var(--bg-elevated); border: 1px solid var(--border);
     border-radius: var(--radius-md); font-size: var(--text-sm);
-    color: var(--text); margin-bottom: var(--space-4);
+    color: var(--text); margin-bottom: var(--space-3);
     min-height: 44px;
     transition: border-color var(--duration-fast) var(--ease);
   }
   .search:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent); }
-
-  .section-label {
-    font-size: var(--text-xs); font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--text-subtle);
-    margin-bottom: var(--space-2); margin-top: var(--space-4);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .section-label:first-child { margin-top: 0; }
 
   .list { display: flex; flex-direction: column; gap: 2px; }
 
@@ -115,11 +111,35 @@
   .avatar__dot[data-status="away"]   { background: var(--warning); }
   .avatar__dot[data-status="busy"]   { background: var(--danger); }
 
+  .badge-icon {
+    width: 44px; height: 44px; border-radius: var(--radius-md);
+    background: var(--brand-subtle); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .badge-icon svg { width: 20px; height: 20px; }
+  .badge-icon--inst { background: #e0e7ff; color: #3730a3; }
+  .badge-icon--fac  { background: #dbeafe; color: #1e40af; }
+  .badge-icon--dept { background: #dcfce7; color: #166534; }
+  .badge-icon--prog { background: #fef3c7; color: #92400e; }
+  .badge-icon--lvl  { background: #fee2e2; color: #991b1b; }
+  .badge-icon--cour { background: #ede9fe; color: #5b21b6; }
+  .badge-icon--int  { background: var(--bg-sunken); color: var(--text-muted); }
+  @media (prefers-color-scheme: dark) {
+    .badge-icon--inst { background: #1e1b4b; color: #a5b4fc; }
+    .badge-icon--fac  { background: #172554; color: #93c5fd; }
+    .badge-icon--dept { background: #052e16; color: #86efac; }
+    .badge-icon--prog { background: #451a03; color: #fcd34d; }
+    .badge-icon--lvl  { background: #450a0a; color: #fca5a5; }
+    .badge-icon--cour { background: #2e1065; color: #c4b5fd; }
+  }
+
   .row__body { flex: 1; min-width: 0; }
   .row__name {
     font-size: var(--text-sm); font-weight: 500;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     display: flex; align-items: center; gap: 6px;
+    margin-bottom: 2px;
   }
   .row__name .role-chip {
     font-size: 0.5625rem; font-weight: 700;
@@ -130,7 +150,6 @@
   .row__sub {
     font-size: var(--text-xs); color: var(--text-muted);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    margin-top: 2px;
   }
 
   .row__action { flex-shrink: 0; display: flex; gap: 6px; align-items: center; }
@@ -147,6 +166,7 @@
     transition: all var(--duration-fast) var(--ease);
     display: inline-flex; align-items: center; gap: 4px;
     white-space: nowrap;
+    font-family: inherit;
   }
   .btn-mini:hover:not(:disabled) { color: var(--text); border-color: var(--border-strong); }
   .btn-mini:disabled { opacity: 0.5; cursor: wait; }
@@ -155,12 +175,47 @@
   .btn-mini--danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
   .btn-mini--danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 10%, transparent); }
 
+  .section-label {
+    font-size: var(--text-xs); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-subtle);
+    margin: var(--space-4) 0 var(--space-2);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-label:first-child { margin-top: 0; }
+  .section-count {
+    font-size: 0.625rem; font-weight: 700;
+    background: var(--bg-sunken); color: var(--text-subtle);
+    padding: 2px 7px; border-radius: var(--radius-sm);
+  }
+
+  .chips {
+    display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px;
+    margin-bottom: var(--space-3); scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    appearance: none;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs); font-weight: 500;
+    cursor: pointer; flex-shrink: 0;
+    transition: all var(--duration-fast) var(--ease);
+    font-family: inherit;
+    min-height: 32px;
+    display: inline-flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--border-strong); color: var(--text); }
+  .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+
   .empty {
     padding: var(--space-8) var(--space-4);
-    text-align: center;
-    color: var(--text-muted);
-    font-size: var(--text-sm);
-    line-height: var(--leading-snug);
+    text-align: center; color: var(--text-muted);
+    font-size: var(--text-sm); line-height: var(--leading-snug);
   }
   .empty svg { color: var(--border-strong); margin-bottom: var(--space-3); }
   .empty h3 { font-size: var(--text-base); color: var(--text); margin-bottom: var(--space-2); font-weight: 600; }
@@ -183,50 +238,52 @@
   .toast[data-show] { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast[data-kind="error"] { background: var(--danger); color: white; }
 </style>
-  <!-- PWA -->
-  <link rel="manifest" href="../../manifest-v2.json">
-  <meta name="theme-color" content="#4f46e5">
-  <meta name="application-name" content="Matric">
-  <link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Matric">
-  <script src="../../v2/js/pwa.js" defer></script>
 </head>
 <body>
 
 <header class="topbar">
-  <div class="topbar__title">Messages</div>
+  <div class="topbar__title">Connect</div>
   <div class="topbar__right"></div>
 </header>
 
 <main class="wrap">
 
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" aria-selected="true" data-tab="chats">Chats</button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="friends">
-      Friends <span class="tab__badge" id="tab-badge-friends"></span>
+    <button class="tab" role="tab" aria-selected="true" data-tab="messages">
+      Messages <span class="tab__badge" id="badge-messages"></span>
     </button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="people">People</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="communities">Communities</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="people">
+      People <span class="tab__badge" id="badge-people"></span>
+    </button>
   </div>
 
   <div class="state" id="state-loading">Loading…</div>
   <div class="state state--error" id="state-error" hidden></div>
 
-  <!-- Chats -->
-  <section class="panel" id="panel-chats" hidden>
-    <div id="chats-body"></div>
+  <section class="panel" id="panel-messages" hidden>
+    <div id="messages-body"></div>
   </section>
 
-  <!-- Friends -->
-  <section class="panel" id="panel-friends" hidden>
-    <input type="search" class="search" id="friends-search" placeholder="Search friends…" autocomplete="off">
-    <div id="friends-body"></div>
+  <section class="panel" id="panel-communities" hidden>
+    <div class="chips" id="comm-filters">
+      <button class="chip" data-scope="mine" aria-pressed="true">My communities</button>
+      <button class="chip" data-scope="academic" aria-pressed="false">Academic</button>
+      <button class="chip" data-scope="courses" aria-pressed="false">Courses</button>
+      <button class="chip" data-scope="interest" aria-pressed="false">Interest</button>
+      <button class="chip" data-scope="discover" aria-pressed="false">Discover</button>
+    </div>
+    <div id="communities-body"></div>
   </section>
 
-  <!-- People -->
   <section class="panel" id="panel-people" hidden>
     <input type="search" class="search" id="people-search" placeholder="Search by name or email…" autocomplete="off">
+    <div class="chips" id="people-filters">
+      <button class="chip" data-role="all" aria-pressed="true">Everyone</button>
+      <button class="chip" data-role="student" aria-pressed="false">Students</button>
+      <button class="chip" data-role="lecturer" aria-pressed="false">Lecturers</button>
+      <button class="chip" data-role="staff" aria-pressed="false">Staff</button>
+    </div>
     <div id="people-body"></div>
   </section>
 
@@ -239,7 +296,7 @@
 
   const $ = (id) => document.getElementById(id);
   let meId = null;
-  let currentTab = 'chats';
+  let currentTab = 'messages';
 
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
@@ -267,11 +324,6 @@
     clearTimeout(toast._t);
     toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
   }
-  function showError(msg) {
-    $('state-loading').hidden = true;
-    $('state-error').hidden = false;
-    $('state-error').textContent = msg;
-  }
 
   // ------------------------------------------------------------------
   // Tab switching
@@ -285,26 +337,30 @@
     document.querySelectorAll('.tab').forEach(t =>
       t.setAttribute('aria-selected', String(t.dataset.tab === name))
     );
-    ['chats','friends','people'].forEach(k => {
+    ['messages','communities','people'].forEach(k => {
       const el = $(`panel-${k}`);
       if (el) el.hidden = k !== name;
     });
-    if (name === 'chats')   loadChats();
-    if (name === 'friends') loadFriends();
-    if (name === 'people')  loadPeople('');
+    if (name === 'messages')    loadMessages();
+    if (name === 'communities') loadCommunities();
+    if (name === 'people')      loadPeople();
   }
 
   // ------------------------------------------------------------------
-  // CHATS
+  // MESSAGES tab
   // ------------------------------------------------------------------
-  async function loadChats() {
-    const body = $('chats-body');
-    body.innerHTML = '<div class="state">Loading chats…</div>';
+  async function loadMessages() {
+    const body = $('messages-body');
+    body.innerHTML = '<div class="state">Loading conversations…</div>';
+
     const { data, error } = await supabase.rpc('dm_inbox');
-    if (error) {
-      body.innerHTML = `<div class="state state--error">${esc(error.message)}</div>`;
-      return;
-    }
+    if (error) { body.innerHTML = `<div class="state state--error">${esc(error.message)}</div>`; return; }
+
+    const unreadTotal = (data || []).reduce((s, t) => s + (t.unread || 0), 0);
+    const badge = $('badge-messages');
+    if (unreadTotal > 0) { badge.textContent = unreadTotal; badge.setAttribute('data-show', '1'); }
+    else badge.removeAttribute('data-show');
+
     if (!data || data.length === 0) {
       body.innerHTML = `
         <div class="empty">
@@ -312,7 +368,7 @@
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
           <h3>No conversations yet</h3>
-          <p>Open the <strong>Friends</strong> tab and start a chat with someone.</p>
+          <p>Open the <strong>People</strong> tab to start a chat with someone at your institution.</p>
         </div>`;
       return;
     }
@@ -337,193 +393,189 @@
   }
 
   // ------------------------------------------------------------------
-  // FRIENDS
+  // COMMUNITIES tab
   // ------------------------------------------------------------------
-  let friendsCache = { pendingIncoming: [], pendingOutgoing: [], friends: [] };
+  let communities = [];
+  let myCommIds = new Set();
+  let commScope = 'mine';
 
-  async function loadFriends() {
-    const body = $('friends-body');
-    body.innerHTML = '<div class="state">Loading…</div>';
-
-    const { data, error } = await supabase
-      .from('user_relationships')
-      .select(`
-        id, kind, created_at,
-        from_user_id, to_user_id,
-        from_profile:profiles!user_relationships_from_user_id_fkey ( id, full_name, email, avatar_url, role, status ),
-        to_profile:profiles!user_relationships_to_user_id_fkey ( id, full_name, email, avatar_url, role, status )
-      `)
-      .in('kind', ['friend_request','friend'])
-      .or(`from_user_id.eq.${meId},to_user_id.eq.${meId}`);
-
-    if (error) {
-      body.innerHTML = `<div class="state state--error">${esc(error.message)}</div>`;
-      return;
-    }
-
-    const pendingIncoming = [];
-    const pendingOutgoing = [];
-    const friends = [];
-
-    (data || []).forEach(row => {
-      if (row.kind === 'friend_request') {
-        if (row.to_user_id === meId) pendingIncoming.push({ id: row.id, user: row.from_profile, at: row.created_at });
-        else                          pendingOutgoing.push({ id: row.id, user: row.to_profile, at: row.created_at });
-      } else if (row.kind === 'friend') {
-        const other = row.from_user_id === meId ? row.to_profile : row.from_profile;
-        friends.push(other);
-      }
-    });
-
-    friendsCache = { pendingIncoming, pendingOutgoing, friends };
-
-    // Tab badge
-    const badge = $('tab-badge-friends');
-    if (pendingIncoming.length) {
-      badge.textContent = pendingIncoming.length;
-      badge.setAttribute('data-show', '1');
-    } else {
-      badge.removeAttribute('data-show');
-    }
-
-    renderFriends($('friends-search').value.trim().toLowerCase());
-  }
-
-  function renderFriends(q) {
-    const body = $('friends-body');
-    const { pendingIncoming, pendingOutgoing, friends } = friendsCache;
-    const filtered = !q ? friends : friends.filter(f =>
-      (f?.full_name || '').toLowerCase().includes(q) ||
-      (f?.email || '').toLowerCase().includes(q)
-    );
-
-    let html = '';
-
-    if (pendingIncoming.length) {
-      html += `<div class="section-label">Requests for you <span style="color:var(--danger)">${pendingIncoming.length}</span></div>`;
-      html += '<div class="list">' + pendingIncoming.map(p => rowForUser(p.user, {
-        actions: [
-          { label: 'Accept', kind: 'primary', action: 'accept', id: p.id },
-          { label: 'Decline', kind: 'danger', action: 'decline', id: p.id },
-        ],
-      })).join('') + '</div>';
-    }
-
-    if (pendingOutgoing.length) {
-      html += `<div class="section-label">Sent</div>`;
-      html += '<div class="list">' + pendingOutgoing.map(p => rowForUser(p.user, {
-        actions: [{ label: 'Cancel', kind: 'danger', action: 'cancel', id: p.id }],
-      })).join('') + '</div>';
-    }
-
-    html += `<div class="section-label">Friends <span style="color:var(--text-subtle)">${filtered.length}</span></div>`;
-    if (filtered.length === 0) {
-      html += `<div class="empty">
-        ${q ? 'No friends match that search.' : 'You haven\'t added any friends yet. Check the <strong>People</strong> tab.'}
-      </div>`;
-    } else {
-      html += '<div class="list">' + filtered.map(f => rowForUser(f, {
-        actions: [
-          { label: 'Message', kind: 'primary', action: 'message', id: f.id },
-          { label: 'Unfriend', kind: 'danger', action: 'unfriend', id: f.id },
-        ],
-      })).join('') + '</div>';
-    }
-
-    body.innerHTML = html;
-  }
-
-  $('friends-search').addEventListener('input', (e) => {
-    renderFriends(e.target.value.trim().toLowerCase());
+  $('comm-filters').addEventListener('click', (e) => {
+    const c = e.target.closest('.chip'); if (!c) return;
+    commScope = c.dataset.scope;
+    document.querySelectorAll('#comm-filters .chip').forEach(x =>
+      x.setAttribute('aria-pressed', String(x.dataset.scope === commScope)));
+    renderCommunities();
   });
 
-  function rowForUser(u, opts = {}) {
-    if (!u) return '';
-    const name = u.full_name || u.email || 'Unknown';
-    const sub = u.email || '';
-    const avatar = u.avatar_url
-      ? `<img src="${esc(u.avatar_url)}" alt="">`
-      : esc(initials(name));
-    const dot = u.status && u.status !== 'offline'
-      ? `<span class="avatar__dot" data-status="${esc(u.status)}"></span>` : '';
+  async function loadCommunities() {
+    const body = $('communities-body');
+    body.innerHTML = '<div class="state">Loading communities…</div>';
 
-    const actions = (opts.actions || []).map(a =>
-      `<button class="btn-mini ${a.kind === 'primary' ? 'btn-mini--primary' : a.kind === 'danger' ? 'btn-mini--danger' : ''}"
-              data-relation-action="${esc(a.action)}"
-              data-relation-id="${esc(a.id)}"
-              type="button">${esc(a.label)}</button>`
-    ).join('');
+    const [cRes, mRes] = await Promise.all([
+      supabase.from('communities')
+        .select('id, name, description, kind, membership_mode, created_at, community_members ( count )')
+        .order('name'),
+      supabase.from('community_members').select('community_id').eq('user_id', meId),
+    ]);
 
-    return `
-      <div class="row">
-        <div class="avatar">${avatar}${dot}</div>
-        <div class="row__body">
-          <div class="row__name">${esc(name)} <span class="role-chip">${esc(u.role || 'student')}</span></div>
-          <div class="row__sub">${esc(sub)}</div>
-        </div>
-        <div class="row__action">${actions}</div>
+    if (cRes.error) { body.innerHTML = `<div class="state state--error">${esc(cRes.error.message)}</div>`; return; }
+
+    communities = (cRes.data || []).map(c => ({
+      ...c,
+      member_count: Array.isArray(c.community_members) && c.community_members[0] ? c.community_members[0].count : 0,
+    }));
+    myCommIds = new Set((mRes.data || []).map(r => r.community_id));
+
+    renderCommunities();
+  }
+
+  function kindMeta(kind) {
+    switch (kind) {
+      case 'institution': return { cls: 'inst', label: 'Institution' };
+      case 'faculty':     return { cls: 'fac',  label: 'Faculty' };
+      case 'department':  return { cls: 'dept', label: 'Department' };
+      case 'programme':   return { cls: 'prog', label: 'Programme' };
+      case 'level':       return { cls: 'lvl',  label: 'Level' };
+      case 'course':      return { cls: 'cour', label: 'Course' };
+      default:            return { cls: 'int',  label: 'Interest' };
+    }
+  }
+  function kindIcon(kind) {
+    const base = (p, s) => `<svg viewBox="0 0 24 24" width="${s||20}" height="${s||20}" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+    switch (kind) {
+      case 'institution': return base('<path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>');
+      case 'faculty':     return base('<path d="M12 2L2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>');
+      case 'department':  return base('<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/>');
+      case 'programme':   return base('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>');
+      case 'level':       return base('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>');
+      case 'course':      return base('<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>');
+      default:            return base('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>');
+    }
+  }
+
+  function renderCommunities() {
+    const body = $('communities-body');
+
+    let items = communities.slice();
+    if (commScope === 'mine') {
+      items = items.filter(c => myCommIds.has(c.id));
+    } else if (commScope === 'academic') {
+      items = items.filter(c =>
+        myCommIds.has(c.id) &&
+        ['institution','faculty','department','programme','level'].includes(c.kind)
+      );
+    } else if (commScope === 'courses') {
+      items = items.filter(c => c.kind === 'course' && myCommIds.has(c.id));
+    } else if (commScope === 'interest') {
+      items = items.filter(c => c.kind === 'interest' && myCommIds.has(c.id));
+    } else if (commScope === 'discover') {
+      items = items.filter(c => !myCommIds.has(c.id) && c.membership_mode === 'open');
+    }
+
+    if (items.length === 0) {
+      body.innerHTML = `<div class="empty">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <h3>${commScope === 'discover' ? 'Nothing to discover' : 'No communities here'}</h3>
+        <p>${commScope === 'discover' ? 'You are in every community at your institution.' : 'Try another filter or discover new communities.'}</p>
       </div>`;
+      return;
+    }
+
+    body.innerHTML = '<div class="list">' + items.map(c => {
+      const meta = kindMeta(c.kind);
+      const isMine = myCommIds.has(c.id);
+      const canJoin = c.membership_mode === 'open' && !isMine;
+      const memberLabel = c.member_count === 1 ? '1 member' : `${c.member_count} members`;
+      const action = canJoin
+        ? `<button class="btn-mini btn-mini--primary" data-comm-action="join" data-id="${esc(c.id)}" type="button">Join</button>`
+        : (isMine ? `<span class="btn-mini" style="color:var(--text-subtle);cursor:default;">Member</span>` : '');
+
+      const clickable = isMine ? ` data-clickable data-id="${esc(c.id)}"` : '';
+      const sub = c.description ? esc(c.description) + ' · ' + memberLabel : meta.label + ' · ' + memberLabel;
+
+      return `
+        <button class="row" type="button"${clickable}>
+          <div class="badge-icon badge-icon--${meta.cls}">${kindIcon(c.kind)}</div>
+          <div class="row__body">
+            <div class="row__name">${esc(c.name)}</div>
+            <div class="row__sub">${sub}</div>
+          </div>
+          <div class="row__action">${action}</div>
+        </button>`;
+    }).join('') + '</div>';
   }
 
   // ------------------------------------------------------------------
-  // PEOPLE
+  // PEOPLE tab
   // ------------------------------------------------------------------
-  async function loadPeople(q) {
+  let people = [];
+  let peopleRole = 'all';
+
+  $('people-filters').addEventListener('click', (e) => {
+    const c = e.target.closest('.chip'); if (!c) return;
+    peopleRole = c.dataset.role;
+    document.querySelectorAll('#people-filters .chip').forEach(x =>
+      x.setAttribute('aria-pressed', String(x.dataset.role === peopleRole)));
+    renderPeople();
+  });
+
+  async function loadPeople() {
     const body = $('people-body');
     body.innerHTML = '<div class="state">Loading…</div>';
+    const { data, error } = await supabase.rpc('people_directory', { p_search: null });
+    if (error) { body.innerHTML = `<div class="state state--error">${esc(error.message)}</div>`; return; }
+    people = data || [];
+    renderPeople();
+  }
 
-    const { data, error } = await supabase.rpc('people_directory', { p_search: q || null });
-    if (error) {
-      body.innerHTML = `<div class="state state--error">${esc(error.message)}</div>`;
-      return;
-    }
+  function renderPeople() {
+    const body = $('people-body');
+    const q = ($('people-search').value || '').trim().toLowerCase();
 
-    if (!data || data.length === 0) {
+    let items = people.slice();
+    if (peopleRole !== 'all') items = items.filter(p => (p.role || '').toLowerCase() === peopleRole);
+    if (q) items = items.filter(p =>
+      (p.full_name || '').toLowerCase().includes(q) ||
+      (p.email || '').toLowerCase().includes(q)
+    );
+
+    if (items.length === 0) {
       body.innerHTML = `<div class="empty">
-        ${q ? 'No one matches that search.' : 'No other users at your institution yet.'}
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <h3>No one matches</h3>
+        <p>Try a different name or filter.</p>
       </div>`;
       return;
     }
 
-    body.innerHTML = '<div class="list">' + data.map(p => {
+    body.innerHTML = '<div class="list">' + items.map(p => {
+      const name = p.full_name || p.email || 'Unknown';
       const actions = [];
-
-      if (p.friendship === 'none' || p.friendship === 'blocked_me') {
-        if (p.friendship !== 'blocked_me') {
-          actions.push({ label: 'Add friend', kind: 'primary', action: 'friend_request', id: p.user_id });
-        }
-      } else if (p.friendship === 'request_sent') {
-        actions.push({ label: 'Request sent', action: 'noop', id: '', disabled: true });
-      } else if (p.friendship === 'request_received') {
-        actions.push({ label: 'Accept request', kind: 'primary', action: 'accept', id: p.user_id });
-      } else if (p.friendship === 'friend') {
+      if (p.friendship === 'friend') {
         actions.push({ label: 'Message', kind: 'primary', action: 'message', id: p.user_id });
-      }
-
-      if (p.friendship === 'blocked_by_me') {
+      } else if (p.friendship === 'request_received') {
+        actions.push({ label: 'Accept', kind: 'primary', action: 'accept', id: p.user_id });
+      } else if (p.friendship === 'request_sent') {
+        actions.push({ label: 'Sent', action: 'noop', id: '', disabled: true });
+      } else if (p.friendship === 'blocked_by_me') {
         actions.push({ label: 'Unblock', kind: 'danger', action: 'unblock', id: p.user_id });
       } else if (p.friendship !== 'blocked_me') {
-        if (p.is_following) {
-          actions.push({ label: 'Unfollow', action: 'unfollow', id: p.user_id });
-        } else {
-          actions.push({ label: 'Follow', action: 'follow', id: p.user_id });
-        }
-        actions.push({ label: 'Block', kind: 'danger', action: 'block', id: p.user_id });
+        actions.push({ label: 'Add', action: 'friend_request', id: p.user_id });
+        actions.push({ label: 'Message', kind: 'primary', action: 'message', id: p.user_id });
       }
 
       const chips = [];
       if (p.is_following) chips.push('Following');
-      if (p.follows_me)   chips.push('Follows you');
-      if (p.friendship === 'friend') chips.push('Friend');
+      if (p.follows_me) chips.push('Follows you');
 
       return `
         <div class="row">
           <div class="avatar">
-            ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" alt="">` : esc(initials(p.full_name || p.email))}
+            ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" alt="">` : esc(initials(name))}
             ${p.status && p.status !== 'offline' ? `<span class="avatar__dot" data-status="${esc(p.status)}"></span>` : ''}
           </div>
           <div class="row__body">
-            <div class="row__name">${esc(p.full_name || p.email)} <span class="role-chip">${esc(p.role || 'student')}</span></div>
+            <div class="row__name">${esc(name)} <span class="role-chip">${esc(p.role || 'member')}</span></div>
             <div class="row__sub">${esc(p.email || '')}${chips.length ? ' · ' + chips.join(' · ') : ''}</div>
           </div>
           <div class="row__action">
@@ -539,118 +591,87 @@
     }).join('') + '</div>';
   }
 
-  $('people-search').addEventListener('input', (e) => {
-    clearTimeout(loadPeople._t);
-    const v = e.target.value.trim();
-    loadPeople._t = setTimeout(() => loadPeople(v), 250);
-  });
+  $('people-search').addEventListener('input', () => renderPeople());
 
   // ------------------------------------------------------------------
-  // Actions (event-delegated)
+  // Event handlers
   // ------------------------------------------------------------------
   document.addEventListener('click', async (e) => {
-    const relBtn = e.target.closest('[data-relation-action]');
-    if (relBtn) { e.preventDefault(); await handleRelation(relBtn); return; }
+    const commBtn = e.target.closest('[data-comm-action]');
+    if (commBtn) {
+      e.preventDefault(); e.stopPropagation();
+      const id = commBtn.dataset.id;
+      commBtn.disabled = true;
+      try {
+        const { error } = await supabase.from('community_members').insert({
+          community_id: id, user_id: meId, source: 'manual',
+        });
+        if (error) throw error;
+        toast('Joined.');
+        await loadCommunities();
+      } catch (err) {
+        toast(err.message || 'Could not join.', 'error');
+        commBtn.disabled = false;
+      }
+      return;
+    }
+
+    const commRow = e.target.closest('.row[data-clickable]');
+    if (commRow && currentTab === 'communities') {
+      const id = commRow.dataset.id;
+      if (id) location.href = 'group-chat.html?id=' + id;
+      return;
+    }
 
     const pplBtn = e.target.closest('[data-people-action]');
-    if (pplBtn) { e.preventDefault(); await handlePeople(pplBtn); return; }
+    if (pplBtn) {
+      e.preventDefault();
+      const action = pplBtn.dataset.peopleAction;
+      const id = pplBtn.dataset.peopleId;
+      if (action === 'noop') return;
+      pplBtn.disabled = true;
+      try {
+        if (action === 'message') {
+          const { data, error } = await supabase.rpc('find_or_create_dm_thread', { other: id });
+          if (error) throw error;
+          location.href = 'dm.html?id=' + data;
+          return;
+        }
+        if (action === 'friend_request') {
+          const { error } = await supabase.rpc('send_friend_request', { p_to_user: id });
+          if (error) throw error;
+          toast('Friend request sent.');
+        } else if (action === 'accept') {
+          const { data: req } = await supabase.from('user_relationships')
+            .select('id').eq('kind','friend_request').eq('from_user_id', id).eq('to_user_id', meId).maybeSingle();
+          if (!req) throw new Error('Request not found');
+          const { error } = await supabase.rpc('respond_friend_request', { p_request_id: req.id, p_accept: true });
+          if (error) throw error;
+          toast('Friend added.');
+        } else if (action === 'unblock') {
+          const { error } = await supabase.rpc('unblock_user', { p_to_user: id });
+          if (error) throw error;
+          toast('Unblocked.');
+        }
+        await loadPeople();
+      } catch (err) {
+        toast(err.message || 'Action failed.', 'error');
+        pplBtn.disabled = false;
+      }
+    }
   });
 
-  async function handleRelation(btn) {
-    const action = btn.dataset.relationAction;
-    const id = btn.dataset.relationId;
-    btn.disabled = true;
-
-    try {
-      if (action === 'accept' || action === 'decline') {
-        const { error } = await supabase.rpc('respond_friend_request', {
-          p_request_id: id, p_accept: action === 'accept',
-        });
-        if (error) throw error;
-        toast(action === 'accept' ? 'Friend added.' : 'Request declined.');
-      } else if (action === 'cancel') {
-        const { error } = await supabase.rpc('respond_friend_request', {
-          p_request_id: id, p_accept: false,
-        });
-        if (error) throw error;
-        toast('Request cancelled.');
-      } else if (action === 'message') {
-        const { data, error } = await supabase.rpc('find_or_create_dm_thread', { other: id });
-        if (error) throw error;
-        location.href = 'dm.html?id=' + data;
-        return;
-      } else if (action === 'unfriend') {
-        const { error } = await supabase.rpc('unfriend', { p_other_user: id });
-        if (error) throw error;
-        toast('Unfriended.');
-      }
-      await loadFriends();
-    } catch (err) {
-      toast(err.message || 'Action failed', 'error');
-      btn.disabled = false;
-    }
-  }
-
-  async function handlePeople(btn) {
-    const action = btn.dataset.peopleAction;
-    const id = btn.dataset.peopleId;
-    if (action === 'noop') return;
-    btn.disabled = true;
-
-    try {
-      if (action === 'friend_request') {
-        const { error } = await supabase.rpc('send_friend_request', { p_to_user: id });
-        if (error) throw error;
-        toast('Friend request sent.');
-      } else if (action === 'accept') {
-        // incoming request: find the request id first
-        const { data: req } = await supabase
-          .from('user_relationships')
-          .select('id')
-          .eq('kind','friend_request')
-          .eq('from_user_id', id)
-          .eq('to_user_id', meId)
-          .maybeSingle();
-        if (!req) throw new Error('Request not found');
-        const { error } = await supabase.rpc('respond_friend_request', { p_request_id: req.id, p_accept: true });
-        if (error) throw error;
-        toast('Friend added.');
-      } else if (action === 'follow') {
-        const { error } = await supabase.rpc('follow_user', { p_to_user: id });
-        if (error) throw error;
-        toast('Following.');
-      } else if (action === 'unfollow') {
-        const { error } = await supabase.rpc('unfollow_user', { p_to_user: id });
-        if (error) throw error;
-        toast('Unfollowed.');
-      } else if (action === 'block') {
-        if (!confirm('Block this person? They won\'t be able to message you.')) { btn.disabled = false; return; }
-        const { error } = await supabase.rpc('block_user', { p_to_user: id });
-        if (error) throw error;
-        toast('Blocked.');
-      } else if (action === 'unblock') {
-        const { error } = await supabase.rpc('unblock_user', { p_to_user: id });
-        if (error) throw error;
-        toast('Unblocked.');
-      } else if (action === 'message') {
-        const { data, error } = await supabase.rpc('find_or_create_dm_thread', { other: id });
-        if (error) throw error;
-        location.href = 'dm.html?id=' + data;
-        return;
-      }
-      const q = $('people-search').value.trim();
-      await loadPeople(q);
-    } catch (err) {
-      toast(err.message || 'Action failed', 'error');
-      btn.disabled = false;
-    }
-  }
-
   // ------------------------------------------------------------------
-  // Boot
+  // Boot — read ?tab= from URL, default to messages
   // ------------------------------------------------------------------
   $('state-loading').hidden = true;
-  switchTab('chats');
+  const params = new URLSearchParams(location.search);
+  const initial = params.get('tab');
+  if (initial === 'communities' || initial === 'people' || initial === 'messages') {
+    switchTab(initial);
+  } else {
+    switchTab('messages');
+  }
 </script>
 
 <script type="module" src="../js/bottom-nav.js"></script>
