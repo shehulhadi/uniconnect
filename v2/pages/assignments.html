@@ -163,289 +163,269 @@
   import { supabase } from '../js/supabase.js';
 
   const $ = (id) => document.getElementById(id);
-  let meId = null, me = null, roleNames = [], mode = 'student';
-  let assignments = [], submissions = [];
-  let filter = 'all';
-  let search = '';
-  let myCourseIds = [];   // student: enrolled; lecturer: taught
-
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) { location.replace('login.html'); throw new Error('unauthenticated'); }
-  meId = session.user.id;
-
-  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-  const initials = (name) => (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
-  const timeAgo = (iso) => {
-    if (!iso) return '';
-    const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-    if (diff < 60) return 'now';
-    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  };
-  const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
-  function toast(msg, kind) {
-    const el = $('toast');
-    el.textContent = msg;
-    el.setAttribute('data-show', '1');
-    if (kind) el.setAttribute('data-kind', kind); else el.removeAttribute('data-kind');
-    clearTimeout(toast._t);
-    toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
-  }
-  function isOverdue(due) { return due && new Date(due) < new Date(); }
-
-  // ---------- Load profile + roles ----------
-  const { data: prof } = await supabase
-    .from('profiles')
-    .select('id, full_name, role, institution_id, programme_id, level_id, session_id')
-    .eq('id', meId).single();
-  me = prof || {};
-
-  const { data: roleRows } = await supabase
-    .from('user_role_assignments')
-    .select('role_definitions(name)')
-    .eq('user_id', meId).eq('status', 'active');
-  roleNames = (roleRows || []).map(r => r.role_definitions?.name).filter(Boolean);
-
-  if (roleNames.includes('LECTURER') || roleNames.includes('HOD') || roleNames.includes('FACULTY_ADMIN')) {
-    mode = 'lecturer';
-  } else {
-    mode = 'student';
+  const errBox = $('state-error');
+  function fatal(msg) {
+    $('state-loading').hidden = true;
+    if (errBox) { errBox.hidden = false; errBox.textContent = msg; }
+    console.error('[assignments]', msg);
   }
 
-  // ---------- Load courses I can see ----------
-  if (mode === 'student') {
-    const { data: ce } = await supabase.from('course_enrollments')
-      .select('course_id, courses ( id, code, title )')
+  try {
+    let meId = null, me = null, roleNames = [], mode = 'student';
+    let assignments = [], submissions = [];
+    let filter = 'all';
+    let search = '';
+    let myCourseIds = [];
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { location.replace('login.html'); throw new Error('unauth'); }
+    meId = session.user.id;
+
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    const initials = (name) => (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+    const timeAgo = (iso) => {
+      if (!iso) return '';
+      const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+      if (diff < 60) return 'now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+      return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    };
+    const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+    function toast(msg, kind) {
+      const el = $('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.setAttribute('data-show', '1');
+      if (kind) el.setAttribute('data-kind', kind); else el.removeAttribute('data-kind');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
+    }
+    function isOverdue(d) { return d && new Date(d) < new Date(); }
+
+    // Load profile
+    const { data: prof } = await supabase.from('profiles')
+      .select('id, full_name, role, institution_id')
+      .eq('id', meId).single();
+    me = prof || {};
+
+    const { data: roleRows } = await supabase
+      .from('user_role_assignments')
+      .select('role_definitions(name)')
       .eq('user_id', meId).eq('status', 'active');
-    myCourseIds = (ce || []).map(r => r.course_id);
-  } else {
-    const { data: ca } = await supabase.from('course_assignments')
-      .select('course_id, courses ( id, code, title )')
-      .eq('lecturer_id', meId);
-    myCourseIds = (ca || []).map(r => r.course_id);
+    roleNames = (roleRows || []).map(r => r.role_definitions?.name).filter(Boolean);
+
+    if (roleNames.includes('LECTURER') || roleNames.includes('HOD') || roleNames.includes('FACULTY_ADMIN')) {
+      mode = 'lecturer';
+    } else {
+      mode = 'student';
+    }
+
+    // Load my courses
+    if (mode === 'student') {
+      const { data: ce } = await supabase.from('course_enrollments')
+        .select('course_id').eq('user_id', meId).eq('status', 'active');
+      myCourseIds = (ce || []).map(r => r.course_id);
+    } else {
+      const { data: ca } = await supabase.from('course_assignments')
+        .select('course_id').eq('lecturer_id', meId);
+      myCourseIds = (ca || []).map(r => r.course_id);
+    }
+
+    const $heroSub = $('hero-sub');
     if (myCourseIds.length === 0) {
-      $('hero-sub').textContent = 'You have no course assignments. An administrator must assign courses to you first.';
+      if ($heroSub) $heroSub.textContent = mode === 'lecturer' ? 'You have no course assignments.' : 'Enrol in courses to see assignments.';
       $('state-loading').hidden = true;
       $('list').hidden = false;
-      $('list').innerHTML = `<div class="empty"><h3>No courses assigned</h3><p>Ask your HOD or University Admin to assign courses to you.</p></div>`;
-      return;
-    }
-  }
-
-  // ---------- Load assignments ----------
-  async function load() {
-    if (mode === 'student') {
-      $('hero-sub').textContent = 'Assignments for your enrolled courses.';
-    } else {
-      $('hero-sub').textContent = 'Assignments you have created.';
+      $('list').innerHTML = mode === 'lecturer'
+        ? `<div class="empty"><h3>No courses assigned</h3><p>Add courses from My Teaching.</p></div>`
+        : `<div class="empty"><h3>No courses yet</h3><p>Complete enrollment first.</p></div>`;
+      throw new Error('__short_circuit__');
     }
 
-    const { data, error } = await supabase
-      .from('assignments')
-      .select(`
-        id, title, instructions, due_at, max_score, status, created_at,
-        course_id, created_by, session_id,
-        courses ( code, title ),
-        profiles:created_by ( full_name )
-      `)
-      .in('course_id', myCourseIds)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      $('state-loading').hidden = true;
-      $('state-error').hidden = false;
-      $('state-error').textContent = error.message;
-      return;
+    if ($heroSub) {
+      $heroSub.textContent = mode === 'student'
+        ? 'Assignments for your enrolled courses.'
+        : 'Assignments you have created.';
     }
-    assignments = data || [];
 
-    // Load submissions
-    if (assignments.length > 0) {
-      const ids = assignments.map(a => a.id);
-      if (mode === 'student') {
-        const { data: subs } = await supabase.from('assignment_submissions')
-          .select('id, assignment_id, status, submitted_at, score, feedback, body, file_name, file_size')
-          .in('assignment_id', ids).eq('student_id', meId);
-        submissions = subs || [];
-      } else {
-        const { data: subs } = await supabase.from('assignment_submissions')
-          .select(`
-            id, assignment_id, status, submitted_at, score, feedback, body, file_name, file_size,
-            profiles:student_id ( id, full_name, avatar_url )
-          `)
-          .in('assignment_id', ids);
-        submissions = subs || [];
+    async function load() {
+      const { data, error } = await supabase
+        .from('assignments')
+        .select(`id, title, instructions, due_at, max_score, status, created_at, course_id, created_by, session_id, courses ( code, title )`)
+        .in('course_id', myCourseIds)
+        .order('created_at', { ascending: false });
+
+      if (error) { fatal(error.message); return; }
+      assignments = data || [];
+
+      if (assignments.length > 0) {
+        const ids = assignments.map(a => a.id);
+        if (mode === 'student') {
+          const { data: subs } = await supabase.from('assignment_submissions')
+            .select('id, assignment_id, status, submitted_at, score, feedback, body, file_name, file_size')
+            .in('assignment_id', ids).eq('student_id', meId);
+          submissions = subs || [];
+        } else {
+          const { data: subs } = await supabase.from('assignment_submissions')
+            .select(`id, assignment_id, status, submitted_at, score, feedback, body, file_name, file_size, profiles:student_id ( id, full_name, avatar_url )`)
+            .in('assignment_id', ids);
+          submissions = subs || [];
+        }
       }
+
+      $('state-loading').hidden = true;
+      $('list').hidden = false;
+      renderFilters();
+      render();
     }
 
-    $('state-loading').hidden = true;
-    $('list').hidden = false;
-    renderFilters();
-    render();
-  }
-
-  function renderFilters() {
-    const set = new Set();
-    assignments.forEach(a => { if (a.courses?.code) set.add(a.courses.code); });
-    const codes = Array.from(set).sort();
-    const f = $('filters');
-    f.innerHTML = '<button class="chip" data-c="all" aria-pressed="true">All</button>' +
-      codes.map(c => `<button class="chip" data-c="${esc(c)}" aria-pressed="false">${esc(c)}</button>`).join('');
-    f.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        filter = chip.dataset.c;
-        f.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.c === filter)));
-        render();
+    function renderFilters() {
+      const set = new Set();
+      assignments.forEach(a => { if (a.courses?.code) set.add(a.courses.code); });
+      const codes = Array.from(set).sort();
+      const f = $('filters');
+      f.innerHTML = '<button class="chip" data-c="all" aria-pressed="true">All</button>' +
+        codes.map(c => `<button class="chip" data-c="${esc(c)}" aria-pressed="false">${esc(c)}</button>`).join('');
+      f.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          filter = chip.dataset.c;
+          f.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.c === filter)));
+          render();
+        });
       });
-    });
-  }
-
-  function statusFor(a) {
-    if (mode === 'lecturer') {
-      const subs = submissions.filter(s => s.assignment_id === a.id);
-      const ungraded = subs.filter(s => s.status !== 'graded').length;
-      return { key: 'submitted', label: `${subs.length} submission${subs.length === 1 ? '' : 's'}${ungraded ? ` · ${ungraded} to grade` : ''}` };
-    }
-    const sub = submissions.find(s => s.assignment_id === a.id);
-    if (sub && sub.status === 'graded')     return { key: 'graded',    label: `Graded${sub.score != null ? ` · ${sub.score}/${a.max_score || '?'}` : ''}` };
-    if (sub)                                return { key: 'submitted', label: 'Submitted' };
-    if (isOverdue(a.due_at))                return { key: 'overdue',   label: 'Overdue' };
-    return { key: 'pending', label: 'Not submitted' };
-  }
-
-  function render() {
-    const q = search.trim().toLowerCase();
-    const filtered = assignments.filter(a => {
-      if (filter !== 'all' && a.courses?.code !== filter) return false;
-      if (!q) return true;
-      return (a.title || '').toLowerCase().includes(q)
-          || (a.courses?.code || '').toLowerCase().includes(q);
-    });
-
-    if (filtered.length === 0) {
-      $('list').innerHTML = `<div class="empty">
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-        <h3>${mode === 'lecturer' ? 'No assignments yet' : 'Nothing here'}</h3>
-        <p>${mode === 'lecturer' ? 'Create your first assignment for a course you teach.' : 'Assignments from your lecturers will appear here.'}</p>
-      </div>`;
-      return;
     }
 
-    $('list').innerHTML = '<div class="list">' + filtered.map(a => {
+    function statusFor(a) {
+      if (mode === 'lecturer') {
+        const subs = submissions.filter(s => s.assignment_id === a.id);
+        const ungraded = subs.filter(s => s.status !== 'graded').length;
+        return { key: 'submitted', label: `${subs.length} submission${subs.length === 1 ? '' : 's'}${ungraded ? ` · ${ungraded} to grade` : ''}` };
+      }
+      const sub = submissions.find(s => s.assignment_id === a.id);
+      if (sub && sub.status === 'graded') return { key: 'graded', label: `Graded${sub.score != null ? ` · ${sub.score}/${a.max_score || '?'}` : ''}` };
+      if (sub) return { key: 'submitted', label: 'Submitted' };
+      if (isOverdue(a.due_at)) return { key: 'overdue', label: 'Overdue' };
+      return { key: 'pending', label: 'Not submitted' };
+    }
+
+    function render() {
+      const q = search.trim().toLowerCase();
+      const filtered = assignments.filter(a => {
+        if (filter !== 'all' && a.courses?.code !== filter) return false;
+        if (!q) return true;
+        return (a.title || '').toLowerCase().includes(q) || (a.courses?.code || '').toLowerCase().includes(q);
+      });
+
+      if (filtered.length === 0) {
+        $('list').innerHTML = `<div class="empty"><h3>${mode === 'lecturer' ? 'No assignments yet' : 'Nothing here'}</h3><p>${mode === 'lecturer' ? 'Create your first assignment.' : 'Assignments will appear here.'}</p></div>`;
+        return;
+      }
+
+      $('list').innerHTML = '<div class="list">' + filtered.map(a => {
+        const st = statusFor(a);
+        return `
+          <div class="asg" data-id="${esc(a.id)}">
+            <div class="asg__head">
+              <span class="asg__course">${esc(a.courses?.code || 'Course')}</span>
+              <span class="asg__status asg__status--${st.key}">${esc(st.label)}</span>
+            </div>
+            <div class="asg__title">${esc(a.title)}</div>
+            <div class="asg__meta">
+              ${a.due_at ? `<span><strong>Due</strong> ${esc(fmtDate(a.due_at))}</span>` : ''}
+              ${mode === 'lecturer' && a.max_score ? `<span><strong>Max</strong> ${a.max_score}</span>` : ''}
+            </div>
+          </div>`;
+      }).join('') + '</div>';
+
+      document.querySelectorAll('.asg').forEach(el => {
+        el.addEventListener('click', () => openDetail(el.dataset.id));
+      });
+    }
+
+    $('search').addEventListener('input', (e) => { search = e.target.value; render(); });
+
+    function openModal(html) {
+      $('modal-body').innerHTML = html;
+      $('modal').setAttribute('data-open', '1');
+      $('modal').setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      $('modal').removeAttribute('data-open');
+      $('modal').setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+    $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal(); });
+
+    function openDetail(id) {
+      const a = assignments.find(x => x.id === id);
+      if (!a) return;
+      if (mode === 'student') openStudentDetail(a);
+      else openLecturerDetail(a);
+    }
+
+    function openStudentDetail(a) {
+      const sub = submissions.find(s => s.assignment_id === a.id);
       const st = statusFor(a);
-      return `
-        <div class="asg" data-id="${esc(a.id)}">
-          <div class="asg__head">
-            <span class="asg__course">${esc(a.courses?.code || 'Course')}</span>
-            <span class="asg__status asg__status--${st.key}">${esc(st.label)}</span>
-          </div>
-          <div class="asg__title">${esc(a.title)}</div>
-          <div class="asg__meta">
-            ${a.due_at ? `<span><strong>Due</strong> ${esc(fmtDate(a.due_at))}</span>` : ''}
-            ${mode === 'lecturer' && a.max_score ? `<span><strong>Max</strong> ${a.max_score}</span>` : ''}
-          </div>
-        </div>`;
-    }).join('') + '</div>';
+      const canSubmit = !sub && !isOverdue(a.due_at);
 
-    document.querySelectorAll('.asg').forEach(el => {
-      el.addEventListener('click', () => openDetail(el.dataset.id));
-    });
-  }
-
-  $('search').addEventListener('input', (e) => { search = e.target.value; render(); });
-
-  // ---------- Detail modal ----------
-  function openModal(html) {
-    $('modal-body').innerHTML = html;
-    $('modal').setAttribute('data-open', '1');
-    $('modal').setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeModal() {
-    $('modal').removeAttribute('data-open');
-    $('modal').setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
-  $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal(); });
-
-  function openDetail(id) {
-    const a = assignments.find(x => x.id === id);
-    if (!a) return;
-    if (mode === 'student') openStudentDetail(a);
-    else openLecturerDetail(a);
-  }
-
-  // ---------- Student detail ----------
-  function openStudentDetail(a) {
-    const sub = submissions.find(s => s.assignment_id === a.id);
-    const st = statusFor(a);
-    const canSubmit = !sub && !isOverdue(a.due_at);
-
-    let body = `
-      <h2>${esc(a.title)}</h2>
-      <p class="sub">${esc(a.courses?.code || '')} · ${esc(a.courses?.title || '')}</p>
-      <div class="info-grid">
-        <div><dt>Due</dt><dd>${esc(fmtDate(a.due_at))}</dd></div>
-        <div><dt>Max score</dt><dd>${a.max_score ?? '—'}</dd></div>
-        <div><dt>Posted by</dt><dd>${esc(a.profiles?.full_name || 'Lecturer')}</dd></div>
-        <div><dt>Status</dt><dd>${esc(st.label)}</dd></div>
-      </div>
-      ${a.instructions ? `<div class="instructions">${esc(a.instructions)}</div>` : ''}
-    `;
-
-    if (sub) {
-      body += `
-        <div style="padding:var(--space-3);background:var(--bg-sunken);border-radius:var(--radius-md);margin-bottom:var(--space-4);">
-          <div style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:8px;">Your submission</div>
-          ${sub.body ? `<div style="font-size:var(--text-sm);line-height:1.5;margin-bottom:6px;white-space:pre-wrap;overflow-wrap:anywhere;">${esc(sub.body)}</div>` : ''}
-          ${sub.file_name ? `<div style="font-size:var(--text-xs);color:var(--text-subtle);">Attached: ${esc(sub.file_name)}</div>` : ''}
-          <div style="font-size:var(--text-xs);color:var(--text-subtle);margin-top:6px;">Submitted ${esc(timeAgo(sub.submitted_at))}</div>
-          ${sub.score != null ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);"><span style="font-size:var(--text-sm);color:var(--text-muted);">Grade:</span> <strong style="font-size:var(--text-md);color:var(--success);">${sub.score}/${a.max_score || '?'}</strong>${sub.feedback ? `<div style="font-size:var(--text-sm);color:var(--text-muted);margin-top:6px;line-height:1.5;">"${esc(sub.feedback)}"</div>` : ''}</div>` : ''}
+      let body = `
+        <h2>${esc(a.title)}</h2>
+        <p class="sub">${esc(a.courses?.code || '')} · ${esc(a.courses?.title || '')}</p>
+        <div class="info-grid">
+          <div><dt>Due</dt><dd>${esc(fmtDate(a.due_at))}</dd></div>
+          <div><dt>Max score</dt><dd>${a.max_score ?? '—'}</dd></div>
+          <div><dt>Status</dt><dd>${esc(st.label)}</dd></div>
         </div>
-        <div class="modal-actions">
-          <button class="btn-ghost" id="md-close">Close</button>
-        </div>`;
-    } else if (canSubmit) {
-      body += `
-        <form id="md-submit-form">
-          <div class="field">
-            <label for="md-body">Your answer <span style="color:var(--text-subtle);font-weight:400;">(optional if attaching a file)</span></label>
-            <textarea id="md-body" maxlength="5000" placeholder="Write your answer or notes…"></textarea>
-          </div>
-          <div class="field">
-            <label for="md-file">Attachment <span style="color:var(--text-subtle);font-weight:400;">(optional, up to 20 MB)</span></label>
-            <input type="file" id="md-file" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.txt,.jpg,.jpeg,.png">
-          </div>
-          <div class="modal-alert modal-alert--error" id="md-alert"></div>
-          <div class="modal-actions">
-            <button type="button" class="btn-ghost" id="md-close">Cancel</button>
-            <button type="submit" class="btn-primary" id="md-submit">Submit</button>
-          </div>
-        </form>`;
-    } else {
-      body += `<div class="modal-actions"><button class="btn-ghost" id="md-close">Close</button></div>`;
-    }
+        ${a.instructions ? `<div class="instructions">${esc(a.instructions)}</div>` : ''}`;
 
-    openModal(body);
-    document.getElementById('md-close')?.addEventListener('click', closeModal);
+      if (sub) {
+        body += `
+          <div style="padding:12px;background:var(--bg-sunken);border-radius:10px;margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:8px;">Your submission</div>
+            ${sub.body ? `<div style="font-size:14px;line-height:1.5;margin-bottom:6px;white-space:pre-wrap;">${esc(sub.body)}</div>` : ''}
+            ${sub.file_name ? `<div style="font-size:12px;color:var(--text-subtle);">Attached: ${esc(sub.file_name)}</div>` : ''}
+            ${sub.score != null ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);"><span style="color:var(--text-muted);">Grade:</span> <strong style="color:var(--success);font-size:17px;">${sub.score}/${a.max_score || '?'}</strong>${sub.feedback ? `<div style="font-size:14px;color:var(--text-muted);margin-top:6px;">"${esc(sub.feedback)}"</div>` : ''}</div>` : ''}
+          </div>
+          <div class="modal-actions"><button class="btn-ghost" id="md-close">Close</button></div>`;
+      } else if (canSubmit) {
+        body += `
+          <form id="md-submit-form">
+            <div class="field">
+              <label for="md-body">Your answer (optional if attaching)</label>
+              <textarea id="md-body" maxlength="5000" placeholder="Write your answer…"></textarea>
+            </div>
+            <div class="field">
+              <label for="md-file">Attachment (optional, up to 20 MB)</label>
+              <input type="file" id="md-file" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.txt,.jpg,.jpeg,.png">
+            </div>
+            <div class="modal-alert modal-alert--error" id="md-alert"></div>
+            <div class="modal-actions">
+              <button type="button" class="btn-ghost" id="md-close">Cancel</button>
+              <button type="submit" class="btn-primary" id="md-submit">Submit</button>
+            </div>
+          </form>`;
+      } else {
+        body += `<div class="modal-actions"><button class="btn-ghost" id="md-close">Close</button></div>`;
+      }
 
-    const form = document.getElementById('md-submit-form');
-    if (form) {
-      form.addEventListener('submit', async (e) => {
+      openModal(body);
+      document.getElementById('md-close')?.addEventListener('click', closeModal);
+
+      const form = document.getElementById('md-submit-form');
+      if (form) form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('md-submit');
         const alertEl = document.getElementById('md-alert');
         alertEl.removeAttribute('data-show');
         btn.disabled = true; btn.textContent = 'Submitting…';
-
         try {
           const text = document.getElementById('md-body').value.trim();
           const file = document.getElementById('md-file').files[0];
-          if (!text && !file) throw new Error('Write an answer or attach a file.');
-
+          if (!text && !file) throw new Error('Write or attach something.');
           let filePath = null, fileName = null, fileSize = null;
           if (file) {
             if (file.size > 20 * 1024 * 1024) throw new Error('File exceeds 20 MB.');
@@ -456,14 +436,9 @@
             if (upErr) throw upErr;
             filePath = path; fileName = file.name; fileSize = file.size;
           }
-
           const { error } = await supabase.from('assignment_submissions').insert({
-            assignment_id: a.id,
-            student_id: meId,
-            body: text || null,
-            file_path: filePath,
-            file_name: fileName,
-            file_size: fileSize,
+            assignment_id: a.id, student_id: meId, body: text || null,
+            file_path: filePath, file_name: fileName, file_size: fileSize,
           });
           if (error) throw error;
           toast('Submitted.');
@@ -476,193 +451,150 @@
         }
       });
     }
-  }
 
-  // ---------- Lecturer detail ----------
-  function openLecturerDetail(a) {
-    const subs = submissions.filter(s => s.assignment_id === a.id);
-    const ungraded = subs.filter(s => s.status !== 'graded');
+    function openLecturerDetail(a) {
+      const subs = submissions.filter(s => s.assignment_id === a.id);
+      const ungraded = subs.filter(s => s.status !== 'graded');
+      let body = `
+        <h2>${esc(a.title)}</h2>
+        <p class="sub">${esc(a.courses?.code || '')} · ${esc(a.courses?.title || '')}</p>
+        <div class="info-grid">
+          <div><dt>Due</dt><dd>${esc(fmtDate(a.due_at))}</dd></div>
+          <div><dt>Submissions</dt><dd>${subs.length}${ungraded.length ? ` (${ungraded.length} to grade)` : ''}</dd></div>
+        </div>
+        ${a.instructions ? `<div class="instructions">${esc(a.instructions)}</div>` : ''}
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:8px;">Submissions</div>
+        ${subs.length === 0
+          ? '<div class="empty" style="padding:16px;">No submissions yet.</div>'
+          : subs.map(s => `
+            <div class="sub-item" data-sub-id="${esc(s.id)}">
+              <div class="sub-avatar">${esc(initials(s.profiles?.full_name))}</div>
+              <div class="sub-body">
+                <div class="sub-name">${esc(s.profiles?.full_name || 'Student')}</div>
+                <div class="sub-meta">${esc(timeAgo(s.submitted_at))}${s.file_name ? ' · 📎 ' + esc(s.file_name) : ''}</div>
+              </div>
+              ${s.status === 'graded' ? `<span class="sub-score">${s.score ?? '—'}/${a.max_score || '?'}</span>` : `<span class="sub-score" data-ungraded>Grade</span>`}
+            </div>`).join('')}
+        <div class="modal-actions"><button class="btn-ghost" id="md-close">Close</button></div>`;
+      openModal(body);
+      document.getElementById('md-close')?.addEventListener('click', closeModal);
+      document.querySelectorAll('.sub-item').forEach(el => {
+        el.addEventListener('click', () => {
+          const s = subs.find(x => x.id === el.dataset.subId);
+          if (s) openGradeView(a, s);
+        });
+      });
+    }
 
-    let body = `
-      <h2>${esc(a.title)}</h2>
-      <p class="sub">${esc(a.courses?.code || '')} · ${esc(a.courses?.title || '')}</p>
-      <div class="info-grid">
-        <div><dt>Due</dt><dd>${esc(fmtDate(a.due_at))}</dd></div>
-        <div><dt>Submissions</dt><dd>${subs.length}${ungraded.length ? ` (${ungraded.length} to grade)` : ''}</dd></div>
-      </div>
-      ${a.instructions ? `<div class="instructions">${esc(a.instructions)}</div>` : ''}
-      <div style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:8px;">Submissions</div>
-      ${subs.length === 0
-        ? '<div class="empty" style="padding:var(--space-4);">No submissions yet.</div>'
-        : subs.map(s => `
-          <div class="sub-item" data-sub-id="${esc(s.id)}">
-            <div class="sub-avatar">${esc(initials(s.profiles?.full_name))}</div>
-            <div class="sub-body">
-              <div class="sub-name">${esc(s.profiles?.full_name || 'Student')}</div>
-              <div class="sub-meta">${esc(timeAgo(s.submitted_at))}${s.file_name ? ` · 📎 ${esc(s.file_name)}` : ''}</div>
-            </div>
-            ${s.status === 'graded'
-              ? `<span class="sub-score">${s.score ?? '—'}/${a.max_score || '?'}</span>`
-              : `<span class="sub-score" data-ungraded>Grade</span>`}
-          </div>`).join('')}
-      <div class="modal-actions">
-        <button class="btn-ghost" id="md-close">Close</button>
-      </div>`;
+    function openGradeView(a, s) {
+      const body = `
+        <h2>${esc(s.profiles?.full_name || 'Student')}</h2>
+        <p class="sub">${esc(a.title)} · ${esc(timeAgo(s.submitted_at))}</p>
+        ${s.body ? `<div class="instructions">${esc(s.body)}</div>` : ''}
+        ${s.file_name ? `<div style="font-size:14px;color:var(--text-muted);margin-bottom:12px;">📎 ${esc(s.file_name)}</div>` : ''}
+        <form id="md-grade-form">
+          <div class="field">
+            <label for="md-score">Score (out of ${a.max_score ?? '—'})</label>
+            <input type="number" id="md-score" min="0" max="${a.max_score || 100}" value="${s.score ?? ''}" required>
+          </div>
+          <div class="field">
+            <label for="md-feedback">Feedback (optional)</label>
+            <textarea id="md-feedback" maxlength="2000">${esc(s.feedback || '')}</textarea>
+          </div>
+          <div class="modal-alert modal-alert--error" id="md-alert"></div>
+          <div class="modal-actions">
+            <button type="button" class="btn-ghost" id="md-back">Back</button>
+            <button type="submit" class="btn-primary" id="md-save">Save grade</button>
+          </div>
+        </form>`;
+      openModal(body);
+      document.getElementById('md-back')?.addEventListener('click', () => openLecturerDetail(a));
+      document.getElementById('md-grade-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('md-save');
+        const alertEl = document.getElementById('md-alert');
+        alertEl.removeAttribute('data-show');
+        const score = parseInt(document.getElementById('md-score').value, 10);
+        const feedback = document.getElementById('md-feedback').value.trim() || null;
+        if (Number.isNaN(score)) { alertEl.textContent = 'Score required.'; alertEl.setAttribute('data-show', '1'); return; }
+        btn.disabled = true; btn.textContent = 'Saving…';
+        const { error } = await supabase.from('assignment_submissions')
+          .update({ score, feedback, status: 'graded', graded_at: new Date().toISOString(), graded_by: meId })
+          .eq('id', s.id);
+        btn.disabled = false; btn.textContent = 'Save grade';
+        if (error) { alertEl.textContent = error.message; alertEl.setAttribute('data-show', '1'); return; }
+        toast('Grade saved.');
+        await load();
+        const a2 = assignments.find(x => x.id === a.id);
+        if (a2) openLecturerDetail(a2);
+      });
+    }
 
-    openModal(body);
-    document.getElementById('md-close')?.addEventListener('click', closeModal);
+    if (mode === 'lecturer') $('btn-new').hidden = false;
 
-    document.querySelectorAll('.sub-item').forEach(el => {
-      el.addEventListener('click', () => {
-        const s = subs.find(x => x.id === el.dataset.subId);
-        if (s) openGradeView(a, s);
+    $('btn-new')?.addEventListener('click', async () => {
+      const { data: taught } = await supabase.from('course_assignments')
+        .select('course_id, session_id, courses ( code, title )').eq('lecturer_id', meId);
+      if (!taught || taught.length === 0) { toast('No courses assigned to you.', 'error'); return; }
+
+      const body = `
+        <h2>New assignment</h2>
+        <p class="sub">Students enrolled will be notified.</p>
+        <form id="md-new-form">
+          <div class="field">
+            <label for="md-course">Course</label>
+            <select id="md-course" required>
+              ${taught.map(t => `<option value="${t.course_id}" data-session="${t.session_id}">${esc(t.courses?.code)} — ${esc(t.courses?.title)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field"><label for="md-title">Title</label><input type="text" id="md-title" required maxlength="200"></div>
+          <div class="field"><label for="md-instructions">Instructions (optional)</label><textarea id="md-instructions" maxlength="5000"></textarea></div>
+          <div class="field"><label for="md-due">Due date</label><input type="datetime-local" id="md-due"></div>
+          <div class="field"><label for="md-max">Max score (optional)</label><input type="number" id="md-max" min="1" max="1000" placeholder="100"></div>
+          <div class="modal-alert modal-alert--error" id="md-alert"></div>
+          <div class="modal-actions">
+            <button type="button" class="btn-ghost" id="md-cancel">Cancel</button>
+            <button type="submit" class="btn-primary" id="md-create">Create</button>
+          </div>
+        </form>`;
+      openModal(body);
+      document.getElementById('md-cancel').addEventListener('click', closeModal);
+      document.getElementById('md-new-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('md-create');
+        const alertEl = document.getElementById('md-alert');
+        alertEl.removeAttribute('data-show');
+        const courseSel = document.getElementById('md-course');
+        const courseId = courseSel.value;
+        const sessionId = courseSel.selectedOptions[0]?.dataset.session;
+        const title = document.getElementById('md-title').value.trim();
+        const instructions = document.getElementById('md-instructions').value.trim() || null;
+        const dueLocal = document.getElementById('md-due').value;
+        const dueAt = dueLocal ? new Date(dueLocal).toISOString() : null;
+        const maxScore = parseInt(document.getElementById('md-max').value, 10) || null;
+        if (!title) { alertEl.textContent = 'Title required.'; alertEl.setAttribute('data-show', '1'); return; }
+        btn.disabled = true; btn.textContent = 'Creating…';
+        const { error } = await supabase.from('assignments').insert({
+          institution_id: me.institution_id, course_id: courseId, session_id: sessionId,
+          created_by: meId, title, instructions, due_at: dueAt, max_score: maxScore, status: 'published',
+        });
+        btn.disabled = false; btn.textContent = 'Create';
+        if (error) { alertEl.textContent = error.message; alertEl.setAttribute('data-show', '1'); return; }
+        toast('Assignment created.');
+        closeModal();
+        await load();
       });
     });
+
+    await load();
+
+  } catch (err) {
+    if (err && err.message === '__short_circuit__') {
+      // already handled
+    } else {
+      fatal('Assignment load failed: ' + (err && err.message ? err.message : String(err)));
+    }
   }
-
-  function openGradeView(a, s) {
-    const body = `
-      <h2>${esc(s.profiles?.full_name || 'Student')}</h2>
-      <p class="sub">${esc(a.title)} · Submitted ${esc(timeAgo(s.submitted_at))}</p>
-      ${s.body ? `<div class="instructions">${esc(s.body)}</div>` : ''}
-      ${s.file_name ? `<div style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:var(--space-3);">📎 ${esc(s.file_name)} <button class="btn-ghost" id="md-download" style="margin-left:8px;padding:0.3rem 0.6rem;min-height:auto;font-size:var(--text-xs);">Open</button></div>` : ''}
-      <form id="md-grade-form">
-        <div class="field">
-          <label for="md-score">Score (out of ${a.max_score ?? '—'})</label>
-          <input type="number" id="md-score" min="0" max="${a.max_score || 100}" value="${s.score ?? ''}" required>
-        </div>
-        <div class="field">
-          <label for="md-feedback">Feedback <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
-          <textarea id="md-feedback" maxlength="2000" placeholder="Comments for the student…">${esc(s.feedback || '')}</textarea>
-        </div>
-        <div class="modal-alert modal-alert--error" id="md-alert"></div>
-        <div class="modal-actions">
-          <button type="button" class="btn-ghost" id="md-back">Back</button>
-          <button type="submit" class="btn-primary" id="md-save">Save grade</button>
-        </div>
-      </form>`;
-
-    openModal(body);
-
-    document.getElementById('md-back')?.addEventListener('click', () => openLecturerDetail(a));
-    document.getElementById('md-download')?.addEventListener('click', async () => {
-      try {
-        const { data, error } = await supabase.storage.from('assignments').createSignedUrl(s.file_path, 60, { download: s.file_name });
-        if (error) throw error;
-        const a2 = document.createElement('a');
-        a2.href = data.signedUrl; a2.download = s.file_name;
-        document.body.appendChild(a2); a2.click(); a2.remove();
-      } catch (err) { toast(err.message, 'error'); }
-    });
-
-    document.getElementById('md-grade-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('md-save');
-      const alertEl = document.getElementById('md-alert');
-      alertEl.removeAttribute('data-show');
-      const score = parseInt(document.getElementById('md-score').value, 10);
-      const feedback = document.getElementById('md-feedback').value.trim() || null;
-      if (Number.isNaN(score)) { alertEl.textContent = 'Score required.'; alertEl.setAttribute('data-show', '1'); return; }
-
-      btn.disabled = true; btn.textContent = 'Saving…';
-      const { error } = await supabase.from('assignment_submissions')
-        .update({ score, feedback, status: 'graded', graded_at: new Date().toISOString(), graded_by: meId })
-        .eq('id', s.id);
-      btn.disabled = false; btn.textContent = 'Save grade';
-      if (error) { alertEl.textContent = error.message; alertEl.setAttribute('data-show', '1'); return; }
-      toast('Grade saved.');
-      await load();
-      // Reopen the assignment detail with fresh data
-      const a2 = assignments.find(x => x.id === a.id);
-      if (a2) openLecturerDetail(a2);
-    });
-  }
-
-  // ---------- New assignment (lecturer only) ----------
-  if (mode === 'lecturer') $('btn-new').hidden = false;
-
-  $('btn-new')?.addEventListener('click', async () => {
-    // Load the courses I teach for the picker
-    const { data: taught } = await supabase.from('course_assignments')
-      .select('course_id, session_id, courses ( code, title )')
-      .eq('lecturer_id', meId);
-    if (!taught || taught.length === 0) { toast('No courses assigned to you.', 'error'); return; }
-
-    const body = `
-      <h2>New assignment</h2>
-      <p class="sub">Students enrolled in the course will be notified.</p>
-      <form id="md-new-form">
-        <div class="field">
-          <label for="md-course">Course</label>
-          <select id="md-course" required>
-            ${taught.map(t => `<option value="${t.course_id}" data-session="${t.session_id}">${esc(t.courses?.code)} — ${esc(t.courses?.title)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field">
-          <label for="md-title">Title</label>
-          <input type="text" id="md-title" required maxlength="200" placeholder="e.g. Assignment 2 — Binary Trees">
-        </div>
-        <div class="field">
-          <label for="md-instructions">Instructions <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
-          <textarea id="md-instructions" maxlength="5000" placeholder="What should students do?"></textarea>
-        </div>
-        <div class="field">
-          <label for="md-due">Due date</label>
-          <input type="datetime-local" id="md-due">
-        </div>
-        <div class="field">
-          <label for="md-max">Max score <span style="color:var(--text-subtle);font-weight:400;">(optional)</span></label>
-          <input type="number" id="md-max" min="1" max="1000" placeholder="100">
-        </div>
-        <div class="modal-alert modal-alert--error" id="md-alert"></div>
-        <div class="modal-actions">
-          <button type="button" class="btn-ghost" id="md-cancel">Cancel</button>
-          <button type="submit" class="btn-primary" id="md-create">Create</button>
-        </div>
-      </form>`;
-
-    openModal(body);
-    document.getElementById('md-cancel').addEventListener('click', closeModal);
-
-    document.getElementById('md-new-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('md-create');
-      const alertEl = document.getElementById('md-alert');
-      alertEl.removeAttribute('data-show');
-
-      const courseSel = document.getElementById('md-course');
-      const courseId = courseSel.value;
-      const sessionId = courseSel.selectedOptions[0]?.dataset.session;
-      const title = document.getElementById('md-title').value.trim();
-      const instructions = document.getElementById('md-instructions').value.trim() || null;
-      const dueLocal = document.getElementById('md-due').value;
-      const dueAt = dueLocal ? new Date(dueLocal).toISOString() : null;
-      const maxScore = parseInt(document.getElementById('md-max').value, 10) || null;
-
-      if (!title) { alertEl.textContent = 'Title required.'; alertEl.setAttribute('data-show', '1'); return; }
-
-      btn.disabled = true; btn.textContent = 'Creating…';
-      const { error } = await supabase.from('assignments').insert({
-        institution_id: me.institution_id,
-        course_id: courseId,
-        session_id: sessionId,
-        created_by: meId,
-        title,
-        instructions,
-        due_at: dueAt,
-        max_score: maxScore,
-        status: 'published',
-      });
-      btn.disabled = false; btn.textContent = 'Create';
-      if (error) { alertEl.textContent = error.message; alertEl.setAttribute('data-show', '1'); return; }
-      toast('Assignment created.');
-      closeModal();
-      await load();
-    });
-  });
-
-  // ---------- Boot ----------
-  await load();
 </script>
 
 <script type="module" src="../js/bottom-nav.js"></script>
