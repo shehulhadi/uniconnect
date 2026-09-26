@@ -177,6 +177,67 @@
   @keyframes enrspin { to { transform: rotate(360deg); } }
 
   .placeholder { padding: var(--space-6) var(--space-5); background: var(--bg-sunken); border-radius: var(--radius-lg); border: 1px dashed var(--border-strong); text-align: center; color: var(--text-muted); font-size: var(--text-sm); line-height: var(--leading-snug); margin-bottom: var(--space-4); }
+
+  .course-picker-hint {
+    font-size: 12px; color: var(--text-subtle);
+    line-height: 1.5; margin-top: 4px; margin-bottom: 8px;
+  }
+  .course-picker {
+    max-height: 260px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    background: var(--bg-elevated);
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .course-picker__empty {
+    padding: 20px 12px;
+    text-align: center;
+    color: var(--text-subtle);
+    font-size: 13px;
+  }
+  .course-picker__item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    width: 100%; text-align: left;
+    font-family: inherit;
+    color: var(--text);
+    transition: background 120ms var(--ease);
+  }
+  .course-picker__item:hover { background: var(--bg-sunken); }
+  .course-picker__item[data-checked] { background: color-mix(in srgb, var(--brand) 8%, transparent); }
+  .course-picker__check {
+    width: 20px; height: 20px; border-radius: 6px;
+    border: 1.5px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 150ms var(--ease);
+    background: var(--bg-elevated);
+  }
+  .course-picker__check svg { width: 12px; height: 12px; color: #fff; opacity: 0; }
+  .course-picker__item[data-checked] .course-picker__check {
+    background: var(--brand); border-color: var(--brand);
+  }
+  .course-picker__item[data-checked] .course-picker__check svg { opacity: 1; }
+  .course-picker__body { flex: 1; min-width: 0; }
+  .course-picker__code {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--brand);
+    background: var(--brand-subtle);
+    padding: 1px 6px; border-radius: 4px;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  .course-picker__title {
+    font-size: 14px; font-weight: 500;
+    line-height: 1.35;
+  }
 </style>
   <!-- PWA -->
   <link rel="manifest" href="../../manifest-v2.json">
@@ -279,6 +340,14 @@
       <div class="field">
         <label for="sel-session">Academic session</label>
         <select id="sel-session" class="select" disabled><option value="">Loading…</option></select>
+      </div>
+
+      <div class="field" id="course-picker-field" hidden>
+        <label>Courses you teach</label>
+        <div class="course-picker-hint">Pick every course you teach this session. You can add or remove courses later from My Teaching.</div>
+        <div class="course-picker" id="course-picker">
+          <div class="course-picker__empty">Select a department first</div>
+        </div>
       </div>
       <div class="onb-actions">
         <button class="btn-secondary" id="btn-acad-back">Back</button>
