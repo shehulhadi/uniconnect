@@ -301,6 +301,7 @@
             <div><dt>Faculty</dt><dd>${esc(r.faculty_name || '—')}</dd></div>
             <div><dt>Institution</dt><dd>${esc(r.institution_name || '—')}</dd></div>
             <div><dt>Submitted</dt><dd>${timeAgo(r.submitted_at)}</dd></div>
+            ${r.course_names ? `<div style="grid-column:1/-1;"><dt>Courses requested</dt><dd>${esc(r.course_names)}</dd></div>` : ''}
           </dl>
           <div class="req__actions">
             <button class="btn btn--danger" data-action="reject" data-id="${esc(r.request_id)}">Reject</button>

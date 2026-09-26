@@ -334,6 +334,7 @@ function mountDrawer(identity) {
       <div class="drawer__section">
         <div class="drawer__label">Academic</div>
         ${secondaryRow('assignments.html', 'Assignments', 'assignment')}
+        ${(roles.includes('LECTURER') || roles.includes('HOD') || roles.includes('FACULTY_ADMIN')) ? secondaryRow('teaching.html', 'My Teaching', 'book') : ''}
       </div>
 
       <div class="drawer__section">
