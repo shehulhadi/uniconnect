@@ -13,17 +13,11 @@
 <link rel="stylesheet" href="../css/notifications.css">
 <link rel="stylesheet" href="../css/topbar.css">
 <style>
-  .topbar {
-    position: sticky; top: 0; z-index: 10;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    border-bottom: 1px solid var(--border); min-height: 56px;
-  }
+  .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); min-height: 56px; }
   .topbar__title { font-size: var(--text-base); font-weight: 600; letter-spacing: -0.01em; }
   .topbar__right { display: flex; align-items: center; gap: var(--space-2); }
 
-  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-4) var(--space-4) var(--space-10); }
+  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-4) var(--space-3) var(--space-10); }
   @media (min-width: 640px) { .wrap { padding: var(--space-5) var(--space-6) var(--space-10); } }
 
   /* ---------- Tabs ---------- */
@@ -34,10 +28,8 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: 3px;
-    margin-bottom: var(--space-4);
-    position: sticky;
-    top: 56px;
-    z-index: 5;
+    margin: 0 var(--space-1) var(--space-4);
+    position: sticky; top: 56px; z-index: 5;
   }
   .tab {
     appearance: none; border: none; background: transparent;
@@ -46,7 +38,7 @@
     color: var(--text-muted);
     border-radius: calc(var(--radius-md) - 3px);
     cursor: pointer;
-    transition: all var(--duration-fast) var(--ease);
+    transition: all 150ms var(--ease);
     display: flex; align-items: center; justify-content: center; gap: 6px;
     min-height: 42px; position: relative;
     font-family: inherit;
@@ -65,178 +57,327 @@
 
   .panel[hidden] { display: none; }
 
-  /* ---------- Shared UI ---------- */
-  .search {
-    width: 100%; padding: 0.7rem 0.9rem;
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    border-radius: var(--radius-md); font-size: var(--text-sm);
-    color: var(--text); margin-bottom: var(--space-3);
-    min-height: 44px;
-    transition: border-color var(--duration-fast) var(--ease);
-  }
-  .search:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent); }
-
-  .list { display: flex; flex-direction: column; gap: 2px; }
-
-  .row {
-    display: flex; align-items: center; gap: var(--space-3);
-    padding: var(--space-3);
-    border-radius: var(--radius-md);
-    text-decoration: none; color: var(--text);
-    transition: background var(--duration-fast) var(--ease);
-    -webkit-tap-highlight-color: transparent;
-    border: none; background: transparent;
-    width: 100%; text-align: left;
-    font-family: inherit; font-size: inherit;
-  }
-  .row:hover { background: var(--bg-sunken); }
-  .row[data-clickable] { cursor: pointer; }
-
-  .avatar {
-    width: 44px; height: 44px; border-radius: var(--radius-full);
-    background: var(--brand-subtle); color: var(--brand);
-    display: flex; align-items: center; justify-content: center;
-    font-size: var(--text-sm); font-weight: 600;
-    flex-shrink: 0; text-transform: uppercase;
-    overflow: hidden; position: relative;
-  }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .avatar__dot {
-    position: absolute; bottom: 0; right: 0;
-    width: 12px; height: 12px; border-radius: 50%;
-    border: 2px solid var(--bg-elevated);
-    background: var(--text-subtle);
-  }
-  .avatar__dot[data-status="online"] { background: var(--success); }
-  .avatar__dot[data-status="away"]   { background: var(--warning); }
-  .avatar__dot[data-status="busy"]   { background: var(--danger); }
-
-  .badge-icon {
-    width: 44px; height: 44px; border-radius: var(--radius-md);
-    background: var(--brand-subtle); color: var(--brand);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .badge-icon svg { width: 20px; height: 20px; }
-  .badge-icon--inst { background: #e0e7ff; color: #3730a3; }
-  .badge-icon--fac  { background: #dbeafe; color: #1e40af; }
-  .badge-icon--dept { background: #dcfce7; color: #166534; }
-  .badge-icon--prog { background: #fef3c7; color: #92400e; }
-  .badge-icon--lvl  { background: #fee2e2; color: #991b1b; }
-  .badge-icon--cour { background: #ede9fe; color: #5b21b6; }
-  .badge-icon--int  { background: var(--bg-sunken); color: var(--text-muted); }
-  @media (prefers-color-scheme: dark) {
-    .badge-icon--inst { background: #1e1b4b; color: #a5b4fc; }
-    .badge-icon--fac  { background: #172554; color: #93c5fd; }
-    .badge-icon--dept { background: #052e16; color: #86efac; }
-    .badge-icon--prog { background: #451a03; color: #fcd34d; }
-    .badge-icon--lvl  { background: #450a0a; color: #fca5a5; }
-    .badge-icon--cour { background: #2e1065; color: #c4b5fd; }
-  }
-
-  .row__body { flex: 1; min-width: 0; }
-  .row__name {
-    font-size: var(--text-sm); font-weight: 500;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    display: flex; align-items: center; gap: 6px;
-    margin-bottom: 2px;
-  }
-  .row__name .role-chip {
-    font-size: 0.5625rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.05em;
-    background: var(--bg-sunken); color: var(--text-subtle);
-    padding: 1px 5px; border-radius: var(--radius-sm);
-  }
-  .row__sub {
-    font-size: var(--text-xs); color: var(--text-muted);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-
-  .row__action { flex-shrink: 0; display: flex; gap: 6px; align-items: center; }
-
-  .btn-mini {
-    appearance: none;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-muted);
-    padding: 0.35rem 0.7rem;
-    border-radius: var(--radius-md);
-    font-size: var(--text-xs); font-weight: 500;
-    cursor: pointer; min-height: 32px;
-    transition: all var(--duration-fast) var(--ease);
-    display: inline-flex; align-items: center; gap: 4px;
-    white-space: nowrap;
-    font-family: inherit;
-  }
-  .btn-mini:hover:not(:disabled) { color: var(--text); border-color: var(--border-strong); }
-  .btn-mini:disabled { opacity: 0.5; cursor: wait; }
-  .btn-mini--primary { background: var(--brand); color: var(--brand-fg); border-color: var(--brand); }
-  .btn-mini--primary:hover:not(:disabled) { background: var(--brand-hover); color: var(--brand-fg); }
-  .btn-mini--danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
-  .btn-mini--danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 10%, transparent); }
-
-  .section-label {
-    font-size: var(--text-xs); font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--text-subtle);
-    margin: var(--space-4) 0 var(--space-2);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .section-label:first-child { margin-top: 0; }
-  .section-count {
-    font-size: 0.625rem; font-weight: 700;
-    background: var(--bg-sunken); color: var(--text-subtle);
-    padding: 2px 7px; border-radius: var(--radius-sm);
-  }
-
+  /* ---------- Filters ---------- */
   .chips {
-    display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px;
-    margin-bottom: var(--space-3); scrollbar-width: none;
+    display: flex; gap: 6px; overflow-x: auto; padding: 0 4px 10px;
+    margin-bottom: var(--space-2); scrollbar-width: none;
   }
   .chips::-webkit-scrollbar { display: none; }
   .chip {
     appearance: none;
-    background: var(--bg-elevated);
+    background: transparent;
     border: 1px solid var(--border);
     color: var(--text-muted);
-    padding: 0.4rem 0.75rem;
+    padding: 0.4rem 0.85rem;
     border-radius: var(--radius-full);
-    font-size: var(--text-xs); font-weight: 500;
+    font-size: 13px; font-weight: 500;
     cursor: pointer; flex-shrink: 0;
-    transition: all var(--duration-fast) var(--ease);
+    transition: all 150ms var(--ease);
     font-family: inherit;
-    min-height: 32px;
+    min-height: 34px;
     display: inline-flex; align-items: center; gap: 5px;
     white-space: nowrap;
   }
   .chip:hover { border-color: var(--border-strong); color: var(--text); }
   .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
 
-  .empty {
-    padding: var(--space-8) var(--space-4);
-    text-align: center; color: var(--text-muted);
-    font-size: var(--text-sm); line-height: var(--leading-snug);
+  /* ---------- Search ---------- */
+  .search {
+    width: 100%; padding: 0.75rem 0.95rem;
+    background: var(--bg-sunken); border: 1px solid transparent;
+    border-radius: var(--radius-md); font-size: 14px;
+    color: var(--text); margin: 0 0 var(--space-3);
+    min-height: 44px;
+    transition: all 150ms var(--ease);
+    font-family: inherit;
   }
-  .empty svg { color: var(--border-strong); margin-bottom: var(--space-3); }
-  .empty h3 { font-size: var(--text-base); color: var(--text); margin-bottom: var(--space-2); font-weight: 600; }
+  .search::placeholder { color: var(--text-subtle); }
+  .search:focus { outline: none; background: var(--bg-elevated); border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 12%, transparent); }
 
-  .state { padding: var(--space-6) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--text-sm); }
+  /* ---------- List ---------- */
+  .list { display: flex; flex-direction: column; gap: 2px; padding: 0 4px; }
+
+  /* ---------- Row (shared anatomy) ---------- */
+  .row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 8px;
+    border-radius: 12px;
+    text-decoration: none; color: var(--text);
+    transition: background 150ms var(--ease);
+    -webkit-tap-highlight-color: transparent;
+    border: none; background: transparent;
+    width: 100%; text-align: left;
+    font-family: inherit; font-size: inherit;
+    cursor: default;
+  }
+  .row[data-clickable] { cursor: pointer; }
+  .row:hover { background: var(--bg-sunken); }
+  .row[data-unread] { background: color-mix(in srgb, var(--brand) 5%, transparent); }
+
+  /* Avatar */
+  .avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--brand-subtle); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600;
+    flex-shrink: 0; text-transform: uppercase;
+    overflow: hidden; position: relative;
+    letter-spacing: 0.02em;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar__dot {
+    position: absolute; bottom: -1px; right: -1px;
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 2.5px solid var(--bg);
+    background: var(--text-subtle);
+    box-sizing: border-box;
+  }
+  .avatar__dot[data-status="online"] { background: var(--success); }
+  .avatar__dot[data-status="away"]   { background: var(--warning); }
+  .avatar__dot[data-status="busy"]   { background: var(--danger); }
+
+  /* Community badge-icon variant of avatar */
+  .avatar--square {
+    border-radius: 12px;
+    width: 48px; height: 48px;
+  }
+  .avatar--square svg { width: 22px; height: 22px; }
+  .avatar--inst { background: #e0e7ff; color: #3730a3; }
+  .avatar--fac  { background: #dbeafe; color: #1e40af; }
+  .avatar--dept { background: #dcfce7; color: #166534; }
+  .avatar--prog { background: #fef3c7; color: #92400e; }
+  .avatar--lvl  { background: #fee2e2; color: #991b1b; }
+  .avatar--cour { background: #ede9fe; color: #5b21b6; }
+  .avatar--int  { background: var(--bg-sunken); color: var(--text-muted); }
+  @media (prefers-color-scheme: dark) {
+    .avatar--inst { background: #1e1b4b; color: #a5b4fc; }
+    .avatar--fac  { background: #172554; color: #93c5fd; }
+    .avatar--dept { background: #052e16; color: #86efac; }
+    .avatar--prog { background: #451a03; color: #fcd34d; }
+    .avatar--lvl  { background: #450a0a; color: #fca5a5; }
+    .avatar--cour { background: #2e1065; color: #c4b5fd; }
+  }
+
+  /* Body */
+  .row__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+
+  .row__top {
+    display: flex; align-items: baseline; gap: 8px;
+    min-width: 0;
+  }
+  .row__name {
+    font-size: 15px; font-weight: 600;
+    letter-spacing: -0.01em; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  .row__role {
+    font-size: 12px; color: var(--text-muted);
+    text-transform: capitalize;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  .row__preview {
+    font-size: 13px; color: var(--text-muted);
+    line-height: 1.45;
+    overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .row[data-unread] .row__preview { color: var(--text); font-weight: 500; }
+
+  .row__meta {
+    font-size: 12px; color: var(--text-subtle);
+    overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Right side */
+  .row__right {
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 4px;
+    flex-shrink: 0;
+  }
+  .row__time {
+    font-size: 12px; color: var(--text-subtle);
+    line-height: 1.2;
+  }
+  .row__unread {
+    min-width: 20px; height: 20px;
+    border-radius: 10px;
+    background: var(--brand); color: var(--brand-fg);
+    font-size: 11px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 6px;
+    line-height: 1;
+  }
+
+  /* Pill action — the single primary action */
+  .pill {
+    appearance: none;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 5px;
+    transition: all 150ms var(--ease);
+    white-space: nowrap;
+    letter-spacing: -0.005em;
+  }
+  .pill:hover:not(:disabled) { border-color: var(--border-strong); }
+  .pill:disabled { opacity: 0.55; cursor: default; }
+  .pill--primary {
+    background: var(--brand); color: var(--brand-fg);
+    border-color: var(--brand);
+  }
+  .pill--primary:hover:not(:disabled) { background: var(--brand-hover); border-color: var(--brand-hover); }
+  .pill--muted {
+    background: transparent; color: var(--text-muted);
+    border-color: transparent;
+  }
+  .pill--danger {
+    background: transparent; color: var(--danger);
+    border-color: color-mix(in srgb, var(--danger) 25%, transparent);
+  }
+  .pill--danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--danger) 8%, transparent);
+  }
+
+  /* More (⋯) icon button */
+  .more-btn {
+    appearance: none;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: var(--text-subtle);
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 150ms var(--ease);
+    flex-shrink: 0;
+    padding: 0;
+  }
+  .more-btn:hover { background: var(--bg-sunken); color: var(--text); }
+
+  /* Sections */
+  .section-label {
+    font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-subtle);
+    padding: var(--space-4) 12px var(--space-2);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-label:first-child { padding-top: 0; }
+  .section-count {
+    font-weight: 600; letter-spacing: 0;
+    text-transform: none;
+    font-size: 12px;
+  }
+
+  /* Empty */
+  .empty {
+    padding: 56px 24px; text-align: center;
+    color: var(--text-muted); font-size: 14px; line-height: 1.5;
+  }
+  .empty svg { color: var(--border-strong); margin-bottom: 12px; }
+  .empty h3 { font-size: 15px; color: var(--text); margin-bottom: 6px; font-weight: 600; }
+
+  .state { padding: 32px 16px; text-align: center; color: var(--text-muted); font-size: 14px; }
   .state[hidden] { display: none; }
   .state--error { color: var(--danger); }
+
+  /* Action sheet */
+  .sheet-backdrop {
+    position: fixed; inset: 0; z-index: 70;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 200ms var(--ease);
+  }
+  .sheet-backdrop[data-open] { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 71;
+    background: var(--bg-elevated);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    transform: translateY(100%);
+    transition: transform 260ms cubic-bezier(0.2, 0, 0, 1);
+    max-height: 70vh;
+    overflow-y: auto;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.16);
+  }
+  .sheet[data-open] { transform: translateY(0); }
+  .sheet__head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .sheet__grab {
+    width: 40px; height: 4px;
+    border-radius: 2px;
+    background: var(--border-strong);
+    margin: 6px auto 4px;
+  }
+  .sheet__avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--brand-subtle); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600;
+    flex-shrink: 0; overflow: hidden;
+    text-transform: uppercase;
+  }
+  .sheet__avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .sheet__body { flex: 1; min-width: 0; }
+  .sheet__name { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; }
+  .sheet__sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; overflow-wrap: anywhere; }
+
+  .sheet__item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    width: 100%; text-align: left;
+    font-family: inherit;
+    font-size: 15px; font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background 120ms var(--ease);
+  }
+  .sheet__item:hover { background: var(--bg-sunken); }
+  .sheet__item svg { width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0; }
+  .sheet__item--danger { color: var(--danger); }
+  .sheet__item--danger svg { color: var(--danger); }
+  .sheet__item--danger:hover { background: color-mix(in srgb, var(--danger) 8%, transparent); }
+  .sheet__item[disabled] { opacity: 0.5; cursor: default; }
+  .sheet__item[disabled]:hover { background: transparent; }
 
   .toast {
     position: fixed; bottom: 84px; left: 50%;
     transform: translateX(-50%) translateY(20px);
     background: var(--text); color: var(--bg);
-    padding: 0.65rem 1rem; border-radius: var(--radius-md);
-    font-size: var(--text-sm); font-weight: 500;
+    padding: 0.65rem 1rem; border-radius: 12px;
+    font-size: 14px; font-weight: 500;
     box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     opacity: 0; pointer-events: none;
-    transition: all var(--duration) var(--ease);
-    z-index: 60; max-width: 90vw; text-align: center;
+    transition: all 200ms var(--ease);
+    z-index: 80; max-width: 90vw; text-align: center;
   }
   .toast[data-show] { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast[data-kind="error"] { background: var(--danger); color: white; }
+  .toast[data-kind="error"] { background: var(--danger); color: #fff; }
 </style>
 </head>
 <body>
@@ -253,9 +394,7 @@
       Messages <span class="tab__badge" id="badge-messages"></span>
     </button>
     <button class="tab" role="tab" aria-selected="false" data-tab="communities">Communities</button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="people">
-      People <span class="tab__badge" id="badge-people"></span>
-    </button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="people">People</button>
   </div>
 
   <div class="state" id="state-loading">Loading…</div>
@@ -267,7 +406,7 @@
 
   <section class="panel" id="panel-communities" hidden>
     <div class="chips" id="comm-filters">
-      <button class="chip" data-scope="mine" aria-pressed="true">My communities</button>
+      <button class="chip" data-scope="mine" aria-pressed="true">Mine</button>
       <button class="chip" data-scope="academic" aria-pressed="false">Academic</button>
       <button class="chip" data-scope="courses" aria-pressed="false">Courses</button>
       <button class="chip" data-scope="interest" aria-pressed="false">Interest</button>
@@ -288,6 +427,13 @@
   </section>
 
 </main>
+
+<!-- Action sheet -->
+<div class="sheet-backdrop" id="sheet-backdrop"></div>
+<div class="sheet" id="sheet" aria-hidden="true">
+  <div class="sheet__grab"></div>
+  <div id="sheet-body"></div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -325,13 +471,29 @@
     toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
   }
 
+  // Sheet
+  function openSheet(html) {
+    $('sheet-body').innerHTML = html;
+    $('sheet').setAttribute('data-open', '1');
+    $('sheet').setAttribute('aria-hidden', 'false');
+    $('sheet-backdrop').setAttribute('data-open', '1');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSheet() {
+    $('sheet').removeAttribute('data-open');
+    $('sheet').setAttribute('aria-hidden', 'true');
+    $('sheet-backdrop').removeAttribute('data-open');
+    document.body.style.overflow = '';
+  }
+  $('sheet-backdrop').addEventListener('click', closeSheet);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+
   // ------------------------------------------------------------------
   // Tab switching
   // ------------------------------------------------------------------
   document.querySelectorAll('.tab').forEach(t => {
     t.addEventListener('click', () => switchTab(t.dataset.tab));
   });
-
   function switchTab(name) {
     currentTab = name;
     document.querySelectorAll('.tab').forEach(t =>
@@ -347,7 +509,7 @@
   }
 
   // ------------------------------------------------------------------
-  // MESSAGES tab
+  // MESSAGES
   // ------------------------------------------------------------------
   async function loadMessages() {
     const body = $('messages-body');
@@ -364,11 +526,9 @@
     if (!data || data.length === 0) {
       body.innerHTML = `
         <div class="empty">
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           <h3>No conversations yet</h3>
-          <p>Open the <strong>People</strong> tab to start a chat with someone at your institution.</p>
+          <p>Open the <strong>People</strong> tab to start a chat.</p>
         </div>`;
       return;
     }
@@ -377,23 +537,24 @@
       const name = t.other_name || t.other_email || 'Unknown';
       const unread = t.unread > 0;
       const last = t.last_message || 'No messages yet';
+      const avatarLetter = initials(name);
       return `
-        <a class="row" href="dm.html?id=${esc(t.thread_id)}" data-clickable>
-          <div class="avatar">${esc(initials(name))}</div>
+        <a class="row" href="dm.html?id=${esc(t.thread_id)}" data-clickable ${unread ? 'data-unread' : ''}>
+          <div class="avatar">${esc(avatarLetter)}</div>
           <div class="row__body">
-            <div class="row__name">${esc(name)}</div>
-            <div class="row__sub" style="${unread ? 'color:var(--text);font-weight:500;' : ''}">${esc(last)}</div>
+            <div class="row__top"><span class="row__name">${esc(name)}</span></div>
+            <div class="row__preview">${esc(last)}</div>
           </div>
-          <div class="row__action">
-            ${unread ? `<span class="tab__badge" data-show="1">${t.unread}</span>` : ''}
-            <span style="font-size:var(--text-xs);color:var(--text-subtle)">${timeAgo(t.last_message_at)}</span>
+          <div class="row__right">
+            <span class="row__time">${timeAgo(t.last_message_at)}</span>
+            ${unread ? `<span class="row__unread">${t.unread}</span>` : ''}
           </div>
         </a>`;
     }).join('') + '</div>';
   }
 
   // ------------------------------------------------------------------
-  // COMMUNITIES tab
+  // COMMUNITIES
   // ------------------------------------------------------------------
   let communities = [];
   let myCommIds = new Set();
@@ -410,22 +571,18 @@
   async function loadCommunities() {
     const body = $('communities-body');
     body.innerHTML = '<div class="state">Loading communities…</div>';
-
     const [cRes, mRes] = await Promise.all([
       supabase.from('communities')
         .select('id, name, description, kind, membership_mode, created_at, community_members ( count )')
         .order('name'),
       supabase.from('community_members').select('community_id').eq('user_id', meId),
     ]);
-
     if (cRes.error) { body.innerHTML = `<div class="state state--error">${esc(cRes.error.message)}</div>`; return; }
-
     communities = (cRes.data || []).map(c => ({
       ...c,
       member_count: Array.isArray(c.community_members) && c.community_members[0] ? c.community_members[0].count : 0,
     }));
     myCommIds = new Set((mRes.data || []).map(r => r.community_id));
-
     renderCommunities();
   }
 
@@ -441,7 +598,7 @@
     }
   }
   function kindIcon(kind) {
-    const base = (p, s) => `<svg viewBox="0 0 24 24" width="${s||20}" height="${s||20}" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+    const base = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
     switch (kind) {
       case 'institution': return base('<path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>');
       case 'faculty':     return base('<path d="M12 2L2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>');
@@ -455,15 +612,12 @@
 
   function renderCommunities() {
     const body = $('communities-body');
-
     let items = communities.slice();
     if (commScope === 'mine') {
       items = items.filter(c => myCommIds.has(c.id));
     } else if (commScope === 'academic') {
-      items = items.filter(c =>
-        myCommIds.has(c.id) &&
-        ['institution','faculty','department','programme','level'].includes(c.kind)
-      );
+      items = items.filter(c => myCommIds.has(c.id) &&
+        ['institution','faculty','department','programme','level'].includes(c.kind));
     } else if (commScope === 'courses') {
       items = items.filter(c => c.kind === 'course' && myCommIds.has(c.id));
     } else if (commScope === 'interest') {
@@ -474,9 +628,9 @@
 
     if (items.length === 0) {
       body.innerHTML = `<div class="empty">
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         <h3>${commScope === 'discover' ? 'Nothing to discover' : 'No communities here'}</h3>
-        <p>${commScope === 'discover' ? 'You are in every community at your institution.' : 'Try another filter or discover new communities.'}</p>
+        <p>${commScope === 'discover' ? 'You are in every community at your institution.' : 'Try another filter.'}</p>
       </div>`;
       return;
     }
@@ -486,27 +640,32 @@
       const isMine = myCommIds.has(c.id);
       const canJoin = c.membership_mode === 'open' && !isMine;
       const memberLabel = c.member_count === 1 ? '1 member' : `${c.member_count} members`;
+      const metaLine = c.description ? esc(c.description) : memberLabel;
+      const subLine = c.description ? memberLabel : meta.label;
+
       const action = canJoin
-        ? `<button class="btn-mini btn-mini--primary" data-comm-action="join" data-id="${esc(c.id)}" type="button">Join</button>`
-        : (isMine ? `<span class="btn-mini" style="color:var(--text-subtle);cursor:default;">Member</span>` : '');
+        ? `<button class="pill pill--primary" data-comm-action="join" data-id="${esc(c.id)}" type="button">Join</button>`
+        : (isMine ? `<span class="pill pill--muted">Member</span>` : '');
 
       const clickable = isMine ? ` data-clickable data-id="${esc(c.id)}"` : '';
-      const sub = c.description ? esc(c.description) + ' · ' + memberLabel : meta.label + ' · ' + memberLabel;
 
       return `
         <button class="row" type="button"${clickable}>
-          <div class="badge-icon badge-icon--${meta.cls}">${kindIcon(c.kind)}</div>
+          <div class="avatar avatar--square avatar--${meta.cls}">${kindIcon(c.kind)}</div>
           <div class="row__body">
-            <div class="row__name">${esc(c.name)}</div>
-            <div class="row__sub">${sub}</div>
+            <div class="row__top">
+              <span class="row__name">${esc(c.name)}</span>
+              <span class="row__role">${esc(meta.label)}</span>
+            </div>
+            <div class="row__meta">${subLine} · ${memberLabel}</div>
           </div>
-          <div class="row__action">${action}</div>
+          <div class="row__right">${action}</div>
         </button>`;
     }).join('') + '</div>';
   }
 
   // ------------------------------------------------------------------
-  // PEOPLE tab
+  // PEOPLE
   // ------------------------------------------------------------------
   let people = [];
   let peopleRole = 'all';
@@ -528,20 +687,27 @@
     renderPeople();
   }
 
+  function primaryActionFor(p) {
+    if (p.friendship === 'friend')           return { label: 'Message',  kind: 'primary', action: 'message', id: p.user_id };
+    if (p.friendship === 'request_received') return { label: 'Accept',   kind: 'primary', action: 'accept', id: p.user_id };
+    if (p.friendship === 'request_sent')     return { label: 'Pending',  kind: 'muted',   action: 'noop', id: '' , disabled: true };
+    if (p.friendship === 'blocked_by_me')    return { label: 'Unblock',  kind: 'danger',  action: 'unblock', id: p.user_id };
+    if (p.friendship === 'blocked_me')       return { label: 'Message',  kind: 'primary', action: 'message', id: p.user_id };
+    return { label: 'Connect', kind: 'primary', action: 'friend_request', id: p.user_id };
+  }
+
   function renderPeople() {
     const body = $('people-body');
     const q = ($('people-search').value || '').trim().toLowerCase();
-
     let items = people.slice();
     if (peopleRole !== 'all') items = items.filter(p => (p.role || '').toLowerCase() === peopleRole);
     if (q) items = items.filter(p =>
-      (p.full_name || '').toLowerCase().includes(q) ||
-      (p.email || '').toLowerCase().includes(q)
+      (p.full_name || '').toLowerCase().includes(q) || (p.email || '').toLowerCase().includes(q)
     );
 
     if (items.length === 0) {
       body.innerHTML = `<div class="empty">
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         <h3>No one matches</h3>
         <p>Try a different name or filter.</p>
       </div>`;
@@ -550,42 +716,30 @@
 
     body.innerHTML = '<div class="list">' + items.map(p => {
       const name = p.full_name || p.email || 'Unknown';
-      const actions = [];
-      if (p.friendship === 'friend') {
-        actions.push({ label: 'Message', kind: 'primary', action: 'message', id: p.user_id });
-      } else if (p.friendship === 'request_received') {
-        actions.push({ label: 'Accept', kind: 'primary', action: 'accept', id: p.user_id });
-      } else if (p.friendship === 'request_sent') {
-        actions.push({ label: 'Sent', action: 'noop', id: '', disabled: true });
-      } else if (p.friendship === 'blocked_by_me') {
-        actions.push({ label: 'Unblock', kind: 'danger', action: 'unblock', id: p.user_id });
-      } else if (p.friendship !== 'blocked_me') {
-        actions.push({ label: 'Add', action: 'friend_request', id: p.user_id });
-        actions.push({ label: 'Message', kind: 'primary', action: 'message', id: p.user_id });
-      }
-
+      const act = primaryActionFor(p);
+      const metaLine = [p.role ? (p.role[0].toUpperCase() + p.role.slice(1)) : null, p.email]
+        .filter(Boolean).join(' · ');
       const chips = [];
       if (p.is_following) chips.push('Following');
-      if (p.follows_me) chips.push('Follows you');
+      if (p.follows_me)   chips.push('Follows you');
+      const metaFull = metaLine + (chips.length ? ' · ' + chips.join(' · ') : '');
 
       return `
-        <div class="row">
+        <div class="row" data-person-id="${esc(p.user_id)}" data-clickable>
           <div class="avatar">
             ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" alt="">` : esc(initials(name))}
             ${p.status && p.status !== 'offline' ? `<span class="avatar__dot" data-status="${esc(p.status)}"></span>` : ''}
           </div>
           <div class="row__body">
-            <div class="row__name">${esc(name)} <span class="role-chip">${esc(p.role || 'member')}</span></div>
-            <div class="row__sub">${esc(p.email || '')}${chips.length ? ' · ' + chips.join(' · ') : ''}</div>
+            <div class="row__top"><span class="row__name">${esc(name)}</span></div>
+            <div class="row__meta">${esc(metaFull)}</div>
           </div>
-          <div class="row__action">
-            ${actions.map(a => `
-              <button class="btn-mini ${a.kind === 'primary' ? 'btn-mini--primary' : a.kind === 'danger' ? 'btn-mini--danger' : ''}"
-                      ${a.disabled ? 'disabled' : ''}
-                      data-people-action="${esc(a.action)}"
-                      data-people-id="${esc(a.id)}"
-                      type="button">${esc(a.label)}</button>
-            `).join('')}
+          <div class="row__right">
+            <button class="pill ${act.kind === 'primary' ? 'pill--primary' : act.kind === 'danger' ? 'pill--danger' : 'pill--muted'}"
+                    ${act.disabled ? 'disabled' : ''}
+                    data-people-action="${esc(act.action)}"
+                    data-people-id="${esc(act.id)}"
+                    type="button">${esc(act.label)}</button>
           </div>
         </div>`;
     }).join('') + '</div>';
@@ -594,18 +748,17 @@
   $('people-search').addEventListener('input', () => renderPeople());
 
   // ------------------------------------------------------------------
-  // Event handlers
+  // Actions
   // ------------------------------------------------------------------
   document.addEventListener('click', async (e) => {
+    // Community join
     const commBtn = e.target.closest('[data-comm-action]');
     if (commBtn) {
       e.preventDefault(); e.stopPropagation();
       const id = commBtn.dataset.id;
       commBtn.disabled = true;
       try {
-        const { error } = await supabase.from('community_members').insert({
-          community_id: id, user_id: meId, source: 'manual',
-        });
+        const { error } = await supabase.from('community_members').insert({ community_id: id, user_id: meId, source: 'manual' });
         if (error) throw error;
         toast('Joined.');
         await loadCommunities();
@@ -616,6 +769,7 @@
       return;
     }
 
+    // Community row → open chat
     const commRow = e.target.closest('.row[data-clickable]');
     if (commRow && currentTab === 'communities') {
       const id = commRow.dataset.id;
@@ -623,9 +777,10 @@
       return;
     }
 
+    // People action button
     const pplBtn = e.target.closest('[data-people-action]');
     if (pplBtn) {
-      e.preventDefault();
+      e.preventDefault(); e.stopPropagation();
       const action = pplBtn.dataset.peopleAction;
       const id = pplBtn.dataset.peopleId;
       if (action === 'noop') return;
@@ -640,14 +795,14 @@
         if (action === 'friend_request') {
           const { error } = await supabase.rpc('send_friend_request', { p_to_user: id });
           if (error) throw error;
-          toast('Friend request sent.');
+          toast('Request sent.');
         } else if (action === 'accept') {
           const { data: req } = await supabase.from('user_relationships')
             .select('id').eq('kind','friend_request').eq('from_user_id', id).eq('to_user_id', meId).maybeSingle();
           if (!req) throw new Error('Request not found');
           const { error } = await supabase.rpc('respond_friend_request', { p_request_id: req.id, p_accept: true });
           if (error) throw error;
-          toast('Friend added.');
+          toast('Connected.');
         } else if (action === 'unblock') {
           const { error } = await supabase.rpc('unblock_user', { p_to_user: id });
           if (error) throw error;
@@ -658,11 +813,130 @@
         toast(err.message || 'Action failed.', 'error');
         pplBtn.disabled = false;
       }
+      return;
+    }
+
+    // People row → action sheet
+    const personRow = e.target.closest('.row[data-person-id]');
+    if (personRow && currentTab === 'people') {
+      const id = personRow.dataset.personId;
+      const p = people.find(x => x.user_id === id);
+      if (p) openPersonSheet(p);
+    }
+  });
+
+  function openPersonSheet(p) {
+    const name = p.full_name || p.email || 'Unknown';
+    const meta = [p.role ? (p.role[0].toUpperCase() + p.role.slice(1)) : null, p.email]
+      .filter(Boolean).join(' · ');
+    const avatar = p.avatar_url
+      ? `<div class="sheet__avatar"><img src="${esc(p.avatar_url)}" alt=""></div>`
+      : `<div class="sheet__avatar">${esc(initials(name))}</div>`;
+
+    const items = [];
+    // Message
+    items.push({ label: 'Message', icon: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>', action: 'message', id: p.user_id });
+    // Friend actions
+    if (p.friendship === 'none' || p.friendship === 'blocked_me') {
+      items.push({ label: 'Add to connections', icon: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>', action: 'friend_request', id: p.user_id });
+    } else if (p.friendship === 'request_received') {
+      items.push({ label: 'Accept request', icon: '<polyline points="20 6 9 17 4 12"/>', action: 'accept', id: p.user_id });
+    } else if (p.friendship === 'request_sent') {
+      items.push({ label: 'Request pending', icon: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', action: 'noop', id: '', disabled: true });
+    } else if (p.friendship === 'friend') {
+      items.push({ label: 'Remove connection', icon: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="22" y1="11" x2="16" y2="11"/>', action: 'unfriend', id: p.user_id, danger: true });
+    }
+    // Follow
+    if (p.is_following) {
+      items.push({ label: 'Unfollow', icon: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>', action: 'unfollow', id: p.user_id });
+    } else if (p.friendship !== 'blocked_me') {
+      items.push({ label: 'Follow', icon: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>', action: 'follow', id: p.user_id });
+    }
+    // Block
+    if (p.friendship === 'blocked_by_me') {
+      items.push({ label: 'Unblock', icon: '<circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/>', action: 'unblock', id: p.user_id, danger: true });
+    } else if (p.friendship !== 'blocked_me') {
+      items.push({ label: 'Block', icon: '<circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/>', action: 'block', id: p.user_id, danger: true });
+    }
+
+    openSheet(`
+      <div class="sheet__head">
+        ${avatar}
+        <div class="sheet__body">
+          <div class="sheet__name">${esc(name)}</div>
+          <div class="sheet__sub">${esc(meta)}</div>
+        </div>
+      </div>
+      ${items.map(i => `
+        <button class="sheet__item ${i.danger ? 'sheet__item--danger' : ''}"
+                ${i.disabled ? 'disabled' : ''}
+                data-sheet-action="${esc(i.action)}"
+                data-sheet-id="${esc(i.id)}"
+                type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${i.icon}</svg>
+          <span>${esc(i.label)}</span>
+        </button>
+      `).join('')}
+    `);
+  }
+
+  // Sheet item handler
+  document.addEventListener('click', async (e) => {
+    const item = e.target.closest('[data-sheet-action]');
+    if (!item) return;
+    const action = item.dataset.sheetAction;
+    const id = item.dataset.sheetId;
+    if (action === 'noop') return;
+    item.disabled = true;
+    try {
+      if (action === 'message') {
+        const { data, error } = await supabase.rpc('find_or_create_dm_thread', { other: id });
+        if (error) throw error;
+        location.href = 'dm.html?id=' + data;
+        return;
+      }
+      if (action === 'friend_request') {
+        const { error } = await supabase.rpc('send_friend_request', { p_to_user: id });
+        if (error) throw error;
+        toast('Request sent.');
+      } else if (action === 'accept') {
+        const { data: req } = await supabase.from('user_relationships')
+          .select('id').eq('kind','friend_request').eq('from_user_id', id).eq('to_user_id', meId).maybeSingle();
+        if (!req) throw new Error('Request not found');
+        const { error } = await supabase.rpc('respond_friend_request', { p_request_id: req.id, p_accept: true });
+        if (error) throw error;
+        toast('Connected.');
+      } else if (action === 'unfriend') {
+        const { error } = await supabase.rpc('unfriend', { p_other_user: id });
+        if (error) throw error;
+        toast('Removed.');
+      } else if (action === 'follow') {
+        const { error } = await supabase.rpc('follow_user', { p_to_user: id });
+        if (error) throw error;
+        toast('Following.');
+      } else if (action === 'unfollow') {
+        const { error } = await supabase.rpc('unfollow_user', { p_to_user: id });
+        if (error) throw error;
+        toast('Unfollowed.');
+      } else if (action === 'block') {
+        const { error } = await supabase.rpc('block_user', { p_to_user: id });
+        if (error) throw error;
+        toast('Blocked.');
+      } else if (action === 'unblock') {
+        const { error } = await supabase.rpc('unblock_user', { p_to_user: id });
+        if (error) throw error;
+        toast('Unblocked.');
+      }
+      closeSheet();
+      if (currentTab === 'people') await loadPeople();
+    } catch (err) {
+      toast(err.message || 'Action failed.', 'error');
+      item.disabled = false;
     }
   });
 
   // ------------------------------------------------------------------
-  // Boot — read ?tab= from URL, default to messages
+  // Boot
   // ------------------------------------------------------------------
   $('state-loading').hidden = true;
   const params = new URLSearchParams(location.search);
