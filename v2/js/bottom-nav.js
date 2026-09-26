@@ -1,15 +1,17 @@
-// v2/js/bottom-nav.js — unified chrome:
-//   • mounts the 4-item bottom navigation
-//   • injects a hamburger button and avatar into the topbar
-//   • mounts the left-side drawer
-//   • maintains realtime unread badges on the bottom nav
+// v2/js/bottom-nav.js — unified chrome for Matric.
 //
-// Every page loads this file with `<script type="module" src="../js/bottom-nav.js">`.
+// Navigation model: left drawer is the only primary navigation.
+// No bottom tab bar. Hamburger top-left, avatar top-right.
+// Swipe from left edge or tap the hamburger to open the drawer.
+//
+// Every page loads this file with:
+//   <script type="module" src="../js/bottom-nav.js"></script>
 
 import { supabase } from './supabase.js';
 
-// ---------- Nav items ----------
-const ITEMS = [
+// ---------- Drawer navigation ----------
+// Primary items — always visible at the top of the drawer.
+const PRIMARY = [
   {
     tab: 'home',
     href: 'dashboard.html',
@@ -93,33 +95,10 @@ function iconWrap(svg) {
          'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" ' +
          'aria-hidden="true">' + svg + '</svg>';
 }
-
-// ============================================================
-// Bottom navigation
-// ============================================================
-function mountNav() {
-  if (document.body.dataset.noNav === '1') return null;
-  if (document.querySelector('.bottom-nav')) return document.querySelector('.bottom-nav');
-
-  const here = currentFile();
-  const nav = document.createElement('nav');
-  nav.className = 'bottom-nav';
-  nav.setAttribute('aria-label', 'Primary navigation');
-
-  nav.innerHTML = ITEMS.map(it => {
-    const active = it.files.includes(here);
-    const cls = 'bottom-nav__item' + (active ? ' is-active' : '');
-    const current = active ? ' aria-current="page"' : '';
-    return '<a class="' + cls + '" data-tab="' + it.tab + '" href="' + it.href + '"' + current + '>' +
-             '<span class="bottom-nav__icon">' + iconWrap(it.svg) + '</span>' +
-             '<span class="bottom-nav__label">' + it.label + '</span>' +
-             '<span class="bottom-nav__badge" data-show=""></span>' +
-           '</a>';
-  }).join('');
-
-  document.body.appendChild(nav);
-  document.body.classList.add('has-bottom-nav');
-  return nav;
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
 }
 
 // ============================================================
@@ -129,7 +108,6 @@ function injectTopbar(identity) {
   const topbar = document.querySelector('.topbar');
   if (!topbar) return;
 
-  // Hamburger — only if this page doesn't already have a back arrow
   const hasBack = topbar.querySelector('.back');
   if (!hasBack && !topbar.querySelector('.topbar__menu-btn')) {
     const btn = document.createElement('button');
@@ -141,7 +119,6 @@ function injectTopbar(identity) {
     topbar.insertBefore(btn, topbar.firstChild);
   }
 
-  // Avatar — right side, after any existing buttons
   let right = topbar.querySelector('.topbar__right');
   if (!right) {
     right = document.createElement('div');
@@ -155,7 +132,7 @@ function injectTopbar(identity) {
     a.setAttribute('aria-label', 'Your profile');
     const p = identity.profile;
     if (p?.avatar_url) {
-      a.innerHTML = '<img src="' + p.avatar_url.replace(/"/g, '&quot;') + '" alt="">';
+      a.innerHTML = '<img src="' + esc(p.avatar_url) + '" alt="">';
     } else {
       a.textContent = initials(p?.full_name || p?.email || '?');
     }
@@ -168,8 +145,18 @@ function injectTopbar(identity) {
 // ============================================================
 let drawerOpen = false;
 
-function drawerItem(href, label, svg) {
-  return '<a class="drawer__item" href="' + href + '">' + iconWrap(svg) + '<span>' + label + '</span></a>';
+function primaryItem(it, here) {
+  const active = it.files.includes(here);
+  const cls = 'drawer__primary' + (active ? ' is-active' : '');
+  return '<a class="' + cls + '" href="' + it.href + '">' +
+    '<span class="drawer__primary-icon">' + iconWrap(it.svg) + '</span>' +
+    '<span class="drawer__primary-label">' + esc(it.label) + '</span>' +
+    '<span class="drawer__primary-badge" data-badge="' + it.tab + '"></span>' +
+  '</a>';
+}
+
+function secondaryItem(href, label, svg) {
+  return '<a class="drawer__item" href="' + href + '">' + iconWrap(svg) + '<span>' + esc(label) + '</span></a>';
 }
 
 function mountDrawer(identity) {
@@ -178,13 +165,15 @@ function mountDrawer(identity) {
   const p = identity.profile || {};
   const roles = identity.roles || [];
   const isAdmin = roles.includes('HOD') || roles.includes('UNIVERSITY_ADMIN');
+  const here = currentFile();
 
   const instName = p.institutions?.name || '';
   const deptName = p.departments?.name || '';
   const scopeLine = [deptName, instName].filter(Boolean).join(' · ') || 'Matric member';
-
   const roleLabel = (p.role || 'member').replace(/-/g, ' ');
-  const verifiedBadge = (p.role === 'student' || roles.includes('LECTURER'))
+  const isVerified = p.role === 'student' || roles.includes('LECTURER') || roles.includes('HOD') || roles.includes('UNIVERSITY_ADMIN');
+
+  const verifiedBadge = isVerified
     ? '<span class="drawer__verified">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
         'Verified' +
@@ -205,13 +194,13 @@ function mountDrawer(identity) {
     <div class="drawer__head">
       <div class="drawer__avatar">
         ${p.avatar_url
-          ? '<img src="' + p.avatar_url.replace(/"/g, '&quot;') + '" alt="">'
+          ? '<img src="' + esc(p.avatar_url) + '" alt="">'
           : initials(p.full_name || p.email || '?')}
       </div>
       <div class="drawer__identity">
-        <div class="drawer__name">${(p.full_name || 'Welcome').replace(/[<>&]/g, '')}</div>
+        <div class="drawer__name">${esc(p.full_name || 'Welcome')}</div>
         <div class="drawer__meta">
-          <span style="text-transform:capitalize;">${roleLabel}</span>
+          <span style="text-transform:capitalize;">${esc(roleLabel)}</span>
           ${verifiedBadge}
         </div>
       </div>
@@ -219,21 +208,27 @@ function mountDrawer(identity) {
 
     <nav class="drawer__body">
 
+      <div class="drawer__primary-group">
+        ${PRIMARY.map(it => primaryItem(it, here)).join('')}
+      </div>
+
+      <hr class="drawer__divider">
+
       <div class="drawer__section">
         <div class="drawer__label">Academic</div>
-        ${drawerItem('assignments.html', 'Assignments', '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>')}
+        ${secondaryItem('assignments.html', 'Assignments', '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>')}
       </div>
 
       <div class="drawer__section">
         <div class="drawer__label">Me</div>
-        ${drawerItem('profile.html', 'Profile', '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>')}
-        ${drawerItem('settings.html', 'Settings', '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.09-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>')}
+        ${secondaryItem('profile.html', 'Profile', '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>')}
+        ${secondaryItem('settings.html', 'Settings', '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.09-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>')}
       </div>
 
       ${isAdmin ? `
       <div class="drawer__section">
         <div class="drawer__label">Administration</div>
-        ${drawerItem('approvals.html', 'Approvals', '<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>')}
+        ${secondaryItem('approvals.html', 'Approvals', '<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>')}
       </div>` : ''}
 
       <hr class="drawer__divider">
@@ -283,7 +278,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawerOpen) closeDrawer();
 });
 
-// Swipe from left edge to open drawer (nice-to-have)
+// Swipe from left edge to open
 let touchStartX = null;
 document.addEventListener('touchstart', (e) => {
   if (e.touches.length === 1 && e.touches[0].clientX < 20) {
@@ -295,28 +290,19 @@ document.addEventListener('touchstart', (e) => {
 document.addEventListener('touchmove', (e) => {
   if (touchStartX === null || drawerOpen) return;
   const dx = e.touches[0].clientX - touchStartX;
-  if (dx > 60) {
-    openDrawer();
-    touchStartX = null;
-  }
+  if (dx > 60) { openDrawer(); touchStartX = null; }
 }, { passive: true });
 document.addEventListener('touchend', () => { touchStartX = null; }, { passive: true });
 
 // ============================================================
-// Bottom-nav badges
+// Drawer badges (unread counts shown next to primary items)
 // ============================================================
 function setBadge(tab, count) {
-  const el = document.querySelector('.bottom-nav__item[data-tab="' + tab + '"] .bottom-nav__badge');
+  const el = document.querySelector('.drawer__primary-badge[data-badge="' + tab + '"]');
   if (!el) return;
-  const currently = el.hasAttribute('data-show');
   if (count > 0) {
-    const text = count > 99 ? '99+' : String(count);
-    if (el.textContent !== text) el.textContent = text;
-    if (!currently) {
-      el.setAttribute('data-show', '1');
-      el.setAttribute('data-pulse', '1');
-      setTimeout(() => el.removeAttribute('data-pulse'), 600);
-    }
+    el.textContent = count > 99 ? '99+' : String(count);
+    el.setAttribute('data-show', '1');
   } else {
     el.removeAttribute('data-show');
   }
@@ -370,11 +356,10 @@ async function initBadges() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return;
   _meId = session.user.id;
-
   await refreshBadges();
 
   _badgeChannel = supabase
-    .channel('nav-badges:' + _meId)
+    .channel('drawer-badges:' + _meId)
     .on('postgres_changes',
         { event: '*', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + _meId },
         () => refreshBadges())
@@ -394,12 +379,11 @@ async function initBadges() {
 // ============================================================
 async function boot() {
   if (document.body.getAttribute(CHROME_SKIP_ATTR) === '1') return;
-
   const identity = await getIdentity();
-  mountNav();
   injectTopbar(identity);
   mountDrawer(identity);
   initBadges().catch(() => {});
+  document.body.classList.add('has-drawer-chrome');
 }
 
 if (document.readyState === 'loading') {
