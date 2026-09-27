@@ -442,6 +442,7 @@
       hod:      { label: 'Head of Department',     scope: 'Scope: ' + (me.departments?.name || '—') },
       dean:     { label: 'Dean',                   scope: 'Scope: ' + (me.faculties?.name || '—') },
       staff:    { label: 'Staff',                  scope: me.institutions?.name || '' },
+      admin:    { label: 'Verified Admin',         scope: me.institutions?.name || '' },
     };
     const m = map[dashType] || map.student;
     return `<div class="greet__row"><span class="role-badge">${esc(m.label)}</span><span class="greet__scope">${esc(m.scope)}</span></div>`;
