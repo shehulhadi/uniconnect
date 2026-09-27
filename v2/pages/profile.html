@@ -684,12 +684,33 @@
   }
 
   async function loadStats() {
+    const role = (profile && profile.role || '').toLowerCase();
+    const isTeachingRole = ['lecturer','hod','faculty_admin','staff'].includes(role);
+
+    const coursesPromise = isTeachingRole
+      ? supabase.from('course_assignments')
+          .select('course_id', { count: 'exact', head: true })
+          .eq('lecturer_id', meId)
+      : supabase.from('course_enrollments')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', meId)
+          .eq('status', 'active');
+
     const [c, m] = await Promise.all([
-      supabase.from('course_enrollments').select('id', { count: 'exact', head: true }).eq('user_id', meId).eq('status', 'active'),
-      supabase.from('community_members').select('community_id', { count: 'exact', head: true }).eq('user_id', meId),
+      coursesPromise,
+      supabase.from('community_members')
+        .select('community_id', { count: 'exact', head: true })
+        .eq('user_id', meId),
     ]);
+
     $('stat-courses').textContent = c.count ?? '—';
     $('stat-communities').textContent = m.count ?? '—';
+
+    // Relabel the tile so it's accurate
+    const label = document.querySelector('.stat:first-child .stat__label');
+    if (label) {
+      label.textContent = isTeachingRole ? 'Teaching' : 'Courses';
+    }
   }
 
   // -------- Status switcher --------

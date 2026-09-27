@@ -420,7 +420,8 @@
   roleNames = (roleRows || []).map(r => r.role_definitions?.name).filter(Boolean);
 
   // Priority: Dean > HOD > Lecturer > Staff > Student
-  if (roleNames.includes('FACULTY_ADMIN')) dashType = 'dean';
+  if (roleNames.includes('UNIVERSITY_ADMIN')) dashType = 'admin';
+  else if (roleNames.includes('FACULTY_ADMIN')) dashType = 'dean';
   else if (roleNames.includes('HOD'))      dashType = 'hod';
   else if (roleNames.includes('LECTURER')) dashType = 'lecturer';
   else if (roleNames.includes('STAFF'))    dashType = 'staff';
@@ -1155,12 +1156,122 @@
   }
 
   // ---------- Wire it up ----------
+  // ============================================================
+  // ADMIN dashboard — institution-wide overview
+  // ============================================================
+  async function renderAdmin() {
+    const html = `
+      ${renderGreeting()}
+      <div class="stats">
+        ${statTile('—', 'Users',       'users')}
+        ${statTile('—', 'Faculties',   'faculties')}
+        ${statTile('—', 'Departments', 'departments')}
+        ${statTile('—', 'Pending',     'pending')}
+      </div>
+      <div class="actions">
+        ${actionTile('approvals.html',    'Approvals',  I.checkSquare)}
+        ${actionTile('announcements.html','Notices',    I.megaphone)}
+        ${actionTile('materials.html',    'Library',    I.folder)}
+        ${actionTile('profile.html',      'Profile',    I.user)}
+      </div>
+
+      <section class="section">
+        ${sectionHead('Institution at a glance', null, null)}
+        <div class="list">
+          <div class="row" style="cursor:default;">
+            <span class="row__icn">${svg(I.users, 18)}</span>
+            <div class="row__body">
+              <div class="row__title">Total users</div>
+              <div class="row__sub">Students, lecturers, staff across your institution</div>
+            </div>
+            <div class="row__meta"><span id="admin-total-users" style="font-weight:700;color:var(--text);font-size:16px;">—</span></div>
+          </div>
+          <div class="row" style="cursor:default;">
+            <span class="row__icn">${svg(I.building, 18)}</span>
+            <div class="row__body">
+              <div class="row__title">Faculties</div>
+              <div class="row__sub">Academic faculties under your institution</div>
+            </div>
+            <div class="row__meta"><span id="admin-total-fac" style="font-weight:700;color:var(--text);font-size:16px;">—</span></div>
+          </div>
+          <div class="row" style="cursor:default;">
+            <span class="row__icn">${svg(I.book, 18)}</span>
+            <div class="row__body">
+              <div class="row__title">Courses</div>
+              <div class="row__sub">Active course catalogue</div>
+            </div>
+            <div class="row__meta"><span id="admin-total-courses" style="font-weight:700;color:var(--text);font-size:16px;">—</span></div>
+          </div>
+          <div class="row" style="cursor:default;">
+            <span class="row__icn">${svg(I.users, 18)}</span>
+            <div class="row__body">
+              <div class="row__title">Communities</div>
+              <div class="row__sub">Academic and interest communities</div>
+            </div>
+            <div class="row__meta"><span id="admin-total-communities" style="font-weight:700;color:var(--text);font-size:16px;">—</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        ${sectionHead('Recent activity', 'announcements.html', 'All notices')}
+        <div id="admin-activity"><div class="skel"></div></div>
+      </section>
+    `;
+    $('content').innerHTML = html;
+    await Promise.all([loadAdminStats(), loadStudentActivity()]);
+  }
+
+  async function loadAdminStats() {
+    const instId = me.institution_id;
+    if (!instId) return;
+    try {
+      const [uRes, fRes, dRes, cRes, pRes] = await Promise.all([
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('institution_id', instId),
+        supabase.from('faculties').select('id', { count: 'exact', head: true }).eq('institution_id', instId),
+        supabase.from('departments').select('id', { count: 'exact', head: true }),
+        supabase.from('courses').select('id', { count: 'exact', head: true }).eq('institution_id', instId),
+        supabase.from('verification_requests').select('id', { count: 'exact', head: true }).eq('institution_id', instId).eq('status','pending'),
+      ]);
+
+      // departments needs a count via faculties; do it client-side
+      const { data: facIds } = await supabase.from('faculties').select('id').eq('institution_id', instId);
+      const ids = (facIds || []).map(f => f.id);
+      let deptCount = 0;
+      if (ids.length) {
+        const { count } = await supabase.from('departments').select('id', { count: 'exact', head: true }).in('faculty_id', ids);
+        deptCount = count || 0;
+      }
+
+      const { count: commCount } = await supabase.from('communities').select('id', { count: 'exact', head: true }).eq('institution_id', instId);
+
+      const set = (id, v) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = v;
+      };
+      // Big stat tiles
+      animateNumber($('stat-users'), uRes.count ?? 0);
+      animateNumber($('stat-faculties'), fRes.count ?? 0);
+      animateNumber($('stat-departments'), deptCount);
+      animateNumber($('stat-pending'), pRes.count ?? 0);
+
+      // Inline numbers
+      set('admin-total-users', uRes.count ?? 0);
+      set('admin-total-fac', fRes.count ?? 0);
+      set('admin-total-courses', cRes.count ?? 0);
+      set('admin-total-communities', commCount ?? 0);
+    } catch (err) {
+      console.error('[dashboard] loadAdminStats:', err);
+    }
+  }
+
   const renderers = {
     student: renderStudent,
     lecturer: renderLecturer,
     hod: renderHod,
     dean: renderDean,
     staff: renderStaff,
+    admin: renderAdmin,
   };
   try {
     await (renderers[dashType] || renderStudent)();
