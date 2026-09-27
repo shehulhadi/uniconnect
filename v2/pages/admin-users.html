@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Users — Matric</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/nav.css">
+<link rel="stylesheet" href="../css/drawer.css">
+<link rel="stylesheet" href="../css/notifications.css">
+<link rel="stylesheet" href="../css/topbar.css">
+<style>
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border); min-height: 56px;
+  }
+  .topbar__title { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+  .topbar__right { display: flex; align-items: center; gap: 8px; }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: var(--space-4) var(--space-3) var(--space-10); }
+
+  .search {
+    width: calc(100% - 8px); margin: 0 4px var(--space-3);
+    padding: 12px 14px;
+    background: var(--bg-sunken); border: 1px solid transparent;
+    border-radius: 10px; font-size: 14px; color: var(--text);
+    min-height: 46px; font-family: inherit;
+    transition: all 150ms var(--ease);
+  }
+  .search:focus { outline: none; background: var(--bg-elevated); border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 12%, transparent); }
+
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding: 0 4px 10px; margin-bottom: var(--space-3); scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    appearance: none; background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-full); font-size: 13px; font-weight: 500;
+    cursor: pointer; flex-shrink: 0; font-family: inherit;
+    min-height: 34px; display: inline-flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+    transition: all 150ms var(--ease);
+  }
+  .chip:hover { border-color: var(--border-strong); color: var(--text); }
+  .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  .list { display: flex; flex-direction: column; gap: 2px; padding: 0 4px; }
+
+  .row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 10px; border-radius: 12px;
+    background: transparent; border: none;
+    width: 100%; text-align: left;
+    font-family: inherit; color: var(--text);
+    cursor: pointer;
+    transition: background 150ms var(--ease);
+  }
+  .row:hover { background: var(--bg-sunken); }
+
+  .avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--brand-subtle); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+    flex-shrink: 0; text-transform: uppercase; overflow: hidden;
+    position: relative;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar__status {
+    position: absolute; bottom: -1px; right: -1px;
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2.5px solid var(--bg-elevated);
+    background: var(--text-subtle);
+  }
+  .avatar__status[data-status="online"] { background: var(--success); }
+  .avatar__status[data-status="away"]   { background: var(--warning); }
+  .avatar__status[data-status="busy"]   { background: var(--danger); }
+
+  .row__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .row__top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+  .row__name {
+    font-size: 15px; font-weight: 600;
+    letter-spacing: -0.01em; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .row__meta {
+    font-size: 13px; color: var(--text-muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .row__right { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
+  .pill-role {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 3px 8px; border-radius: var(--radius-full);
+    background: var(--bg-sunken); color: var(--text-muted);
+  }
+  .pill-role[data-role="hod"]              { background: #dbeafe; color: #1e40af; }
+  .pill-role[data-role="lecturer"]         { background: #e0e7ff; color: #3730a3; }
+  .pill-role[data-role="faculty-admin"]    { background: #fef3c7; color: #92400e; }
+  .pill-role[data-role="admin"]            { background: #dcfce7; color: #166534; }
+  .pill-role[data-role="student"]          { background: var(--brand-subtle); color: var(--brand); }
+  @media (prefers-color-scheme: dark) {
+    .pill-role[data-role="hod"]           { background: #172554; color: #93c5fd; }
+    .pill-role[data-role="lecturer"]      { background: #1e1b4b; color: #a5b4fc; }
+    .pill-role[data-role="faculty-admin"] { background: #451a03; color: #fcd34d; }
+    .pill-role[data-role="admin"]         { background: #052e16; color: #86efac; }
+  }
+
+  .suspend-badge {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 3px 8px; border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--danger) 12%, transparent);
+    color: var(--danger);
+  }
+
+  .chev { color: var(--text-subtle); flex-shrink: 0; }
+
+  .empty { padding: 56px 24px; text-align: center; color: var(--text-muted); font-size: 14px; }
+  .empty svg { color: var(--border-strong); margin-bottom: 12px; }
+  .empty h3 { font-size: 15px; color: var(--text); margin-bottom: 6px; font-weight: 600; }
+
+  .state { padding: 32px 16px; text-align: center; color: var(--text-muted); font-size: 14px; }
+  .state[hidden] { display: none; }
+  .state--error { color: var(--danger); }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 220ms var(--ease);
+  }
+  .modal-backdrop[data-open] { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: var(--bg-elevated);
+    border-top-left-radius: 20px; border-top-right-radius: 20px;
+    width: 100%; max-width: 560px;
+    max-height: 90vh; max-height: 90dvh;
+    overflow-y: auto;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    transform: translateY(100%);
+    transition: transform 280ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  .modal-backdrop[data-open] .modal { transform: translateY(0); }
+  @media (min-width: 640px) {
+    .modal-backdrop { align-items: center; padding: 16px; }
+    .modal { border-radius: 16px; max-width: 520px; }
+  }
+  .modal__grab { width: 40px; height: 4px; border-radius: 2px; background: var(--border-strong); margin: 0 auto 12px; }
+  @media (min-width: 640px) { .modal__grab { display: none; } }
+
+  .modal h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.015em; margin-bottom: 6px; }
+  .modal .sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  .modal .field { margin-bottom: 12px; }
+  .modal label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .modal input, .modal textarea, .modal select {
+    width: 100%; padding: 12px 14px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 14px; color: var(--text);
+    font-family: inherit; min-height: 46px;
+    transition: border-color 150ms var(--ease);
+  }
+  .modal input:focus, .modal textarea:focus, .modal select:focus {
+    outline: none; border-color: var(--brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 12%, transparent);
+  }
+  .modal textarea { min-height: 90px; resize: vertical; line-height: 1.5; }
+
+  .modal-alert {
+    display: none; padding: 10px 12px; border-radius: 10px;
+    font-size: 13px; margin-bottom: 12px; overflow-wrap: anywhere;
+  }
+  .modal-alert[data-show] { display: block; }
+  .modal-alert--error {
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
+    color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
+  }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end; }
+  @media (max-width: 480px) { .modal-actions { flex-direction: column-reverse; } }
+  .btn-ghost {
+    appearance: none; background: transparent;
+    border: 1px solid var(--border); color: var(--text-muted);
+    padding: 12px 16px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    font-family: inherit; min-height: 42px; flex: 1;
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--border-strong); }
+  .btn-primary {
+    appearance: none; background: var(--brand); color: var(--brand-fg);
+    border: none; padding: 12px 16px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; min-height: 42px; flex: 1;
+  }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-danger {
+    appearance: none; background: transparent; color: var(--danger);
+    border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+    padding: 12px 16px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; min-height: 42px; flex: 1;
+  }
+  .btn-danger:hover { background: color-mix(in srgb, var(--danger) 8%, transparent); }
+
+  /* Profile header inside modal */
+  .m-head {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  }
+  .m-head .avatar { width: 56px; height: 56px; font-size: 18px; }
+  .m-head__body { flex: 1; min-width: 0; }
+  .m-head__name { font-size: 17px; font-weight: 700; letter-spacing: -0.015em; overflow-wrap: anywhere; line-height: 1.2; }
+  .m-head__email { font-size: 13px; color: var(--text-muted); margin-top: 3px; overflow-wrap: anywhere; }
+  .m-head__badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+  .m-section { margin-bottom: 16px; }
+  .m-section h3 {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-subtle); margin-bottom: 8px;
+  }
+  .m-row {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .m-row:last-child { border-bottom: none; }
+  .m-row dt { color: var(--text-muted); }
+  .m-row dd { color: var(--text); font-weight: 500; text-align: right; overflow-wrap: anywhere; }
+
+  .assign-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px; background: var(--bg-sunken);
+    border-radius: 10px; margin-bottom: 6px;
+  }
+  .assign-card__body { flex: 1; min-width: 0; }
+  .assign-card__name { font-size: 14px; font-weight: 600; }
+  .assign-card__meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: var(--bg);
+    padding: 10px 16px; border-radius: 12px;
+    font-size: 14px; font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none;
+    transition: all 200ms var(--ease);
+    z-index: 80; max-width: 90vw; text-align: center;
+  }
+  .toast[data-show] { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast[data-kind="error"] { background: var(--danger); color: white; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__title">Users</div>
+  <div class="topbar__right"></div>
+</header>
+
+<main class="wrap">
+  <input type="search" class="search" id="search" placeholder="Search users by name or email…" autocomplete="off">
+
+  <div class="chips" id="filters">
+    <button class="chip" data-role="all" aria-pressed="true">Everyone</button>
+    <button class="chip" data-role="student" aria-pressed="false">Students</button>
+    <button class="chip" data-role="lecturer" aria-pressed="false">Lecturers</button>
+    <button class="chip" data-role="hod" aria-pressed="false">HODs</button>
+    <button class="chip" data-role="faculty-admin" aria-pressed="false">Deans</button>
+    <button class="chip" data-role="admin" aria-pressed="false">Admins</button>
+    <button class="chip" data-role="staff" aria-pressed="false">Staff</button>
+  </div>
+
+  <div class="state" id="state-loading">Loading…</div>
+  <div class="state state--error" id="state-error" hidden></div>
+  <div id="list-body" hidden></div>
+</main>
+
+<div class="modal-backdrop" id="modal" aria-hidden="true">
+  <div class="modal">
+    <div class="modal__grab"></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { supabase } from '../js/supabase.js';
+
+  const $ = (id) => document.getElementById(id);
+  let meId = null, me = null, roleNames = [];
+  let users = [];
+  let filter = 'all';
+  let search = '';
+  let adminInstitutionId = null;
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { location.replace('login.html'); throw new Error('unauth'); }
+  meId = session.user.id;
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const initials = (name) => (name || '?').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+  function toast(msg, kind) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.setAttribute('data-show', '1');
+    if (kind) el.setAttribute('data-kind', kind); else el.removeAttribute('data-kind');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.removeAttribute('data-show'), 3000);
+  }
+
+  // ---------- Load me ----------
+  const { data: prof } = await supabase.from('profiles')
+    .select('id, full_name, role, institution_id').eq('id', meId).single();
+  me = prof || {};
+  adminInstitutionId = me.institution_id;
+
+  const { data: roleRows } = await supabase
+    .from('user_role_assignments')
+    .select('role_definitions(name)')
+    .eq('user_id', meId).eq('status', 'active');
+  roleNames = (roleRows || []).map(r => r.role_definitions?.name).filter(Boolean);
+
+  const isAdmin = roleNames.includes('UNIVERSITY_ADMIN') || roleNames.includes('SUPER_ADMIN');
+  if (!isAdmin) {
+    location.replace('dashboard.html');
+    throw new Error('not an admin');
+  }
+  if (!adminInstitutionId) {
+    $('state-loading').hidden = true;
+    $('state-error').hidden = false;
+    $('state-error').textContent = 'Your account has no institution.';
+    throw new Error('no institution');
+  }
+
+  // ---------- Load users ----------
+  async function loadUsers() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select(`
+        id, full_name, email, role, status, avatar_url,
+        matric_no, staff_no, admission_year, graduation_year,
+        institution_id, faculty_id, department_id, programme_id, level_id, session_id,
+        created_at, settings,
+        institutions ( name ),
+        faculties ( name ),
+        departments ( name ),
+        programmes ( name ),
+        levels ( display_name ),
+        academic_sessions ( name )
+      `)
+      .eq('institution_id', adminInstitutionId)
+      .order('full_name');
+
+    if (error) {
+      $('state-loading').hidden = true;
+      $('state-error').hidden = false;
+      $('state-error').textContent = error.message;
+      return;
+    }
+    users = data || [];
+    $('state-loading').hidden = true;
+    $('list-body').hidden = false;
+    render();
+  }
+
+  function userRoleGroup(u) {
+    const r = (u.role || '').toLowerCase();
+    if (r === 'admin' || r === 'super-admin') return 'admin';
+    if (r === 'faculty-admin' || r === 'dean') return 'faculty-admin';
+    if (r === 'hod') return 'hod';
+    if (r === 'lecturer') return 'lecturer';
+    if (r === 'staff') return 'staff';
+    return 'student';
+  }
+
+  function render() {
+    const body = $('list-body');
+    const q = search.trim().toLowerCase();
+    const filtered = users.filter(u => {
+      if (filter !== 'all' && userRoleGroup(u) !== filter) return false;
+      if (!q) return true;
+      return (u.full_name || '').toLowerCase().includes(q)
+          || (u.email || '').toLowerCase().includes(q);
+    });
+
+    if (filtered.length === 0) {
+      body.innerHTML = `<div class="empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <h3>No users match</h3>
+        <p>Try a different search or filter.</p>
+      </div>`;
+      return;
+    }
+
+    body.innerHTML = '<div class="list">' + filtered.map(u => {
+      const name = u.full_name || u.email || 'Unknown';
+      const isSuspended = u.settings && u.settings.suspended;
+      const roleGroup = userRoleGroup(u);
+      const dept = u.departments?.name || '';
+      return `
+        <button class="row" data-user-id="${esc(u.id)}" type="button">
+          <div class="avatar">
+            ${u.avatar_url ? `<img src="${esc(u.avatar_url)}" alt="">` : esc(initials(name))}
+            <span class="avatar__status" data-status="${esc(u.status || 'offline')}"></span>
+          </div>
+          <div class="row__body">
+            <div class="row__top"><span class="row__name">${esc(name)}</span></div>
+            <div class="row__meta">${esc(dept)}${dept && u.email ? ' · ' : ''}${esc(u.email || '')}</div>
+          </div>
+          <div class="row__right">
+            ${isSuspended ? '<span class="suspend-badge">Suspended</span>' : `<span class="pill-role" data-role="${esc(roleGroup)}">${esc(roleGroup.replace('-', ' '))}</span>`}
+          </div>
+          <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>`;
+    }).join('') + '</div>';
+  }
+
+  $('search').addEventListener('input', (e) => { search = e.target.value; render(); });
+  $('filters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip'); if (!chip) return;
+    filter = chip.dataset.role;
+    document.querySelectorAll('#filters .chip').forEach(c =>
+      c.setAttribute('aria-pressed', String(c.dataset.role === filter)));
+    render();
+  });
+
+  // ---------- Modal helpers ----------
+  function openModal(html) {
+    $('modal-body').innerHTML = html;
+    $('modal').setAttribute('data-open', '1');
+    $('modal').setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    $('modal').removeAttribute('data-open');
+    $('modal').setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('modal').hasAttribute('data-open')) closeModal(); });
+
+  // ---------- User detail ----------
+  async function openUser(id) {
+    const u = users.find(x => x.id === id);
+    if (!u) return;
+
+    // Load their active role assignments
+    const { data: assignments } = await supabase
+      .from('user_role_assignments')
+      .select(`
+        id, scope_type, scope_id, status, created_at, expires_at,
+        role_definitions ( name )
+      `)
+      .eq('user_id', id)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false });
+
+    renderUserDetail(u, assignments || []);
+  }
+
+  function renderUserDetail(u, assignments) {
+    const name = u.full_name || u.email || 'Unknown';
+    const isSuspended = u.settings && u.settings.suspended;
+    const roleGroup = userRoleGroup(u);
+
+    const body = `
+      <div class="m-head">
+        <div class="avatar">
+          ${u.avatar_url ? `<img src="${esc(u.avatar_url)}" alt="">` : esc(initials(name))}
+        </div>
+        <div class="m-head__body">
+          <div class="m-head__name">${esc(name)}</div>
+          <div class="m-head__email">${esc(u.email || '')}</div>
+          <div class="m-head__badges">
+            <span class="pill-role" data-role="${esc(roleGroup)}">${esc(roleGroup.replace('-', ' '))}</span>
+            ${isSuspended ? '<span class="suspend-badge">Suspended</span>' : ''}
+          </div>
+        </div>
+      </div>
+
+      <div class="m-section">
+        <h3>Academic identity</h3>
+        <dl>
+          <div class="m-row"><dt>Institution</dt><dd>${esc(u.institutions?.name || '—')}</dd></div>
+          <div class="m-row"><dt>Faculty</dt><dd>${esc(u.faculties?.name || '—')}</dd></div>
+          <div class="m-row"><dt>Department</dt><dd>${esc(u.departments?.name || '—')}</dd></div>
+          ${u.programmes ? `<div class="m-row"><dt>Programme</dt><dd>${esc(u.programmes.name)}</dd></div>` : ''}
+          ${u.levels ? `<div class="m-row"><dt>Level</dt><dd>${esc(u.levels.display_name)}</dd></div>` : ''}
+          ${u.academic_sessions ? `<div class="m-row"><dt>Session</dt><dd>${esc(u.academic_sessions.name)}</dd></div>` : ''}
+          ${u.matric_no ? `<div class="m-row"><dt>Matric</dt><dd>${esc(u.matric_no)}</dd></div>` : ''}
+          ${u.staff_no ? `<div class="m-row"><dt>Staff no.</dt><dd>${esc(u.staff_no)}</dd></div>` : ''}
+        </dl>
+      </div>
+
+      <div class="m-section">
+        <h3>Role assignments (${assignments.length})</h3>
+        ${assignments.length === 0
+          ? '<p style="font-size:13px;color:var(--text-muted);">No active role assignments.</p>'
+          : assignments.map(a => `
+            <div class="assign-card">
+              <div class="assign-card__body">
+                <div class="assign-card__name">${esc((a.role_definitions?.name || '').replace('_', ' '))}</div>
+                <div class="assign-card__meta">Scope: ${esc(a.scope_type)} · assigned ${new Date(a.created_at).toLocaleDateString()}</div>
+              </div>
+              <button class="pill" style="background:transparent;border:1px solid color-mix(in srgb,var(--danger) 35%,transparent);color:var(--danger);padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;" data-action="revoke" data-id="${esc(a.id)}">Revoke</button>
+            </div>
+          `).join('')}
+      </div>
+
+      <div class="modal-actions" style="flex-wrap:wrap;gap:8px;">
+        <button class="btn-ghost" id="md-assign">Assign role</button>
+        ${isSuspended
+          ? `<button class="btn-primary" id="md-restore">Restore</button>`
+          : `<button class="btn-danger" id="md-suspend">Suspend</button>`}
+      </div>
+      <div class="modal-actions" style="margin-top:8px;">
+        <button class="btn-ghost" id="md-close" style="border:none;">Close</button>
+      </div>
+    `;
+    openModal(body);
+
+    document.getElementById('md-close').addEventListener('click', closeModal);
+    document.getElementById('md-assign').addEventListener('click', () => openAssignRole(u));
+    document.getElementById('md-suspend')?.addEventListener('click', () => confirmSuspend(u));
+    document.getElementById('md-restore')?.addEventListener('click', () => restoreUser(u));
+
+    document.querySelectorAll('[data-action="revoke"]').forEach(btn => {
+      btn.addEventListener('click', () => confirmRevoke(u, btn.dataset.id));
+    });
+  }
+
+  // ---------- Assign role ----------
+  function openAssignRole(u) {
+    // Compute valid scopes based on the user's placement
+    const scopeOptions = [];
+    if (u.department_id) scopeOptions.push({ value: 'department', id: u.department_id, label: 'Department — ' + (u.departments?.name || '') });
+    if (u.faculty_id)    scopeOptions.push({ value: 'faculty',    id: u.faculty_id,    label: 'Faculty — ' + (u.faculties?.name || '') });
+    scopeOptions.push({ value: 'institution', id: u.institution_id, label: 'Institution — ' + (u.institutions?.name || '') });
+
+    const roleOptions = [
+      { value: 'STUDENT',        label: 'Student' },
+      { value: 'LECTURER',       label: 'Lecturer' },
+      { value: 'HOD',            label: 'Head of Department' },
+      { value: 'FACULTY_ADMIN',  label: 'Faculty Admin / Dean' },
+      { value: 'STAFF',          label: 'Staff' },
+      { value: 'LEADERSHIP',     label: 'Leadership' },
+      { value: 'UNIVERSITY_ADMIN', label: 'University Admin' },
+    ];
+
+    const body = `
+      <h2>Assign role</h2>
+      <p class="sub">For ${esc(u.full_name || u.email)}</p>
+      <form id="md-assign-form">
+        <div class="field">
+          <label for="f-role">Role</label>
+          <select id="f-role" required>
+            ${roleOptions.map(o => `<option value="${o.value}">${esc(o.label)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-scope">Scope</label>
+          <select id="f-scope" required>
+            ${scopeOptions.map((o, i) => `<option value="${o.value}" data-scope-id="${esc(o.id)}" ${i === 0 ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-expires">Expires (optional)</label>
+          <input type="date" id="f-expires">
+        </div>
+        <div class="modal-alert modal-alert--error" id="md-alert"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="md-cancel">Cancel</button>
+          <button type="submit" class="btn-primary" id="md-save">Assign</button>
+        </div>
+      </form>`;
+    openModal(body);
+
+    document.getElementById('md-cancel').addEventListener('click', () => openUser(u.id));
+    document.getElementById('md-assign-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('md-save');
+      const alertEl = document.getElementById('md-alert');
+      alertEl.removeAttribute('data-show');
+      const role = document.getElementById('f-role').value;
+      const scopeSel = document.getElementById('f-scope');
+      const scope = scopeSel.value;
+      const scopeId = scopeSel.selectedOptions[0]?.dataset.scopeId;
+      const expiresRaw = document.getElementById('f-expires').value;
+      const expiresAt = expiresRaw ? new Date(expiresRaw).toISOString() : null;
+
+      btn.disabled = true; btn.textContent = 'Assigning…';
+      const { error } = await supabase.rpc('assign_role', {
+        p_user_id: u.id,
+        p_role_name: role,
+        p_scope_type: scope,
+        p_scope_id: scopeId,
+        p_expires_at: expiresAt,
+      });
+      btn.disabled = false; btn.textContent = 'Assign';
+      if (error) { alertEl.textContent = error.message; alertEl.setAttribute('data-show', '1'); return; }
+      toast('Role assigned.');
+      await loadUsers();
+      openUser(u.id);
+    });
+  }
+
+  // ---------- Revoke ----------
+  async function confirmRevoke(u, assignmentId) {
+    if (!confirm('Revoke this role assignment?')) return;
+    const { error } = await supabase.rpc('revoke_role', { p_assignment_id: assignmentId });
+    if (error) { toast(error.message, 'error'); return; }
+    toast('Role revoked.');
+    await loadUsers();
+    openUser(u.id);
+  }
+
+  // ---------- Suspend / restore ----------
+  async function confirmSuspend(u) {
+    const reason = prompt('Reason for suspension (optional):');
+    if (reason === null) return;
+    const { error } = await supabase.rpc('suspend_user', { p_user_id: u.id, p_reason: reason || null });
+    if (error) { toast(error.message, 'error'); return; }
+    toast('User suspended.');
+    await loadUsers();
+    openUser(u.id);
+  }
+
+  async function restoreUser(u) {
+    const { error } = await supabase.rpc('restore_user', { p_user_id: u.id });
+    if (error) { toast(error.message, 'error'); return; }
+    toast('User restored.');
+    await loadUsers();
+    openUser(u.id);
+  }
+
+  // ---------- Click on a user row ----------
+  document.addEventListener('click', (e) => {
+    const row = e.target.closest('.row[data-user-id]');
+    if (row) openUser(row.dataset.userId);
+  });
+
+  await loadUsers();
+</script>
+
+<script type="module" src="../js/bottom-nav.js"></script>
+<script type="module" src="../js/notifications.js"></script>
+</body>
+</html>

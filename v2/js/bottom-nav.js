@@ -347,6 +347,7 @@ function mountDrawer(identity) {
       <div class="drawer__section">
         <div class="drawer__label">Administration</div>
         ${secondaryRow('approvals.html', 'Approvals', 'shieldCheck')}
+        ${secondaryRow('admin-users.html', 'Users', 'users')}
       </div>` : ''}
 
       <hr class="drawer__divider">
